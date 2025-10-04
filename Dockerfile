@@ -1,7 +1,7 @@
 FROM php:8.3-fpm
 
 # Arguments defined in docker-compose.yml
-ARG user=kyoei
+ARG user=laravel-user
 ARG uid=1000
 
 # Install system dependencies
