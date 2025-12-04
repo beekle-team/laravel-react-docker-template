@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  laravel-tests:
+  lint:
     runs-on: ubuntu-latest
     
     defaults:
@@ -19,7 +19,40 @@ jobs:
       matrix:
         php: [8.2, 8.3]
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+    name: Lint (PHP ${{ matrix.php }})
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+        coverage: none
+
+    - name: Install Composer Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Execute Pint (Linting)
+      run: ./vendor/bin/pint --test
+
+    - name: Execute Larastan (Static Analysis)
+      run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+  tests:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./src
+
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [8.2, 8.3]
+
+    name: Tests (PHP ${{ matrix.php }})
 
     steps:
     - uses: actions/checkout@v4
@@ -61,15 +94,8 @@ jobs:
         mkdir -p database
         touch database/database.sqlite
 
-    - name: Execute Pint (Linting)
-      run: ./vendor/bin/pint --test
-
-    - name: Execute Larastan (Static Analysis)
-      run: ./vendor/bin/phpstan analyse --memory-limit=2G
-
     - name: Execute Tests (Unit and Feature)
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
       run: php artisan test
-
