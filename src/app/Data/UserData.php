@@ -16,4 +16,3 @@ class UserData extends Data
         public string $email,
     ) {}
 }
-

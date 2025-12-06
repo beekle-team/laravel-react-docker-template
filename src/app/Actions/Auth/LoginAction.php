@@ -68,4 +68,3 @@ class LoginAction
         return Str::transliterate(Str::lower($data->email).'|'.$ip);
     }
 }
-
