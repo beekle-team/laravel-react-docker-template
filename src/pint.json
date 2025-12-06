@@ -1,1 +1,1 @@
-{"preset": "laravel", "rules": {"declare_strict_types": true}}
+{ "preset": "laravel", "rules": { "declare_strict_types": true } }
