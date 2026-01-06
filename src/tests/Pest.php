@@ -43,7 +43,16 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Create a new GWT (Given-When-Then) scenario.
+ *
+ * @example
+ * scenario('ユーザー登録フロー')
+ *     ->given('有効なユーザーデータ', fn () => ['name' => 'Test'])
+ *     ->when('登録APIを呼び出す', fn ($data) => post('/register', $data))
+ *     ->then('成功レスポンス', fn ($response) => $response->assertOk());
+ */
+function scenario(string $description): Tests\Support\Gwt\Scenario
 {
-    // ..
+    return new Tests\Support\Gwt\Scenario($description);
 }
