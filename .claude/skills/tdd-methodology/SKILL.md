@@ -1,14 +1,14 @@
 ---
 name: tdd-methodology
-description: TDD/BDD実践ガイド。Gherkin形式での要件定義、Pest Feature Tests、Pest v4 Browser Tests（Playwright）によるE2Eテストを網羅。実装前にテストを書き、ブラウザで動作確認まで行う。
+description: TDD/BDD実践ガイド。Pest v4の関数型構文（it/describe）でBDDスタイルのテストを記述。Gherkin形式での要件定義、Feature Tests、Browser Tests（Playwright）によるE2Eテストを網羅。
 ---
 
 # TDD/BDD Methodology
 
 Test-Driven Development と Behavior-Driven Development の実践ガイド。
-Gherkin形式での要件定義から、Feature Tests、E2E Browser Testsまでをカバー。
+**Pest v4の関数型構文（`it`/`describe`）を使用したBDDスタイル**を標準とする。
 
-**Keywords**: tdd, bdd, test-first, gherkin, requirements, given-when-then, red-green-refactor, pest, vitest, playwright, e2e, browser-test
+**Keywords**: tdd, bdd, test-first, gherkin, requirements, given-when-then, red-green-refactor, pest, vitest, playwright, e2e, browser-test, it, describe
 
 ## Core Principles
 
