@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "npx",
+      "args": ["-y", "laravel-boost-mcp"]
+    }
+  }
+}
