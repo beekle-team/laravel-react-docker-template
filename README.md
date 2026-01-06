@@ -9,11 +9,28 @@ A production-ready Docker template for Laravel 12 with React, Inertia.js, and Ty
 - **Inertia.js** for seamless SPA experience
 - **PostgreSQL** database
 - **Redis** for caching/sessions
-- **Laravel Dusk** for E2E testing with Selenium
+- **Pest v4** + **Playwright** for fast E2E testing
 - **Larastan** (PHPStan) for static analysis
 - **Biome** for JS/TS linting and formatting
 - **Laravel Pint** for PHP code style
 - **Laravel Data** + **TypeScript Transformer** for type-safe DTOs
+
+## Tech Stack & Key Libraries
+
+This template is curated to provide a modern, type-safe, and developer-friendly experience.
+
+### Backend (PHP)
+- **[Spatie Laravel Data](https://spatie.be/docs/laravel-data)**: Used for Data Transfer Objects (DTOs). It handles validation and transformation, serving as the source of truth for data structures.
+- **[Larastan](https://github.com/larastan/larastan)**: Runs PHPStan on your Laravel code to find errors without running the code. Configured in `phpstan.neon` (default level: 5).
+- **[Laravel Pint](https://laravel.com/docs/pint)**: An opinionated PHP code style fixer. Configured in `pint.json` (preset: laravel, strict types enabled).
+
+### Frontend (React)
+- **[Inertia.js](https://inertiajs.com/)**: Allows building single-page apps using classic server-side routing and controllers. No separate API required.
+- **[Biome](https://biomejs.dev/)**: A fast all-in-one toolchain for web projects. It replaces Prettier and ESLint for formatting and linting TypeScript/React code.
+- **[Tailwind CSS](https://tailwindcss.com/)**: A utility-first CSS framework for rapid UI development.
+
+### Type Safety Bridge
+- **[Laravel Data + TypeScript Transformer](https://spatie.be/docs/typescript-transformer)**: Automatically generates TypeScript interfaces from your PHP Data classes. This ensures your frontend types are always in sync with your backend data structures.
 
 ## Requirements
 
@@ -55,8 +72,8 @@ docker compose exec app npm run dev
 # Run PHP tests
 docker compose exec app php artisan test
 
-# Run E2E tests (Dusk)
-docker compose exec app php artisan dusk
+# Run E2E tests (Playwright)
+docker compose exec app npm run test:e2e
 
 # Static analysis
 docker compose exec app ./vendor/bin/phpstan analyse
@@ -147,15 +164,16 @@ Tests run against a dedicated PostgreSQL test database.
 docker compose exec app php artisan test
 ```
 
-### Laravel Dusk (E2E Tests)
+### Playwright (E2E Tests)
 
-Browser tests using Selenium Chrome.
+Browser tests powered by Playwright.
 
 ```bash
-docker compose exec app php artisan dusk
+docker compose exec app npm run test:e2e
 ```
 
-View test screenshots in `tests/Browser/screenshots/`.
+By default the tests hit `http://localhost:8080`. Override with `PLAYWRIGHT_BASE_URL` if needed.
+Run `docker compose exec app npm run test:e2e:install` once to download browser binaries for the container.
 
 ## Docker Services
 
@@ -166,17 +184,27 @@ View test screenshots in `tests/Browser/screenshots/`.
 | postgres | 5432 | Main database |
 | postgres-test | 5433 | Test database |
 | redis | 6379 | Cache/Queue |
-| selenium | 4444, 7900 | Browser testing |
 
 ## IDE Support
 
-IDE helper files are generated automatically:
+To ensure the best development experience with autocompletion and type checking, this project uses [Laravel IDE Helper](https://github.com/barryvdh/laravel-ide-helper).
+
+Helper files are generated automatically using the following commands:
 
 ```bash
+# Generate helper file for Facades
 docker compose exec app php artisan ide-helper:generate
+
+# Generate PHPDocs for Models
 docker compose exec app php artisan ide-helper:models -N
+
+# Generate PhpStorm/VSCode meta file
 docker compose exec app php artisan ide-helper:meta
 ```
+
+**Note:** These files (`_ide_helper.php`, `_ide_helper_models.php`, `.phpstorm.meta.php`) are already included and ignored in git to prevent conflicts, but you should regenerate them when:
+1. You add new packages/Facades.
+2. You modify database migrations/schema.
 
 ## License
 

@@ -1,0 +1,698 @@
+---
+name: tdd-methodology
+description: TDD/BDD実践ガイド。Gherkin形式での要件定義、Pest Feature Tests、Pest v4 Browser Tests（Playwright）によるE2Eテストを網羅。実装前にテストを書き、ブラウザで動作確認まで行う。
+---
+
+# TDD/BDD Methodology
+
+Test-Driven Development と Behavior-Driven Development の実践ガイド。
+Gherkin形式での要件定義から、Feature Tests、E2E Browser Testsまでをカバー。
+
+**Keywords**: tdd, bdd, test-first, gherkin, requirements, given-when-then, red-green-refactor, pest, vitest, playwright, e2e, browser-test
+
+## Core Principles
+
+### 1. Test-First Development (TDD Cycle)
+
+```
+RED → GREEN → REFACTOR
+
+1. RED: Write a failing test first
+2. GREEN: Write minimal code to pass the test
+3. REFACTOR: Improve code while keeping tests green
+```
+
+**Rules:**
+- NEVER write implementation code without a failing test
+- Each test should test ONE behavior
+- Tests must be independent and repeatable
+
+### 2. Requirements Documentation (BDD)
+
+**CRITICAL RULE: Undocumented Implementation Prevention**
+
+When implementing ANY feature or behavior:
+
+1. **Check** `.kiro/specs/{feature}/requirements.md` for existing requirement
+2. **If NOT documented**: Add requirement in Gherkin format BEFORE implementing
+3. **If documented**: Proceed with implementation
+
+### Gherkin Format
+
+All requirements MUST be documented in Gherkin format:
+
+```gherkin
+### REQ-XXX: [Requirement Title]
+
+**Scenario**: [Scenario Name]
+  Given [initial context]
+  When [action is performed]
+  Then [expected outcome]
+  And [additional outcome if needed]
+```
+
+### Example
+
+```gherkin
+### REQ-POST-001: Post Publication
+
+**Scenario**: Successful post publication
+  Given a user has written a blog post
+  And the post has a title and content
+  When the user clicks "Publish"
+  Then the post status changes to "published"
+  And the published_at timestamp is set
+  And the user is redirected to the post page
+
+**Scenario**: Draft post cannot be published without title
+  Given a user has a draft post without a title
+  When the user attempts to publish
+  Then an error message "Title is required" is displayed
+  And the post remains in draft status
+```
+
+## Test Organization
+
+### Backend Tests (Pest)
+```
+tests/
+├── Feature/           # Integration tests (HTTP, database)
+│   ├── Post/          # Post-related tests
+│   ├── Auth/          # Authentication tests
+│   └── User/          # User management tests
+└── Unit/              # Unit tests (isolated logic)
+    ├── Models/        # Model logic tests
+    └── Helpers/       # Helper function tests
+```
+
+### Frontend Tests (Vitest)
+```
+resources/js/
+├── __tests__/         # Test files
+│   ├── components/    # Component tests
+│   ├── hooks/         # Custom hook tests
+│   └── utils/         # Utility function tests
+```
+
+## Testing Strategy
+
+### Backend (Laravel/Pest)
+
+**What to Test:**
+
+| Layer | Test Type | Priority |
+|-------|-----------|----------|
+| Controllers | Feature tests (HTTP) | High |
+| Models | Unit tests (relationships, scopes) | High |
+| Jobs | Feature tests (queue assertions) | Medium |
+| FormRequests | Feature tests (validation) | Medium |
+
+**Pest Test Examples:**
+
+```php
+// Feature test - Controller
+it('publishes a post successfully', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()
+        ->for($user)
+        ->draft()
+        ->create();
+
+    $this->actingAs($user)
+        ->post(route('posts.publish', $post))
+        ->assertRedirect(route('posts.show', $post));
+
+    expect($post->fresh()->status)->toBe('published');
+    expect($post->fresh()->published_at)->not->toBeNull();
+});
+
+// Unit test - Model
+it('generates slug from title', function () {
+    $post = Post::factory()->create([
+        'title' => 'My First Blog Post',
+    ]);
+
+    expect($post->slug)->toBe('my-first-blog-post');
+});
+
+// Testing validation
+it('requires a title to publish', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()
+        ->for($user)
+        ->create(['title' => null]);
+
+    $this->actingAs($user)
+        ->post(route('posts.publish', $post))
+        ->assertSessionHasErrors(['title']);
+
+    expect($post->fresh()->status)->toBe('draft');
+});
+```
+
+### Frontend (Vitest + Testing Library)
+
+```typescript
+// Component test
+import { render, screen } from '@testing-library/react';
+import { PostCard } from '@/components/PostCard';
+
+describe('PostCard', () => {
+  it('displays post title and excerpt', () => {
+    const post = {
+      id: 1,
+      title: 'Test Post',
+      excerpt: 'This is a test excerpt',
+    };
+
+    render(<PostCard post={post} />);
+
+    expect(screen.getByText('Test Post')).toBeInTheDocument();
+    expect(screen.getByText('This is a test excerpt')).toBeInTheDocument();
+  });
+});
+
+// Hook test
+import { renderHook, act } from '@testing-library/react';
+import { useForm } from '@/hooks/useForm';
+
+describe('useForm', () => {
+  it('manages form state correctly', () => {
+    const { result } = renderHook(() => useForm({ title: '' }));
+
+    act(() => {
+      result.current.setData('title', 'New Title');
+    });
+
+    expect(result.current.data.title).toBe('New Title');
+  });
+});
+```
+
+### E2E Browser Tests (Pest v4 + Playwright)
+
+Pest v4のBrowser Testing機能を使用して、実際のブラウザでE2Eテストを実行。
+
+**テストファイル配置:**
+```
+tests/
+├── Browser/              # E2E Browser Tests
+│   ├── Post/             # 投稿フロー
+│   ├── Auth/             # 認証フロー
+│   └── Dashboard/        # ダッシュボード
+├── Feature/              # HTTP Feature Tests
+└── Unit/                 # Unit Tests
+```
+
+#### 基本的なBrowser Test
+
+```php
+// tests/Browser/Post/PublishPostTest.php
+<?php
+
+use App\Models\User;
+use App\Models\Post;
+
+it('publishes a post through the UI', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()->for($user)->draft()->create();
+
+    $this->actingAs($user);
+
+    visit(route('posts.edit', $post))
+        ->assertSee('Edit Post')
+        ->fill('title', 'Updated Title')
+        ->fill('content', 'Updated content here...')
+        ->click('Publish')
+        ->assertPathIs('/posts/' . $post->slug)
+        ->assertSee('Updated Title')
+        ->assertSee('Published');
+});
+
+it('shows validation error for empty title', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()->for($user)->draft()->create();
+
+    $this->actingAs($user);
+
+    visit(route('posts.edit', $post))
+        ->fill('title', '')
+        ->click('Publish')
+        ->assertSee('The title field is required');
+});
+```
+
+#### フォーム操作
+
+```php
+it('allows user to update profile', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    visit(route('profile.edit'))
+        ->assertSee('Edit Profile')
+        ->fill('name', 'New Name')
+        ->fill('email', 'new@example.com')
+        ->select('timezone', 'Asia/Tokyo')
+        ->check('notifications_enabled')
+        ->click('Save')
+        ->assertSee('Profile updated successfully');
+
+    expect($user->fresh()->name)->toBe('New Name');
+});
+```
+
+#### JavaScript操作（モーダル、ドロップダウン等）
+
+```php
+it('opens delete confirmation modal', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()->for($user)->create();
+
+    $this->actingAs($user);
+
+    visit(route('posts.show', $post))
+        ->click('[data-testid="delete-button"]')
+        ->waitFor('[data-testid="confirmation-modal"]')
+        ->assertSee('Are you sure you want to delete this post?')
+        ->click('Confirm')
+        ->assertPathIs('/posts')
+        ->assertSee('Post deleted successfully');
+});
+```
+
+#### 複数ブラウザ・デバイス対応
+
+```php
+it('works on mobile viewport', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    visit(route('dashboard'))
+        ->resize(375, 812)  // iPhone X
+        ->assertSee('Dashboard')
+        ->click('[data-testid="mobile-menu-toggle"]')
+        ->waitFor('[data-testid="mobile-menu"]')
+        ->assertSee('Posts');
+});
+
+it('supports dark mode', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    visit(route('dashboard'))
+        ->switchColorScheme('dark')
+        ->screenshot('dashboard-dark-mode');
+});
+```
+
+#### エラーチェック
+
+```php
+it('has no JavaScript errors on the page', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    visit(route('dashboard'))
+        ->assertNoJavascriptErrors()
+        ->assertNoConsoleLogs(['error', 'warning']);
+});
+```
+
+#### Smoke Tests（全ページ確認）
+
+```php
+// tests/Browser/SmokeTest.php
+it('loads all public pages without errors', function () {
+    $pages = visit([
+        route('welcome'),
+        route('login'),
+        route('register'),
+    ]);
+
+    $pages
+        ->assertNoJavascriptErrors()
+        ->assertNoConsoleLogs();
+});
+
+it('loads all authenticated pages without errors', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    $pages = visit([
+        route('dashboard'),
+        route('posts.index'),
+        route('profile.edit'),
+    ]);
+
+    $pages
+        ->assertNoJavascriptErrors()
+        ->assertNoConsoleLogs();
+});
+```
+
+#### スクリーンショット・デバッグ
+
+```php
+it('captures visual state for debugging', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    visit(route('dashboard'))
+        ->screenshot('dashboard-page')  // storage/app/screenshots/に保存
+        ->pause(1000)  // 1秒待機（デバッグ用）
+        ->assertSee('Dashboard');
+});
+```
+
+#### Browser Test実行
+
+```bash
+# 全Browser Testsを実行
+php artisan test tests/Browser/
+
+# 特定のテストファイル
+php artisan test tests/Browser/Post/PublishPostTest.php
+
+# フィルタ
+php artisan test --filter="publishes a post"
+
+# ヘッドレスモードをオフ（ブラウザを表示）
+HEADLESS=false php artisan test tests/Browser/
+```
+
+## Running Tests
+
+### Backend (Pest)
+
+```bash
+# Run all tests
+composer test
+
+# Run specific file
+php artisan test tests/Feature/Post/PublishPostTest.php
+
+# Run with filter
+php artisan test --filter=PublishPostTest
+
+# Run with coverage
+php artisan test --coverage
+
+# Run in parallel
+php artisan test --parallel
+```
+
+### Frontend (Vitest)
+
+```bash
+# Run all tests
+npm run test
+
+# Watch mode
+npm run test:watch
+
+# With coverage
+npm run test:coverage
+
+# Specific file
+npm run test -- PostCard
+```
+
+## BDD Implementation Workflow
+
+### Gherkin → Test → Implementation → E2E の流れ
+
+```
+1. Gherkin要件定義
+   ↓
+2. Feature Test作成（RED）
+   ↓
+3. 実装（GREEN）
+   ↓
+4. リファクタリング
+   ↓
+5. Browser Test作成（E2E確認）
+   ↓
+6. 全テスト通過を確認
+```
+
+### Step 1: Gherkin要件を書く
+
+```gherkin
+### REQ-POST-001: 投稿の公開
+
+**Scenario**: 投稿の公開
+  Given ログイン済みのユーザーがいる
+  And 下書き状態の投稿がある
+  When ユーザーが「公開」ボタンをクリックする
+  Then 投稿ステータスが「published」になる
+  And published_atタイムスタンプが設定される
+  And 投稿ページにリダイレクトされる
+
+**Scenario**: タイトルなしの投稿は公開できない
+  Given ログイン済みのユーザーがいる
+  And タイトルのない下書き投稿がある
+  When ユーザーが「公開」ボタンをクリックする
+  Then 「タイトルは必須です」エラーが表示される
+  And 投稿ステータスは変更されない
+```
+
+### Step 2: Feature Test を書く（RED）
+
+```php
+// tests/Feature/Post/PublishPostTest.php
+<?php
+
+use App\Models\User;
+use App\Models\Post;
+
+describe('投稿の公開', function () {
+    it('投稿を公開できる', function () {
+        // Given: ログイン済みのユーザーと下書き投稿
+        $user = User::factory()->create();
+        $post = Post::factory()
+            ->for($user)
+            ->draft()
+            ->create();
+
+        // When: 公開リクエストを送信
+        $response = $this->actingAs($user)
+            ->post(route('posts.publish', $post));
+
+        // Then: 期待される結果を検証
+        $response->assertRedirect(route('posts.show', $post));
+
+        $post->refresh();
+        expect($post->status)->toBe('published');
+        expect($post->published_at)->not->toBeNull();
+    });
+
+    it('タイトルなしでは公開できない', function () {
+        // Given: タイトルなしの下書き
+        $user = User::factory()->create();
+        $post = Post::factory()
+            ->for($user)
+            ->draft()
+            ->create(['title' => null]);
+
+        // When: 公開リクエストを送信
+        $response = $this->actingAs($user)
+            ->post(route('posts.publish', $post));
+
+        // Then: バリデーションエラー
+        $response->assertSessionHasErrors(['title']);
+
+        expect($post->fresh()->status)->toBe('draft');
+    });
+});
+```
+
+### Step 3: 実装する（GREEN）
+
+```php
+// app/Http/Controllers/PostController.php
+public function publish(Post $post): RedirectResponse
+{
+    // バリデーション
+    if (empty($post->title)) {
+        return back()->withErrors(['title' => 'タイトルは必須です']);
+    }
+
+    // 公開処理
+    $post->publish();
+
+    return redirect()->route('posts.show', $post);
+}
+
+// app/Models/Post.php
+public function publish(): void
+{
+    $this->update([
+        'status' => 'published',
+        'published_at' => now(),
+    ]);
+}
+```
+
+### Step 4: Browser Test を書く（E2E確認）
+
+```php
+// tests/Browser/Post/PublishPostBrowserTest.php
+<?php
+
+use App\Models\User;
+use App\Models\Post;
+
+it('投稿公開フローが正常に動作する', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()
+        ->for($user)
+        ->draft()
+        ->create();
+
+    $this->actingAs($user);
+
+    visit(route('posts.edit', $post))
+        ->assertSee('Edit Post')
+        ->click('Publish')
+        ->assertPathIs('/posts/' . $post->slug)
+        ->assertSee($post->title)
+        ->assertNoJavascriptErrors();
+});
+
+it('タイトルなし時にエラーメッセージを表示する', function () {
+    $user = User::factory()->create();
+    $post = Post::factory()
+        ->for($user)
+        ->draft()
+        ->create(['title' => null]);
+
+    $this->actingAs($user);
+
+    visit(route('posts.edit', $post))
+        ->click('Publish')
+        ->assertSee('Title is required')
+        ->assertPathIs(route('posts.edit', $post));
+});
+```
+
+### Step 5: 全テスト実行
+
+```bash
+# Feature Tests
+php artisan test tests/Feature/Post/PublishPostTest.php
+
+# Browser Tests
+php artisan test tests/Browser/Post/PublishPostBrowserTest.php
+
+# 全テスト
+php artisan test
+```
+
+## テスト戦略: Feature vs Browser
+
+| テストタイプ | 用途 | 速度 | カバレッジ |
+|-------------|------|------|-----------|
+| Feature Test | API/ビジネスロジック | 高速 | ロジック重視 |
+| Browser Test | UI/UXフロー | 低速 | ユーザー体験重視 |
+
+**推奨バランス:**
+- Feature Tests: 80%（高速、CI向き）
+- Browser Tests: 20%（重要フロー、E2E確認）
+
+### Feature Testで十分な場合
+- APIエンドポイントの動作確認
+- バリデーションルールのテスト
+- ビジネスロジックの検証
+- データベース状態の確認
+
+### Browser Testが必要な場合
+- JavaScriptを含むUIインタラクション
+- 複数ページにまたがるフロー
+- リアルタイム更新（ポーリング、WebSocket）
+- レスポンシブデザインの確認
+- ダークモード/テーマ切り替え
+
+## Implementation Report (tasks.md)
+
+**CRITICAL RULE: Always Document Implementation**
+
+After completing each task, add an implementation report:
+
+```markdown
+- [x] Task 1.1: Implement post publication
+
+  **Implementation Report:**
+  - **Files Changed**:
+    - `app/Http/Controllers/PostController.php`
+    - `app/Models/Post.php`
+  - **Tests Added**:
+    - `tests/Feature/Post/PublishPostTest.php`
+  - **Key Decisions**: Used model method for publish logic
+  - **Notes**: Added published_at timestamp for tracking
+```
+
+## Anti-patterns to Avoid
+
+### Test Anti-Patterns
+- Writing tests after implementation
+- Tests that depend on other tests
+- Testing implementation details instead of behavior
+- Skipping tests to meet deadlines
+- Mocking too much (test behavior, not implementation)
+
+### Documentation Anti-Patterns
+- Implementing without requirements
+- Vague or incomplete scenarios
+- Missing edge cases
+- Outdated requirements
+
+## Enforcement Checklist
+
+Before completing any implementation task:
+
+### 要件・ドキュメント
+- [ ] Requirement exists in requirements.md (Gherkin format)
+- [ ] Gherkin scenario covers happy path and edge cases
+
+### Feature Tests
+- [ ] Feature Test written BEFORE implementation
+- [ ] Test was RED before GREEN
+- [ ] All Feature tests pass (`php artisan test tests/Feature/`)
+
+### Browser Tests（重要フローのみ）
+- [ ] Browser Test written for user-facing flows
+- [ ] JavaScript errors checked (`assertNoJavascriptErrors`)
+- [ ] All Browser tests pass (`php artisan test tests/Browser/`)
+
+### 品質
+- [ ] Code refactored if needed
+- [ ] No skipped or commented tests
+- [ ] Implementation report added to tasks.md
+
+## Integration with Spec-Driven Development
+
+This skill works with `/kiro:spec-impl`:
+
+1. `/kiro:spec-impl` loads requirements.md
+2. TDD skill ensures Gherkin format compliance
+3. Implementation follows RED-GREEN-REFACTOR
+4. New behaviors are documented before coding
+5. **Implementation report added to tasks.md after completion**
+
+## Quality Commands
+
+```bash
+# Full verification
+composer lint      # Pint + PHPStan
+composer test      # Pest tests
+npm run lint       # Biome + ESLint
+npm run test       # Vitest tests
+npm run types      # TypeScript check
+```
