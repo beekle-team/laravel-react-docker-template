@@ -55,6 +55,23 @@ public function findUser($id)
 }
 ```
 
+## IDE Helper 自動更新
+
+モデルファイル (`app/Models/*.php`) を編集した後、IDE Helper を更新する。
+
+**トリガー**: `app/Models/` 配下の PHP ファイルを編集・作成した時
+
+**実行コマンド**:
+```bash
+php artisan ide-helper:models -W  # モデルの DocBlock を更新
+```
+
+**対象**:
+- モデルのプロパティ追加・変更
+- リレーション追加・変更
+- スコープ追加・変更
+- アクセサ/ミューテタ追加・変更
+
 ## 検証コマンド
 
 ```bash
