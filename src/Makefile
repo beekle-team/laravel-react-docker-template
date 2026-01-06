@@ -1,17 +1,17 @@
 .PHONY: help setup setup-dev setup-preview clean test test-local test-ssl test-ssl-dry-run up down logs ps shell-nginx shell-app shell-certbot shell-ofelia
 
-# 変数定義
-COMPOSE_FILE_DEV = docker-compose.yml
-COMPOSE_FILE_PREVIEW = docker-compose.preview.yml
-DOMAIN = early-bird.techbeans.info
-EMAIL = develop@techbeans.co.jp
+# 変数定義（環境変数でオーバーライド可能）
+COMPOSE_FILE_DEV ?= docker-compose.yml
+COMPOSE_FILE_PREVIEW ?= docker-compose.preview.yml
+DOMAIN ?= example.com
+EMAIL ?= admin@example.com
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
 
 ## ヘルプ表示
 help:
-	@echo "Early Bird アプリケーション - Makefile"
+	@echo "Laravel Application - Makefile"
 	@echo ""
 	@echo "使用方法: make [ターゲット]"
 	@echo ""
@@ -43,6 +43,12 @@ help:
 	@echo "  ssl-issue      - SSL証明書を発行（本番環境）"
 	@echo "  ssl-renew      - SSL証明書を更新"
 	@echo "  ssl-check      - SSL証明書の状態を確認"
+	@echo ""
+	@echo "環境変数（オーバーライド可能）:"
+	@echo "  DOMAIN         - ドメイン名（デフォルト: example.com）"
+	@echo "  EMAIL          - Let's Encrypt用メールアドレス（デフォルト: admin@example.com）"
+	@echo ""
+	@echo "例: DOMAIN=myapp.com EMAIL=me@myapp.com make ssl-issue"
 
 ## セットアップ
 setup:
