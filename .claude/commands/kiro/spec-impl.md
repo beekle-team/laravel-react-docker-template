@@ -1,6 +1,6 @@
 ---
 description: Execute spec tasks using TDD methodology
-allowed-tools: Bash, Read, Write, Edit, MultiEdit, Grep, Glob, LS, WebFetch, WebSearch, Task
+allowed-tools: Bash, Read, Write, Edit, MultiEdit, Grep, Glob, LS, WebFetch, WebSearch
 argument-hint: <feature-name> [task-numbers]
 ---
 
@@ -30,101 +30,59 @@ Execute implementation tasks for feature **$1** using Test-Driven Development.
 **Validate approvals**:
 - Verify tasks are approved in spec.json (stop if not, see Safety & Fallback)
 
-### Step 2: Analyze and Delegate
+### Step 2: Select Tasks
 
-**Determine task domain from design.md**:
-- **Backend tasks** (Python, API, DB): Use `backend-architect` subagent
-- **Frontend tasks** (Flutter, UI): Use `frontend-architect` subagent
-- **Mixed tasks**: Run both agents in parallel
+**Determine which tasks to execute**:
+- If `$2` provided: Execute specified task numbers (e.g., "1.1" or "1,2,3")
+- Otherwise: Execute all pending tasks (unchecked `- [ ]` in tasks.md)
 
-**Use the Task tool to delegate**:
-```
-Task(
-  subagent_type: "backend-architect" or "frontend-architect",
-  prompt: "Implement task X.Y for feature '$1' using TDD methodology.
-    Context:
-    - Requirements: [from requirements.md]
-    - Design: [from design.md]
-    - Task: [specific task description]
+### Step 3: Execute with TDD
 
-    Follow TDD cycle: RED (write failing test) → GREEN (minimal impl) → REFACTOR
-    Mark task complete in tasks.md when done.",
-  run_in_background: false  # or true for parallel tasks
-)
-```
+For each selected task, follow Kent Beck's TDD cycle:
 
-### Step 3: Parallel Execution (for multiple tasks)
+1. **RED - Write Failing Test**:
+   - Write test for the next small piece of functionality
+   - Test should fail (code doesn't exist yet)
+   - Use descriptive test names
 
-**If multiple independent tasks**:
-- Launch multiple subagents in parallel using `run_in_background: true`
-- Monitor progress with TaskOutput
-- Aggregate results
+2. **GREEN - Write Minimal Code**:
+   - Implement simplest solution to make test pass
+   - Focus only on making THIS test pass
+   - Avoid over-engineering
 
-### Step 4: Requirements Check (Gherkin)
+3. **REFACTOR - Clean Up**:
+   - Improve code structure and readability
+   - Remove duplication
+   - Apply design patterns where appropriate
+   - Ensure all tests still pass after refactoring
 
-**Before implementing each task**:
-1. Check if behavior is documented in `requirements.md`
-2. If NOT documented: Add Gherkin scenario BEFORE implementing
-3. Format:
-   ```gherkin
-   ### REQ-XXX: [Title]
-   **Scenario**: [Name]
-     Given [context]
-     When [action]
-     Then [outcome]
-   ```
+4. **VERIFY - Validate Quality**:
+   - All tests pass (new and existing)
+   - No regressions in existing functionality
+   - Code coverage maintained or improved
 
-### Step 5: API Testing (curl)
-
-**If task involves API changes**:
-1. Ensure `make dev-server` is running
-2. Test endpoint with curl:
-   ```bash
-   curl -X POST http://localhost:8787/api/your-endpoint \
-     -H "Authorization: Bearer $TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '{"key": "value"}' | jq .
-   ```
-3. Verify: happy path, error cases (400/401/404), response schema
-
-**Mandatory for**: Auth, file upload, WebSocket, Durable Objects, external APIs
-
-### Step 6: Verify and Mark Complete
-
-After each task:
-1. Run tests to verify no regressions
-2. Update checkbox from `- [ ]` to `- [x]` in tasks.md
-3. **Add Implementation Report** under the completed task:
-   ```markdown
-   - [x] Task X.Y: [Description]
-
-     **Implementation Report:**
-     - **Files Changed**: [list of files]
-     - **Tests Added**: [test files]
-     - **Key Decisions**: [design choices]
-     - **Notes**: [caveats, follow-ups]
-   ```
-4. Report completion status
+5. **MARK COMPLETE**:
+   - Update checkbox from `- [ ]` to `- [x]` in tasks.md
 
 ## Critical Constraints
 - **TDD Mandatory**: Tests MUST be written before implementation code
-- **Subagent Delegation**: Use specialized agents for domain-specific implementation
-- **Parallel When Possible**: Independent tasks run concurrently
+- **Task Scope**: Implement only what the specific task requires
+- **Test Coverage**: All new code must have tests
 - **No Regressions**: Existing tests must continue to pass
+- **Design Alignment**: Implementation must follow design.md specifications
 </instructions>
 
 ## Tool Guidance
-- **Task tool**: Primary tool for delegation to specialized agents
-- **Read first**: Load all context before delegating
-- **Parallel execution**: Use `run_in_background: true` for independent tasks
-- **TaskOutput**: Monitor background tasks
+- **Read first**: Load all context before implementation
+- **Test first**: Write tests before code
+- Use **WebSearch/WebFetch** for library documentation when needed
 
 ## Output Description
 
 Provide brief summary in the language specified in spec.json:
 
-1. **Tasks Executed**: Task numbers and agent used
-2. **Status**: Completed tasks, test results, remaining count
+1. **Tasks Executed**: Task numbers and test results
+2. **Status**: Completed tasks marked in tasks.md, remaining tasks count
 
 **Format**: Concise (under 150 words)
 
@@ -136,15 +94,15 @@ Provide brief summary in the language specified in spec.json:
 - **Stop Execution**: All spec files must exist and tasks must be approved
 - **Suggested Action**: "Complete previous phases: `/kiro:spec-requirements`, `/kiro:spec-design`, `/kiro:spec-tasks`"
 
-**Subagent Failures**:
-- **Retry**: Attempt with more context
-- **Fallback**: Execute directly if agent unavailable
+**Test Failures**:
+- **Stop Implementation**: Fix failing tests before continuing
+- **Action**: Debug and fix, then re-run
 
 ### Task Execution
 
 **Execute specific task(s)**:
 - `/kiro:spec-impl $1 1.1` - Single task
-- `/kiro:spec-impl $1 1,2,3` - Multiple tasks (parallel if independent)
+- `/kiro:spec-impl $1 1,2,3` - Multiple tasks
 
 **Execute all pending**:
 - `/kiro:spec-impl $1` - All unchecked tasks
