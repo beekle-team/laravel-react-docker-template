@@ -39,7 +39,8 @@ fi
 # TypeScript/JavaScript checks (React)
 if [ -n "$STAGED_TS" ]; then
   echo ">>> TypeScript: Running Biome lint..."
-  cd "$PROJECT_DIR"
+  ORIGINAL_DIR=$(pwd)
+  cd "$PROJECT_DIR/src"
 
   if ! npm run lint:js 2>&1; then
     echo "BLOCK: Biome lint failed"
@@ -57,6 +58,8 @@ if [ -n "$STAGED_TS" ]; then
     echo "BLOCK: Vitest tests failed"
     ERRORS=1
   fi
+
+  cd "$ORIGINAL_DIR"
 fi
 
 if [ $ERRORS -ne 0 ]; then

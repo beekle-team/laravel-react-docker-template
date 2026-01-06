@@ -6,6 +6,7 @@ COMPOSE_FILE_DEV ?= docker-compose.yml
 COMPOSE_FILE_PREVIEW ?= docker-compose.preview.yml
 DOMAIN ?= example.com
 EMAIL ?= admin@example.com
+NGINX_TIMEOUT ?= 30
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -48,6 +49,7 @@ help:
 	@echo "環境変数（オーバーライド可能）:"
 	@echo "  DOMAIN         - ドメイン名（デフォルト: example.com）"
 	@echo "  EMAIL          - Let's Encrypt用メールアドレス（デフォルト: admin@example.com）"
+	@echo "  NGINX_TIMEOUT  - nginx起動待機タイムアウト秒数（デフォルト: 30）"
 	@echo ""
 	@echo "例: DOMAIN=myapp.com EMAIL=me@myapp.com make ssl-issue"
 
@@ -101,8 +103,20 @@ test-script:
 
 test-nginx:
 	@echo "🔍 nginx設定構文チェック中..."
-	@docker compose -f $(COMPOSE_FILE_PREVIEW) up -d nginx > /dev/null 2>&1 || true
-	@sleep 2
+	@docker compose -f $(COMPOSE_FILE_PREVIEW) up -d nginx
+	@echo "⏳ nginxコンテナの起動を待機中..."
+	@timeout=$(NGINX_TIMEOUT); \
+	while [ $$timeout -gt 0 ]; do \
+		if docker compose -f $(COMPOSE_FILE_PREVIEW) exec -T nginx nginx -t > /dev/null 2>&1; then \
+			break; \
+		fi; \
+		sleep 1; \
+		timeout=$$((timeout - 1)); \
+	done; \
+	if [ $$timeout -eq 0 ]; then \
+		echo "❌ nginxコンテナの起動がタイムアウトしました（$(NGINX_TIMEOUT)秒）"; \
+		exit 1; \
+	fi
 	@docker compose -f $(COMPOSE_FILE_PREVIEW) exec -T nginx nginx -t
 	@echo "✅ nginx設定構文チェック: OK"
 
@@ -114,8 +128,20 @@ test-ssl-dry-run:
 	@echo "   ドメイン: $(DOMAIN)"
 	@echo "   メール: $(EMAIL)"
 	@echo "   モード: --staging --dry-run"
-	@docker compose -f $(COMPOSE_FILE_PREVIEW) up -d nginx > /dev/null 2>&1 || true
-	@sleep 2
+	@docker compose -f $(COMPOSE_FILE_PREVIEW) up -d nginx
+	@echo "⏳ nginxコンテナの起動を待機中..."
+	@timeout=$(NGINX_TIMEOUT); \
+	while [ $$timeout -gt 0 ]; do \
+		if docker compose -f $(COMPOSE_FILE_PREVIEW) exec -T nginx nginx -t > /dev/null 2>&1; then \
+			break; \
+		fi; \
+		sleep 1; \
+		timeout=$$((timeout - 1)); \
+	done; \
+	if [ $$timeout -eq 0 ]; then \
+		echo "❌ nginxコンテナの起動がタイムアウトしました（$(NGINX_TIMEOUT)秒）"; \
+		exit 1; \
+	fi
 	@docker compose -f $(COMPOSE_FILE_PREVIEW) run --rm certbot certbot certonly \
 		--webroot \
 		--webroot-path=/var/www/public \
