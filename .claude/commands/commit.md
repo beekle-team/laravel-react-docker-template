@@ -7,18 +7,20 @@
 1. `git status` と `git diff` で変更内容を確認
 2. **品質ゲート (MANDATORY)**: Lintを実行して全てパスすること
    ```bash
-   # PHP (Pint + PHPStan)
-   ./vendor/bin/sail composer pint
-   ./vendor/bin/sail composer stan
+   # PHP (Pint + PHPStan) - srcディレクトリ内で実行
+   cd src && composer pint
+   cd src && composer stan
 
    # TypeScript/React (Biome)
-   ./vendor/bin/sail npm run lint:js
+   cd src && npm run lint:js
 
-   # または統合コマンド
-   make lint
+   # Docker環境の場合
+   docker compose exec app composer pint
+   docker compose exec app composer stan
+   docker compose exec app npm run lint:js
    ```
    - ⚠️ **Lint失敗時は絶対にコミットしない**
-   - 🔧 修正: `make lint-fix` または `./vendor/bin/sail composer lint:fix && ./vendor/bin/sail npm run lint:js:fix`
+   - 🔧 修正: `cd src && composer pint -- --fix` または `cd src && npm run lint:js:fix`
 3. 変更の目的を分析（新機能、バグ修正、リファクタ等）
 4. Conventional Commits形式でメッセージを作成
 5. コミットを実行
