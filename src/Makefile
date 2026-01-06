@@ -1,6 +1,7 @@
 .PHONY: help setup setup-dev setup-preview clean test test-local test-ssl test-ssl-dry-run up down logs ps shell-nginx shell-app shell-certbot shell-ofelia
 
 # 変数定義（環境変数でオーバーライド可能）
+APP_NAME ?= Laravel Application
 COMPOSE_FILE_DEV ?= docker-compose.yml
 COMPOSE_FILE_PREVIEW ?= docker-compose.preview.yml
 DOMAIN ?= example.com
@@ -11,7 +12,7 @@ EMAIL ?= admin@example.com
 
 ## ヘルプ表示
 help:
-	@echo "Laravel Application - Makefile"
+	@echo "$(APP_NAME) - Makefile"
 	@echo ""
 	@echo "使用方法: make [ターゲット]"
 	@echo ""
