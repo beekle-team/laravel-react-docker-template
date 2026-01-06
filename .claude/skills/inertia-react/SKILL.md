@@ -1,6 +1,6 @@
 ---
 name: inertia-react
-description: Inertia.js v2 + React開発のベストプラクティス。ページ作成、フォーム処理、ナビゲーション、データ取得、ポーリング、プリフェッチ、遅延読み込みなどInertia v2の全機能を網羅。Laravel + React SPAを構築する際に使用。
+description: Inertia.js v2 + React開発のベストプラクティス。ページ作成、フォーム処理、ナビゲーション、データ取得、ポーリング、プリフェッチ、遅延読み込み、Laravel Precognition（リアルタイムバリデーション）などInertia v2の全機能を網羅。Laravel + React SPAを構築する際に使用。
 license: MIT
 ---
 
@@ -645,6 +645,215 @@ function handleSubmit(e: React.FormEvent) {
 )}
 ```
 
+### Laravel Precognition（リアルタイムバリデーション）
+
+Laravel Precognition を使用すると、サーバーサイドのバリデーションルールをフロントエンドでリアルタイムに実行できます。
+
+#### セットアップ
+
+```bash
+# Laravel側
+composer require laravel/precognition
+
+# React側
+npm install laravel-precognition-react
+```
+
+#### Laravel側の設定
+
+```php
+// routes/web.php
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+
+Route::post('/users', [UserController::class, 'store'])
+    ->middleware([HandlePrecognitiveRequests::class]);
+```
+
+```php
+// app/Http/Controllers/UserController.php
+use App\Http\Requests\StoreUserRequest;
+
+class UserController extends Controller
+{
+    public function store(StoreUserRequest $request)
+    {
+        // Precognitionリクエストの場合、ここには到達しない
+        // バリデーション通過後のみ実行される
+        User::create($request->validated());
+
+        return redirect()->route('users.index');
+    }
+}
+```
+
+```php
+// app/Http/Requests/StoreUserRequest.php
+class StoreUserRequest extends FormRequest
+{
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'min:8', 'confirmed'],
+        ];
+    }
+}
+```
+
+#### React側の実装
+
+```tsx
+import { useForm } from 'laravel-precognition-react-inertia';
+
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export default function CreateUser() {
+  const form = useForm<FormData>('post', route('users.store'), {
+    name: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+  });
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    form.submit({
+      onSuccess: () => form.reset(),
+      preserveScroll: true,
+    });
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <input
+          type="text"
+          value={form.data.name}
+          onChange={e => form.setData('name', e.target.value)}
+          onBlur={() => form.validate('name')}  // フォーカス外れたらバリデーション
+        />
+        {form.invalid('name') && (
+          <p className="text-red-500 text-sm">{form.errors.name}</p>
+        )}
+      </div>
+
+      <div>
+        <input
+          type="email"
+          value={form.data.email}
+          onChange={e => form.setData('email', e.target.value)}
+          onBlur={() => form.validate('email')}  // unique チェックもリアルタイム
+        />
+        {form.invalid('email') && (
+          <p className="text-red-500 text-sm">{form.errors.email}</p>
+        )}
+        {form.validating && <span className="text-gray-400">確認中...</span>}
+      </div>
+
+      <div>
+        <input
+          type="password"
+          value={form.data.password}
+          onChange={e => form.setData('password', e.target.value)}
+          onBlur={() => form.validate('password')}
+        />
+        {form.invalid('password') && (
+          <p className="text-red-500 text-sm">{form.errors.password}</p>
+        )}
+      </div>
+
+      <div>
+        <input
+          type="password"
+          value={form.data.password_confirmation}
+          onChange={e => form.setData('password_confirmation', e.target.value)}
+          onBlur={() => form.validate('password')}  // confirmed ルール用
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={form.processing || form.hasErrors}
+      >
+        {form.processing ? 'Creating...' : 'Create User'}
+      </button>
+    </form>
+  );
+}
+```
+
+#### Precognition API
+
+```tsx
+const form = useForm('post', route('users.store'), initialData);
+
+// バリデーション
+form.validate('email');              // 単一フィールド
+form.validate(['email', 'name']);    // 複数フィールド
+form.validateFiles();                // ファイルのみ
+
+// 状態チェック
+form.valid('email');                 // バリデーション成功?
+form.invalid('email');               // バリデーション失敗?
+form.validating;                     // バリデーション中?
+form.hasErrors;                      // エラーあり?
+
+// エラー
+form.errors.email;                   // エラーメッセージ
+form.setErrors({ email: 'Error' }); // 手動設定
+form.forgetError('email');          // エラークリア
+form.clearErrors();                  // 全クリア
+
+// 送信
+form.submit();                       // フォーム送信
+form.submit({ onSuccess, onError }); // コールバック付き
+
+// リセット
+form.reset();                        // 全リセット
+form.reset('email');                 // 特定フィールド
+```
+
+#### デバウンス設定
+
+```tsx
+const form = useForm('post', route('users.store'), initialData);
+
+// 入力中にリアルタイムバリデーション（デバウンス付き）
+<input
+  value={form.data.email}
+  onChange={e => {
+    form.setData('email', e.target.value);
+    form.validate('email');  // 自動的にデバウンスされる（デフォルト: 1500ms）
+  }}
+/>
+```
+
+```tsx
+// デバウンス時間をカスタマイズ
+form.setValidationTimeout(500);  // 500ms に変更
+```
+
+#### Precognition vs Inertia useForm
+
+| 機能 | Inertia useForm | Precognition |
+|------|----------------|--------------|
+| 基本フォーム処理 | ✅ | ✅ |
+| リアルタイムバリデーション | ❌ | ✅ |
+| uniqueルールのリアルタイムチェック | ❌ | ✅ |
+| サーバーサイドルール活用 | 送信時のみ | リアルタイム |
+| デバウンス | ❌ | ✅ |
+
+**使い分け:**
+- **シンプルなフォーム** → Inertia `useForm`
+- **リアルタイムバリデーションが必要** → Precognition
+- **uniqueチェックが必要** → Precognition
+
 ## Inertia v2 新機能
 
 ### 1. Deferred Props（遅延読み込み）
@@ -1063,11 +1272,20 @@ resources/js/
 - [ ] TypeScript型が完全に定義されている
 - [ ] `route()` ヘルパーでルート生成
 - [ ] `<Link>` / `router` でナビゲーション
-- [ ] フォームは `useForm` で管理
+- [ ] フォームは `useForm` で管理（リアルタイムバリデーションには Precognition）
 - [ ] 遅延データには `Deferred` + スケルトン
 - [ ] エラー表示が適切
 - [ ] `preserveScroll` / `preserveState` を適切に使用
 - [ ] レイアウトコンポーネントを使用
+
+### Precognition 使用時
+
+- [ ] ルートに `HandlePrecognitiveRequests` ミドルウェアを設定
+- [ ] `laravel-precognition-react-inertia` からインポート
+- [ ] `onBlur` で `form.validate()` を呼び出し
+- [ ] `form.invalid()` / `form.valid()` でエラー状態を表示
+- [ ] `form.validating` でローディング状態を表示
+- [ ] ボタンに `disabled={form.processing || form.hasErrors}` を設定
 
 ### Laravel Data + 型生成時
 
