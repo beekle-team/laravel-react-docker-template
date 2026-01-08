@@ -27,7 +27,32 @@ RED → GREEN → REFACTOR
 - Each test should test ONE behavior
 - Tests must be independent and repeatable
 
-### 2. Requirements Documentation (BDD)
+### 2. Feature テストでは scenario() ヘルパー必須
+
+**🔴 CRITICAL: Feature テスト（tests/Feature/）では必ず `scenario()` ヘルパーを使用すること**
+
+```php
+// ✅ 正しい: scenario() ヘルパーを使用
+it('Scenario 1.1: ユーザー登録できる', function () {
+    scenario('ユーザー登録フロー')
+        ->given('有効なユーザーデータ', function () { ... })
+        ->when('登録APIを呼び出す', function ($data) { ... })
+        ->then('成功する', function ($response) { ... })
+        ->run();
+});
+
+// ❌ 間違い: scenario() なしの直接テスト
+it('registers a user', function () {
+    $response = $this->post('/register', [...]);
+    expect(...)->toBe(...);
+});
+```
+
+**例外（scenario() 不要）:**
+- `tests/Unit/` - ユニットテスト
+- `tests/Browser/` - ブラウザテスト
+
+### 3. Requirements Documentation (BDD)
 
 **CRITICAL RULE: Undocumented Implementation Prevention**
 
@@ -110,23 +135,66 @@ resources/js/
 **Pest Test Examples:**
 
 ```php
-// Feature test - Controller
-it('publishes a post successfully', function () {
-    $user = User::factory()->create();
-    $post = Post::factory()
-        ->for($user)
-        ->draft()
-        ->create();
+// Feature test - scenario() ヘルパー必須
+describe('UC-01: 投稿公開', function () {
+    it('Scenario 1.1: 投稿を正常に公開できる', function () {
+        scenario('投稿公開フロー')
+            ->given('ログイン済みユーザーが存在する', function () {
+                return User::factory()->create();
+            })
+            ->and('下書き投稿がある', function (User $user) {
+                $post = Post::factory()
+                    ->for($user)
+                    ->draft()
+                    ->create();
 
-    $this->actingAs($user)
-        ->post(route('posts.publish', $post))
-        ->assertRedirect(route('posts.show', $post));
+                return ['user' => $user, 'post' => $post];
+            })
+            ->when('公開APIを呼び出す', function (array $context) {
+                $this->actingAs($context['user']);
 
-    expect($post->fresh()->status)->toBe('published');
-    expect($post->fresh()->published_at)->not->toBeNull();
+                return $this->post(route('posts.publish', $context['post']));
+            })
+            ->then('投稿ページにリダイレクトされる', function ($response) {
+                $response->assertRedirect();
+            })
+            ->and('ステータスがpublishedになる', function ($response) {
+                $post = Post::latest()->first();
+                expect($post->status)->toBe('published');
+                expect($post->published_at)->not->toBeNull();
+            })
+            ->run();
+    });
+
+    it('Scenario 1.2: タイトルなしでは公開できない', function () {
+        scenario('タイトル必須バリデーション')
+            ->given('ログイン済みユーザーが存在する', function () {
+                return User::factory()->create();
+            })
+            ->and('タイトルなしの下書き投稿', function (User $user) {
+                $post = Post::factory()
+                    ->for($user)
+                    ->create(['title' => null]);
+
+                return ['user' => $user, 'post' => $post];
+            })
+            ->when('公開APIを呼び出す', function (array $context) {
+                $this->actingAs($context['user']);
+
+                return $this->post(route('posts.publish', $context['post']));
+            })
+            ->then('バリデーションエラーになる', function ($response) {
+                $response->assertSessionHasErrors(['title']);
+            })
+            ->and('ステータスはdraftのまま', function ($response) {
+                $post = Post::latest()->first();
+                expect($post->status)->toBe('draft');
+            })
+            ->run();
+    });
 });
 
-// Unit test - Model
+// Unit test - Model（scenario不要）
 it('generates slug from title', function () {
     $post = Post::factory()->create([
         'title' => 'My First Blog Post',
@@ -134,21 +202,9 @@ it('generates slug from title', function () {
 
     expect($post->slug)->toBe('my-first-blog-post');
 });
-
-// Testing validation
-it('requires a title to publish', function () {
-    $user = User::factory()->create();
-    $post = Post::factory()
-        ->for($user)
-        ->create(['title' => null]);
-
-    $this->actingAs($user)
-        ->post(route('posts.publish', $post))
-        ->assertSessionHasErrors(['title']);
-
-    expect($post->fresh()->status)->toBe('draft');
-});
 ```
+
+**重要: Feature テストは必ず `scenario()` ヘルパーを使用すること。Unit テストは不要。**
 
 ### Frontend (Vitest + Testing Library)
 
@@ -463,52 +519,85 @@ npm run test -- PostCard
   And 投稿ステータスは変更されない
 ```
 
-### Step 2: Feature Test を書く（RED）
+### Step 2: Feature Test を書く（RED）- scenario() ヘルパー必須
 
 ```php
-// tests/Feature/Post/PublishPostTest.php
+// tests/Feature/Post/PublishPostGwtTest.php
 <?php
+
+declare(strict_types=1);
 
 use App\Models\User;
 use App\Models\Post;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-describe('投稿の公開', function () {
-    it('投稿を公開できる', function () {
-        // Given: ログイン済みのユーザーと下書き投稿
-        $user = User::factory()->create();
-        $post = Post::factory()
-            ->for($user)
-            ->draft()
-            ->create();
+uses(RefreshDatabase::class);
 
-        // When: 公開リクエストを送信
-        $response = $this->actingAs($user)
-            ->post(route('posts.publish', $post));
+/**
+ * 投稿公開 - GWT テスト
+ *
+ * @see .kiro/specs/post/requirements.md
+ */
 
-        // Then: 期待される結果を検証
-        $response->assertRedirect(route('posts.show', $post));
+describe('UC-01: 投稿公開', function () {
+    it('Scenario 1.1: 投稿を公開できる', function () {
+        scenario('投稿公開フロー')
+            ->given('ログイン済みのユーザーがいる', function () {
+                return User::factory()->create();
+            })
+            ->and('下書き状態の投稿がある', function (User $user) {
+                $post = Post::factory()
+                    ->for($user)
+                    ->draft()
+                    ->create();
 
-        $post->refresh();
-        expect($post->status)->toBe('published');
-        expect($post->published_at)->not->toBeNull();
+                return ['user' => $user, 'post' => $post];
+            })
+            ->when('公開リクエストを送信', function (array $context) {
+                $this->actingAs($context['user']);
+
+                return $this->post(route('posts.publish', $context['post']));
+            })
+            ->then('投稿ページにリダイレクトされる', function ($response) {
+                $response->assertRedirect();
+            })
+            ->and('ステータスがpublishedになる', function ($response) {
+                $post = Post::latest()->first();
+                expect($post->status)->toBe('published');
+            })
+            ->and('published_atタイムスタンプが設定される', function ($response) {
+                $post = Post::latest()->first();
+                expect($post->published_at)->not->toBeNull();
+            })
+            ->run();
     });
 
-    it('タイトルなしでは公開できない', function () {
-        // Given: タイトルなしの下書き
-        $user = User::factory()->create();
-        $post = Post::factory()
-            ->for($user)
-            ->draft()
-            ->create(['title' => null]);
+    it('Scenario 1.2: タイトルなしでは公開できない', function () {
+        scenario('タイトル必須バリデーション')
+            ->given('ログイン済みのユーザーがいる', function () {
+                return User::factory()->create();
+            })
+            ->and('タイトルのない下書き投稿がある', function (User $user) {
+                $post = Post::factory()
+                    ->for($user)
+                    ->draft()
+                    ->create(['title' => null]);
 
-        // When: 公開リクエストを送信
-        $response = $this->actingAs($user)
-            ->post(route('posts.publish', $post));
+                return ['user' => $user, 'post' => $post];
+            })
+            ->when('公開リクエストを送信', function (array $context) {
+                $this->actingAs($context['user']);
 
-        // Then: バリデーションエラー
-        $response->assertSessionHasErrors(['title']);
-
-        expect($post->fresh()->status)->toBe('draft');
+                return $this->post(route('posts.publish', $context['post']));
+            })
+            ->then('バリデーションエラーになる', function ($response) {
+                $response->assertSessionHasErrors(['title']);
+            })
+            ->and('投稿ステータスは変更されない', function ($response) {
+                $post = Post::latest()->first();
+                expect($post->status)->toBe('draft');
+            })
+            ->run();
     });
 });
 ```

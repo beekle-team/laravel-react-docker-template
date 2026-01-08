@@ -5,14 +5,66 @@
 **Feature テストは BDD フローを経由してのみ作成可能**
 
 ```
-❌ 禁止: requirements.md なしで tests/Feature/ にファイル作成
-❌ 禁止: Gherkin シナリオなしで Feature テスト実装
-❌ 禁止: ユーザー承認なしでテスト生成
-❌ 禁止: 複数テストを一括で書く（1テストずつ進める）
-❌ 禁止: テスト失敗のまま次のテストに進む
-✅ 許可: /bdd コマンド経由でのテスト生成
-✅ 許可: 既存 requirements.md に基づく追加（承認後）
-✅ 必須: 1テストがパスしてから次へ
+禁止: requirements.md なしで tests/Feature/ にファイル作成
+禁止: Gherkin シナリオなしで Feature テスト実装
+禁止: ユーザー承認なしでテスト生成
+禁止: 複数テストを一括で書く（1テストずつ進める）
+禁止: テスト失敗のまま次のテストに進む
+禁止: scenario() ヘルパーなしで Feature テスト実装 ← 🔴 NEW
+許可: /bdd コマンド経由でのテスト生成
+許可: 既存 requirements.md に基づく追加（承認後）
+必須: 1テストがパスしてから次へ
+必須: scenario() ヘルパーを使用した GWT 形式 ← 🔴 NEW
+```
+
+## scenario() ヘルパー強制
+
+**🔴 CRITICAL: Feature テストでは必ず `scenario()` ヘルパーを使用**
+
+```php
+// ✅ 正しい形式
+describe('UC-01: ユーザー登録', function () {
+    it('Scenario 1.1: 有効なデータで登録できる', function () {
+        scenario('ユーザー登録フロー')
+            ->given('有効なユーザーデータ', function () {
+                return ['name' => 'Test', 'email' => 'test@example.com'];
+            })
+            ->when('登録APIを呼び出す', function (array $data) {
+                return $this->post('/register', $data);
+            })
+            ->then('成功する', function ($response) {
+                $response->assertRedirect();
+            })
+            ->run();
+    });
+});
+
+// ❌ 禁止: scenario() なしの直接テスト
+it('registers a user', function () {
+    $response = $this->post('/register', [...]);
+    expect(...)->toBe(...);
+});
+```
+
+### 命名規則
+
+| 要素 | 形式 | 例 |
+|------|------|-----|
+| describe | `UC-XX: {名前}` | `UC-01: ユーザー登録` |
+| it | `Scenario X.Y: {名前}` | `Scenario 1.1: 有効なデータで...` |
+| ファイル名 | `{Feature}GwtTest.php` | `AuthGwtTest.php` |
+
+### 検出パターン
+
+以下のコードを検出したら即座に修正を要求:
+
+```php
+// ❌ これを検出したら違反
+it('...', function () {
+    $this->post(...);        // scenario() なしの直接リクエスト
+    $this->get(...);
+    $this->actingAs(...)->post(...);
+});
 ```
 
 ## TDD サイクル（1テストずつ）
