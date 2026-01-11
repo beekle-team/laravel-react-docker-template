@@ -166,7 +166,7 @@ docker compose exec app ./vendor/bin/pest tests/Feature/{Feature}/
 ### requirements.md がない状態で Feature テスト要求された場合
 
 ```
-❌ Feature テストを直接作成することはできません。
+Feature テストを直接作成することはできません。
 
 BDD アプローチでは、まず要件定義が必要です:
 1. /bdd {feature-name} を実行してください
@@ -179,7 +179,7 @@ BDD アプローチでは、まず要件定義が必要です:
 ### Gherkin シナリオがない場合
 
 ```
-❌ テスト生成にはシナリオ定義が必要です。
+テスト生成にはシナリオ定義が必要です。
 
 requirements.md にシナリオが定義されていません。
 以下の情報を教えてください:

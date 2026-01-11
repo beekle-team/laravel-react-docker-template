@@ -9,14 +9,14 @@ Steering files are **project memory**, not exhaustive specifications.
 ### Golden Rule
 > "If new code follows existing patterns, steering shouldn't need updating."
 
-### ✅ Document
+### Document
 - Organizational patterns (feature-first, layered)
 - Naming conventions (PascalCase rules)
 - Import strategies (absolute vs relative)
 - Architectural decisions (state management)
 - Technology standards (key frameworks)
 
-### ❌ Avoid
+### Avoid
 - Complete file listings
 - Every component description
 - All dependencies

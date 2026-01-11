@@ -153,9 +153,9 @@ graph TB
 - **Plain Mermaid only** – avoid custom styling or unsupported syntax.
 - **Node IDs** – alphanumeric plus underscores only (e.g., `Client`, `ServiceA`). Do not use `@`, `/`, or leading `-`.
 - **Labels** – simple words. Do not embed parentheses `()`, square brackets `[]`, quotes `"`, or slashes `/`.
-  - ❌ `DnD[@dnd-kit/core]` → invalid ID (`@`).
-  - ❌ `UI[KanbanBoard(React)]` → invalid label (`()`).
-  - ✅ `DndKit[dnd-kit core]` → use plain text in labels, keep technology details in the accompanying description.
+  - `DnD[@dnd-kit/core]` → invalid ID (`@`).
+  - `UI[KanbanBoard(React)]` → invalid label (`()`).
+  - `DndKit[dnd-kit core]` → use plain text in labels, keep technology details in the accompanying description.
   - ℹ️ Mermaid strict-mode will otherwise fail with errors like `Expecting 'SQE' ... got 'PS'`; remove punctuation from labels before rendering.
 - **Edges** – show data or control flow direction.
 - **Groups** – using Mermaid subgraphs to cluster related components is allowed; use it sparingly for clarity.
@@ -172,11 +172,11 @@ graph TB
 - Migration path clear (if applicable)
 
 ### Common Anti-patterns to Avoid
-❌ Mixing design with implementation
-❌ Vague interface definitions
-❌ Missing error scenarios
-❌ Ignored non-functional requirements
-❌ Overcomplicated architectures
-❌ Tight coupling between components
-❌ Missing data consistency strategy
-❌ Incomplete dependency analysis
+- Mixing design with implementation
+- Vague interface definitions
+- Missing error scenarios
+- Ignored non-functional requirements
+- Overcomplicated architectures
+- Tight coupling between components
+- Missing data consistency strategy
+- Incomplete dependency analysis

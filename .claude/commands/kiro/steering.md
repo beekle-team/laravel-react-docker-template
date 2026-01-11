@@ -91,7 +91,7 @@ Chat summary only (files updated directly).
 
 ### Bootstrap:
 ```
-✅ Steering Created
+Steering Created
 
 ## Generated:
 - product.md: [Brief description]
@@ -103,7 +103,7 @@ Review and approve as Source of Truth.
 
 ### Sync:
 ```
-✅ Steering Updated
+Steering Updated
 
 ## Changes:
 - tech.md: React 18 → 19
