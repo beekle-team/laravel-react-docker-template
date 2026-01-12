@@ -80,7 +80,7 @@ From `.kiro/settings/rules/steering-principles.md`:
 Chat summary with file location (file created directly).
 
 ```
-✅ Custom Steering Created
+Custom Steering Created
 
 ## Created:
 - .kiro/steering/api-standards.md

@@ -64,7 +64,7 @@ Provide status report in the language specified in spec.json:
 4. **Next Action**: Specific command to run next
 5. **Issues**: Any blockers or missing elements
 
-**Format**: Clear, scannable format with emojis (✅/⏳/❌) for status
+**Format**: Clear, scannable format with status indicators (OK/Waiting/Error) for status
 
 ## Safety & Fallback
 

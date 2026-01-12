@@ -29,7 +29,7 @@ license: MIT
 同一コードが複数箇所に存在
 
 ```php
-// ❌ BAD: 同じコードが複数箇所に
+// BAD: 同じコードが複数箇所に
 // UserController.php
 $user->notify(new WelcomeNotification($user));
 Log::info('User notified', ['user_id' => $user->id]);
@@ -40,7 +40,7 @@ Log::info('User notified', ['user_id' => $user->id]);
 ```
 
 ```php
-// ✅ GOOD: Modelメソッドに抽出
+// GOOD: Modelメソッドに抽出
 // app/Models/User.php
 class User extends Model
 {
@@ -60,7 +60,7 @@ $user->sendWelcomeNotification();
 変数名・値のみ異なる同一構造
 
 ```tsx
-// ❌ BAD: 同じ構造、異なる値
+// BAD: 同じ構造、異なる値
 const [name, setName] = useState('');
 const [nameError, setNameError] = useState('');
 const validateName = () => { ... };
@@ -71,7 +71,7 @@ const validateEmail = () => { ... };
 ```
 
 ```tsx
-// ✅ GOOD: カスタムフックに抽出
+// GOOD: カスタムフックに抽出
 function useFormField(initialValue: string, validator: (v: string) => string | null) {
   const [value, setValue] = useState(initialValue);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +95,7 @@ const email = useFormField('', validateEmail);
 異なる処理だが同一パターン/構造
 
 ```php
-// ❌ BAD: 同じパターンの繰り返し
+// BAD: 同じパターンの繰り返し
 public function getActiveUsers(): Collection
 {
     return User::query()
@@ -114,7 +114,7 @@ public function getActiveProducts(): Collection
 ```
 
 ```php
-// ✅ GOOD: Query Scopeに抽出
+// GOOD: Query Scopeに抽出
 // app/Models/Concerns/HasActiveScope.php
 trait HasActiveScope
 {
@@ -496,11 +496,11 @@ npm run lint
 ### 過度な抽象化
 
 ```tsx
-// ❌ BAD: 1回しか使わないのに抽象化
+// BAD: 1回しか使わないのに抽象化
 const useUserName = () => useState('');
 const useUserEmail = () => useState('');
 
-// ✅ GOOD: シンプルに保つ
+// GOOD: シンプルに保つ
 const [name, setName] = useState('');
 const [email, setEmail] = useState('');
 ```
@@ -508,7 +508,7 @@ const [email, setEmail] = useState('');
 ### 不適切な共通化
 
 ```php
-// ❌ BAD: 意味的に異なるものを無理に共通化
+// BAD: 意味的に異なるものを無理に共通化
 trait HasName
 {
     public function getDisplayName(): string
@@ -518,7 +518,7 @@ trait HasName
     }
 }
 
-// ✅ GOOD: 各モデルで適切に実装
+// GOOD: 各モデルで適切に実装
 class User extends Model
 {
     public function getDisplayName(): string
@@ -539,7 +539,7 @@ class Product extends Model
 ### 時期尚早な最適化
 
 ```tsx
-// ❌ BAD: 最初から過度に汎用化
+// BAD: 最初から過度に汎用化
 function useGenericCRUD<T extends BaseEntity>(
   endpoint: string,
   transform?: (data: T) => T,
@@ -547,7 +547,7 @@ function useGenericCRUD<T extends BaseEntity>(
   // ... 10個以上のオプション
 ) { ... }
 
-// ✅ GOOD: 必要になってから抽象化
+// GOOD: 必要になってから抽象化
 function useUsers() { ... }  // まずは具体的に
 function useProducts() { ... }  // 重複が見えてきたら抽象化検討
 ```
@@ -557,15 +557,15 @@ function useProducts() { ... }  // 重複が見えてきたら抽象化検討
 重複検出時、以下の形式で提案:
 
 ```
-🔍 重複コード検出
+重複コード検出
 
-📍 場所:
+場所:
 - app/Http/Controllers/UserController.php:45-52
 - app/Http/Controllers/AdminController.php:78-85
 
-📊 重複タイプ: Type 2（パラメータ化重複）
+重複タイプ: Type 2（パラメータ化重複）
 
-💡 推奨リファクタリング:
+推奨リファクタリング:
 【単一モデル関連の場合】
 1. app/Models/User.php にメソッドを追加
 2. 各ControllerからModelメソッドを呼び出し
@@ -575,10 +575,10 @@ function useProducts() { ... }  // 重複が見えてきたら抽象化検討
 2. 共通ロジックをTraitに抽出
 3. 各Modelでuseして利用
 
-📝 変更例:
+変更例:
 [コード例を提示]
 
-⚠️ 考慮事項:
+考慮事項:
 - Modelのテスト追加が必要
 - 既存のConcernで対応可能か確認
 ```

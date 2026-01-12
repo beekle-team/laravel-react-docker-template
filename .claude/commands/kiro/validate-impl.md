@@ -113,7 +113,7 @@ Provide output in the language specified in spec.json with:
 
 **Format Requirements**:
 - Use Markdown headings and tables for clarity
-- Flag critical issues with ⚠️ or 🔴
+- Flag critical issues with [WARNING] or [CRITICAL]
 - Keep summary concise (under 400 words)
 
 ## Safety & Fallback
