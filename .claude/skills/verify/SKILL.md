@@ -1,25 +1,38 @@
 ---
-description: Verify App
-allowed-tools: Bash, Read, Edit, Glob, Grep, Task
-argument-hint: [--quick]
+name: verify
+description: プロジェクト全体の検証を並列実行し、問題があれば修正する。Backend/Frontend を同時にチェック。
+license: MIT
 ---
 
 # Verify App
 
-プロジェクト全体の検証を並列実行し、問題があれば修正してください。
+プロジェクト全体の品質検証を並列サブエージェントで実行するスキル。
 
-## オプション
+**Keywords**: verify, lint, test, quality, pint, phpstan, biome, pest, vitest, parallel
 
-- `--quick` または `-q`: Lint のみ（テストをスキップ）
+---
 
-## 実行方法
-
-### 並列サブエージェント方式
-
-Backend と Frontend の検証を**並列**で実行するため、2つの `quality-engineer` サブエージェントを同時起動する。
+## Usage
 
 ```
-# 並列で2つのTask呼び出しを行う
+/verify           # フル検証（Lint + Test）
+/verify --quick   # Lint のみ（テストをスキップ）
+/verify -q        # 同上
+```
+
+---
+
+## Workflow
+
+### Step 1: モード判定
+
+`$ARGUMENTS` に `--quick` または `-q` が含まれるか確認。
+
+### Step 2: 並列サブエージェント起動
+
+**フルモード** (デフォルト):
+
+```
 Task(
   subagent_type: "quality-engineer",
   description: "Backend verification",
@@ -44,9 +57,7 @@ Task(
 )
 ```
 
-### --quick モード（Lintのみ）
-
-`$ARGUMENTS` に `--quick` または `-q` が含まれる場合、テストをスキップ:
+**Quick モード** (`--quick` / `-q`):
 
 ```
 Task(
@@ -60,13 +71,20 @@ Task(
 )
 ```
 
-### 結果集約
+### Step 3: 結果集約
 
-TaskOutputで両方の結果を取得し、統合レポートを生成。
+`TaskOutput` で両方の結果を取得し、統合レポートを生成。
 
-## 検証コマンド
+### Step 4: 問題修正
+
+エラーがあれば修正し、再検証を実行。
+
+---
+
+## Commands
 
 ### Backend (Laravel/PHP)
+
 ```bash
 composer lint      # Pint + PHPStan
 composer pint      # コードフォーマット
@@ -75,6 +93,7 @@ composer test      # Pest テスト
 ```
 
 ### Frontend (React/TypeScript)
+
 ```bash
 npm run lint       # Biome + ESLint
 npm run lint:js    # Biome のみ
@@ -84,20 +103,40 @@ npm run format     # Prettier フォーマット
 ```
 
 ### Full Stack
+
 ```bash
 composer dev       # 開発サーバー起動（Laravel + Vite + Queue）
 npm run lint:all   # JS + PHP 全体 lint
 ```
 
-## カバレッジ基準
+---
+
+## Quality Standards
 
 - 新規コードは**テスト必須**
 - カバレッジが下がっていたら警告
 - 未テストのロジックを報告
-
-## 重要
-
 - すべてのテストがパスするまで完了としない
 - 警告も可能な限り解消する
 - 修正後は再度検証を実行して確認
-- **並列実行**で高速化（BackendとFrontendは独立）
+
+---
+
+## Output Format
+
+```
+## Verification Report
+
+### Backend
+- Lint: ✅ Passed / ❌ N errors
+- Tests: ✅ M passed / ❌ N failed
+- Coverage: XX%
+
+### Frontend
+- Lint: ✅ Passed / ❌ N errors
+- Types: ✅ Passed / ❌ N errors
+- Tests: ✅ M passed / ❌ N failed
+
+### Summary
+Overall: ✅ All checks passed / ❌ Action required
+```

@@ -1,70 +1,54 @@
+---
+name: bdd
+description: BDD テスト生成。要件定義から GWT パターンの Pest テストを生成。scenario() ヘルパー使用必須。
+license: MIT
+---
+
 # BDD テスト生成
 
-要件定義から GWT パターンの BDD テストを生成する。
+要件定義から GWT パターンの BDD テストを生成するスキル。
 
-## 使い方
+**Keywords**: bdd, tdd, test, gwt, gherkin, pest, scenario, requirements
+
+---
+
+## Usage
 
 ```
-/bdd {feature-name}
-/bdd {feature-name} --spec-only    # requirements.md のみ生成
-/bdd {feature-name} --test-only    # テストのみ生成 (既存 spec から)
+/bdd {feature-name}              # フルフロー（要件 → テスト）
+/bdd {feature-name} --spec-only  # requirements.md のみ生成
+/bdd {feature-name} --test-only  # テストのみ生成（既存 spec から）
 ```
 
 ---
 
-## 重要: Feature テスト生成ルール
+## Critical Rules
 
 ### 絶対禁止事項
 
 1. **requirements.md なしでの Feature テスト作成は禁止**
    - `.kiro/specs/{feature}/requirements.md` が存在しない状態で Feature テストを書いてはならない
-   - 「とりあえずテスト書く」は BDD 違反
 
 2. **Gherkin シナリオなしでの実装は禁止**
    - requirements.md に Gherkin 形式のシナリオが記述されていない場合、テストを書いてはならない
-   - シナリオがなければ、まずユーザーにヒアリングして requirements.md を作成する
 
 3. **勝手な Feature テスト追加は禁止**
    - `/bdd` コマンド経由以外での Feature テスト作成は原則禁止
-   - 例外: 既存の requirements.md に基づく追加シナリオのみ
 
 4. **複数テストの一括実装は禁止**
    - 1テストずつ Red → Green → Refactor のサイクルを回す
    - 現在のテストがパスするまで次のテストに進んではならない
-   - テスト失敗のまま次に進むことは禁止
-
-### 必須フロー
-
-```
-[ユーザー要求]
-     ↓
-[requirements.md 存在確認] ── なし ──→ [ヒアリング] → [requirements.md 作成] → [ユーザー承認待ち]
-     ↓ あり                                                ↓
-[Gherkin シナリオ確認] ── なし ──→ [シナリオ追加] → [ユーザー承認待ち]
-     ↓ あり
-[GWT テスト生成]
-     ↓
-[テスト実行・確認]
-```
-
-### 承認ポイント
-
-以下の段階でユーザー承認を必須とする：
-
-1. **requirements.md 新規作成時**: 内容をユーザーに提示し、承認を得る
-2. **シナリオ追加時**: 追加シナリオをユーザーに提示し、承認を得る
-3. **テスト生成前**: 生成するテストの一覧を提示し、承認を得る
 
 ---
 
-## 実行手順
+## Workflow
 
-### 1. 要件定義の確認/作成
+### Step 1: 要件定義の確認/作成
 
-`.kiro/specs/$ARGUMENTS/requirements.md` を確認:
+`.kiro/specs/{feature}/requirements.md` を確認:
 
 **存在しない場合**:
-1. ユーザーに以下をヒアリング:
+1. ユーザーにヒアリング:
    - 機能の目的・概要
    - 主要なユースケース
    - 各ユースケースの具体的なシナリオ
@@ -77,9 +61,7 @@
 2. Gherkin シナリオが存在するか確認
 3. シナリオがなければユーザーにヒアリングして追加
 
-### 2. requirements.md フォーマット
-
-`.kiro/steering/bdd.md` のフォーマットに従って作成:
+### Step 2: requirements.md フォーマット
 
 ```markdown
 # {機能名} - 要件定義
@@ -108,7 +90,7 @@ Then ...
 ```
 ```
 
-### 3. テスト生成前の確認
+### Step 3: テスト生成前の確認
 
 **テスト生成前に必ず以下を提示**:
 
@@ -126,11 +108,15 @@ Then ...
 
 ユーザーの承認後にのみテストを生成する。
 
-### 4. GWT テスト生成
+### Step 4: GWT テスト生成
 
 requirements.md の各シナリオを `scenario()` ヘルパーを使ったテストに変換:
 
 ```php
+<?php
+
+declare(strict_types=1);
+
 describe('UC-01: {ユースケース名}', function () {
     it('Scenario 1.1: {シナリオ名}', function () {
         scenario('{シナリオの説明}')
@@ -148,12 +134,12 @@ describe('UC-01: {ユースケース名}', function () {
 });
 ```
 
-### 5. ファイル配置
+### Step 5: ファイル配置
 
 - Spec: `.kiro/specs/{feature}/requirements.md`
 - Test: `tests/Feature/{Feature}/{Feature}GwtTest.php`
 
-### 6. テスト実行
+### Step 6: テスト実行
 
 ```bash
 docker compose exec app ./vendor/bin/pest tests/Feature/{Feature}/
@@ -161,7 +147,7 @@ docker compose exec app ./vendor/bin/pest tests/Feature/{Feature}/
 
 ---
 
-## エラー処理
+## Error Handling
 
 ### requirements.md がない状態で Feature テスト要求された場合
 
@@ -190,7 +176,7 @@ requirements.md にシナリオが定義されていません。
 
 ---
 
-## 出力例
+## Output
 
 `/bdd auth` 実行時:
 
@@ -200,7 +186,7 @@ requirements.md にシナリオが定義されていません。
 
 ---
 
-## 参照
+## References
 
 - `.kiro/steering/bdd.md` - BDD ガイドライン
 - `tests/Support/Gwt/Scenario.php` - GWT ヘルパー
