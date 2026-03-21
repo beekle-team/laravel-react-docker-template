@@ -13,7 +13,7 @@ license: MIT
 
 ## プロジェクトコンテキスト
 
-**Stack**: Laravel 12 + Inertia.js v2 + React 19 + TypeScript
+**Stack**: Laravel 13 + Inertia.js v2 + React 18 + TypeScript
 **Data Layer**: Spatie Laravel Data v4 + TypeScript Transformer v2
 **Routing**: Ziggy (`route()` helper)
 **Styling**: Tailwind CSS v4

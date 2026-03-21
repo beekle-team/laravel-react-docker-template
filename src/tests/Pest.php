@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+use Tests\Support\Gwt\Scenario;
+use Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +15,7 @@ declare(strict_types=1);
 |
 */
 
-pest()->extend(Tests\TestCase::class)
+pest()->extend(TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature', 'Unit');
 
@@ -52,7 +54,7 @@ expect()->extend('toBeOne', function () {
  *     ->when('登録APIを呼び出す', fn ($data) => post('/register', $data))
  *     ->then('成功レスポンス', fn ($response) => $response->assertOk());
  */
-function scenario(string $description): Tests\Support\Gwt\Scenario
+function scenario(string $description): Scenario
 {
-    return new Tests\Support\Gwt\Scenario($description);
+    return new Scenario($description);
 }
