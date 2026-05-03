@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "tsc && vite build",
+        "build": "php artisan wayfinder:generate --with-form && tsc && vite build",
         "dev": "vite",
         "lint": "biome lint .",
         "format": "biome format --write .",
