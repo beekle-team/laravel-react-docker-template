@@ -1,3 +1,4 @@
+import { store as passwordResetStore } from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -13,7 +14,7 @@ export default function ResetPassword({
     token: string;
     email: string;
 }) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, submit: submitForm, processing, errors, reset } = useForm({
         token: token,
         email: email,
         password: '',
@@ -23,7 +24,7 @@ export default function ResetPassword({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('password.store'), {
+        submitForm(passwordResetStore(), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };

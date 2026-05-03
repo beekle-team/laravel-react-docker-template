@@ -1,15 +1,17 @@
+import { store as verificationSendStore } from '@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController';
 import PrimaryButton from '@/Components/PrimaryButton';
 import GuestLayout from '@/Layouts/GuestLayout';
+import { logout } from '@/routes';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    const { post, processing } = useForm({});
+    const { submit: submitForm, processing } = useForm({});
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('verification.send'));
+        submitForm(verificationSendStore());
     };
 
     return (
@@ -37,8 +39,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     </PrimaryButton>
 
                     <Link
-                        href={route('logout')}
-                        method="post"
+                        href={logout()}
                         as="button"
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >

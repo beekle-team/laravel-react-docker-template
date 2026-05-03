@@ -1,3 +1,4 @@
+import { store as confirmPasswordStore } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -7,14 +8,14 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, submit: submitForm, processing, errors, reset } = useForm({
         password: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(route('password.confirm'), {
+        submitForm(confirmPasswordStore(), {
             onFinish: () => reset('password'),
         });
     };
