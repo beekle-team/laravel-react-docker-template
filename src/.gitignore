@@ -1,24 +1,58 @@
-*.log
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
+# Laravel
+/vendor
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
+/bootstrap/cache/*.php
+
+# Environment
+.env
+.env.backup
+.env.production
+!.env.example
+
+# Logs
+*.log
+
+# Testing
+/.phpunit.cache
+.phpunit.result.cache
+/coverage
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+/.idea
+/.vscode
+/.fleet
+/.nova
+/.zed
+.phpactor.json
+
+# IDE Helper (auto-generated)
+.phpstorm.meta.php
+_ide_helper.php
+_ide_helper_models.php
+
+# Wayfinder (auto-generated)
+/resources/js/actions
+/resources/js/routes
+/resources/js/wayfinder
+
+# Auth
+/auth.json
+
+# Legacy
 Homestead.json
 Homestead.yaml
-Thumbs.db
+
+# Playwright
+/test-results
+/playwright-report
+
+# Misc
+npm-debug.log
+yarn-error.log

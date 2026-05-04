@@ -1,3 +1,4 @@
+import { destroy as profileDestroy } from '@/actions/App/Http/Controllers/ProfileController';
 import DangerButton from '@/Components/DangerButton';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -18,7 +19,7 @@ export default function DeleteUserForm({
     const {
         data,
         setData,
-        delete: destroy,
+        submit: submitForm,
         processing,
         reset,
         errors,
@@ -34,7 +35,7 @@ export default function DeleteUserForm({
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
 
-        destroy(route('profile.destroy'), {
+        submitForm(profileDestroy(), {
             preserveScroll: true,
             onSuccess: () => closeModal(),
             onError: () => passwordInput.current?.focus(),

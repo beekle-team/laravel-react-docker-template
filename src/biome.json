@@ -23,7 +23,10 @@
             "storage",
             "bootstrap/cache",
             "public/build",
-            "*.blade.php"
+            "*.blade.php",
+            "resources/js/actions",
+            "resources/js/routes",
+            "resources/js/wayfinder"
         ]
     }
 }

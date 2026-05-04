@@ -1,3 +1,4 @@
+import { update as passwordUpdate } from '@/actions/App/Http/Controllers/Auth/PasswordController';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -18,7 +19,7 @@ export default function UpdatePasswordForm({
         data,
         setData,
         errors,
-        put,
+        submit: submitForm,
         reset,
         processing,
         recentlySuccessful,
@@ -31,7 +32,7 @@ export default function UpdatePasswordForm({
     const updatePassword: FormEventHandler = (e) => {
         e.preventDefault();
 
-        put(route('password.update'), {
+        submitForm(passwordUpdate(), {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {
