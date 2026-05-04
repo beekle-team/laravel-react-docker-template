@@ -99,9 +99,6 @@ jobs:
     - name: Generate Key
       run: php artisan key:generate
 
-    - name: Generate Wayfinder Types
-      run: php artisan wayfinder:generate --with-form
-
     - name: Build Frontend Assets
       run: npm run build
 
