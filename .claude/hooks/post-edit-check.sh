@@ -12,6 +12,15 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
 case "$EXT" in
   php)
+    # Service / Action classes become generic buckets; keep logic in Models.
+    if [[ "$FILE_PATH" == *"/app/Services/"* || "$FILE_PATH" == *"/app/Actions/"* ]]; then
+      echo "BLOCK: Service / Action classes are not allowed."
+      echo "Place DB logic in Eloquent Models, external API logic in Models/Gateway, and shared model behavior in Models/Concerns."
+    elif [[ "$FILE_PATH" == *Service.php && "$FILE_PATH" != *"/app/Providers/"*ServiceProvider.php ]]; then
+      echo "BLOCK: Service classes are not allowed."
+      echo "Place DB logic in Eloquent Models, external API logic in Models/Gateway, and shared model behavior in Models/Concerns."
+    fi
+
     # Enforce Form Request based input validation in controllers.
     if [[ "$FILE_PATH" == *"/app/Http/Controllers/"* ]]; then
       if grep -nE '(\$request->validate\(|request\(\)->validate\()' "$FILE_PATH" >/tmp/form-request-validation-check.txt; then

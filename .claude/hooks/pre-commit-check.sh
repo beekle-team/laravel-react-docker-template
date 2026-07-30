@@ -18,6 +18,30 @@ if [ -n "$STAGED_PHP" ]; then
   echo ">>> PHP: Running Pint..."
   cd "$PROJECT_DIR"
 
+  SERVICE_LAYER_FILES=""
+  while IFS= read -r FILE; do
+    [ -z "$FILE" ] && continue
+
+    if [[ "$FILE" == src/app/Services/* || "$FILE" == src/app/Actions/* ]]; then
+      SERVICE_LAYER_FILES="${SERVICE_LAYER_FILES}${FILE}
+"
+      continue
+    fi
+
+    if [[ "$FILE" == src/app/*Service.php || "$FILE" == src/app/**/*Service.php ]]; then
+      if [[ "$FILE" != src/app/Providers/*ServiceProvider.php ]]; then
+        SERVICE_LAYER_FILES="${SERVICE_LAYER_FILES}${FILE}
+"
+      fi
+    fi
+  done < <(printf '%s\n' "$STAGED_PHP")
+  if [ -n "$SERVICE_LAYER_FILES" ]; then
+    echo "BLOCK: Service / Action classes are not allowed."
+    echo "$SERVICE_LAYER_FILES"
+    echo "Place DB logic in Eloquent Models, external API logic in Models/Gateway, and shared model behavior in Models/Concerns."
+    ERRORS=1
+  fi
+
   CONTROLLER_VALIDATION=""
   while IFS= read -r FILE; do
     [ -z "$FILE" ] && continue
