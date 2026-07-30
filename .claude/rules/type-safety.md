@@ -9,6 +9,7 @@
 - `resources/js/types/index.d.ts` への手動型追加
 - `resources/js/types/` 配下への手動 interface/type 追加
 - Data クラスなしでのモデル/API レスポンス型定義
+- Inertia props にモデル/API レスポンス由来の raw array を渡すこと
 - `any` 型の使用
 
 ### 違反検出トリガー
@@ -48,8 +49,9 @@ pre-commit hook は staged diff の追加行を検査し、以下をブロック
 ```
 1. app/Data/{Model}Data.php を作成
 2. Enum が必要なら app/Enums/{Name}.php を作成
-3. php artisan typescript:transform を実行
-4. generated.d.ts から import して使用
+3. Controller の Inertia props は Data::from() / Data::collect() で渡す
+4. php artisan typescript:transform を実行
+5. generated.d.ts から import して使用
 ```
 
 ## Data クラスの作成例

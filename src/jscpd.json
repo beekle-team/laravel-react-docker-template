@@ -1,0 +1,19 @@
+{
+    "threshold": 6,
+    "minLines": 10,
+    "minTokens": 100,
+    "reporters": ["console"],
+    "ignore": [
+        "**/node_modules/**",
+        "**/app/Http/Requests/**",
+        "**/config/**",
+        "**/database/migrations/**",
+        "**/package-lock.json",
+        "**/public/build/**",
+        "**/resources/js/actions/**",
+        "**/resources/js/routes/**",
+        "**/resources/js/types/generated.d.ts",
+        "**/resources/js/wayfinder/**",
+        "**/vendor/**"
+    ]
+}

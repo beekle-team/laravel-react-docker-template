@@ -6,7 +6,13 @@
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": true
+            "recommended": true,
+            "a11y": {
+                "noLabelWithoutControl": "off",
+                "noSvgWithoutTitle": "off",
+                "useAltText": "off",
+                "useKeyWithClickEvents": "off"
+            }
         }
     },
     "formatter": {
@@ -26,6 +32,7 @@
             "*.blade.php",
             "resources/js/actions",
             "resources/js/routes",
+            "resources/js/types/generated.d.ts",
             "resources/js/wayfinder"
         ]
     }

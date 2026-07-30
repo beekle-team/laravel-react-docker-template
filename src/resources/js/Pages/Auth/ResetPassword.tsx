@@ -1,11 +1,11 @@
-import { store as passwordResetStore } from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { store as passwordResetStore } from "@/actions/App/Http/Controllers/Auth/NewPasswordController";
+import { Head, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
 
 export default function ResetPassword({
     token,
@@ -14,18 +14,26 @@ export default function ResetPassword({
     token: string;
     email: string;
 }) {
-    const { data, setData, submit: submitForm, processing, errors, reset } = useForm({
+    const {
+        data,
+        setData,
+        submit: submitForm,
+        processing,
+        errors,
+        reset,
+        validate,
+    } = useForm(passwordResetStore(), {
         token: token,
         email: email,
-        password: '',
-        password_confirmation: '',
+        password: "",
+        password_confirmation: "",
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         submitForm(passwordResetStore(), {
-            onFinish: () => reset('password', 'password_confirmation'),
+            onFinish: () => reset("password", "password_confirmation"),
         });
     };
 
@@ -44,7 +52,8 @@ export default function ResetPassword({
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => setData("email", e.target.value)}
+                        onBlur={() => validate("email")}
                     />
 
                     <InputError message={errors.email} className="mt-2" />
@@ -61,17 +70,15 @@ export default function ResetPassword({
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => setData("password", e.target.value)}
+                        onBlur={() => validate("password")}
                     />
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
+                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
 
                     <TextInput
                         type="password"
@@ -79,15 +86,11 @@ export default function ResetPassword({
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
+                        onChange={(e) => setData("password_confirmation", e.target.value)}
+                        onBlur={() => validate("password_confirmation")}
                     />
 
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
+                    <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">

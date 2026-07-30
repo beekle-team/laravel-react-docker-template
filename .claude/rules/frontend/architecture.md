@@ -41,6 +41,8 @@ resources/js/
 
 `Pages` はなくさない。Inertia のルーティング境界として残す。
 
+既存の `Pages/**/Partials` は段階的移行対象とする。新規 feature 固有 UI / hooks / helpers は `features/{feature}` へ作り、既存 Partials は触るタイミングで feature 配下へ寄せる。
+
 ## Features
 
 feature 固有の UI、hooks、helper、型は `features/{feature}` に置く。

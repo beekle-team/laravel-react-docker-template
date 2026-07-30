@@ -1,26 +1,34 @@
-import { store as registerStore } from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { login } from '@/routes';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { store as registerStore } from "@/actions/App/Http/Controllers/Auth/RegisteredUserController";
+import { login } from "@/routes";
+import { Head, Link, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
 
 export default function Register() {
-    const { data, setData, submit: submitForm, processing, errors, reset } = useForm({
-        name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+    const {
+        data,
+        setData,
+        submit: submitForm,
+        processing,
+        errors,
+        reset,
+        validate,
+    } = useForm(registerStore(), {
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         submitForm(registerStore(), {
-            onFinish: () => reset('password', 'password_confirmation'),
+            onFinish: () => reset("password", "password_confirmation"),
         });
     };
 
@@ -39,7 +47,8 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="name"
                         isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData("name", e.target.value)}
+                        onBlur={() => validate("name")}
                         required
                     />
 
@@ -56,7 +65,8 @@ export default function Register() {
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => setData("email", e.target.value)}
+                        onBlur={() => validate("email")}
                         required
                     />
 
@@ -73,7 +83,8 @@ export default function Register() {
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => setData("password", e.target.value)}
+                        onBlur={() => validate("password")}
                         required
                     />
 
@@ -81,10 +92,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
+                    <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
 
                     <TextInput
                         id="password_confirmation"
@@ -93,16 +101,12 @@ export default function Register() {
                         value={data.password_confirmation}
                         className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
+                        onChange={(e) => setData("password_confirmation", e.target.value)}
+                        onBlur={() => validate("password_confirmation")}
                         required
                     />
 
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
+                    <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
                 <div className="mt-4 flex items-center justify-end">

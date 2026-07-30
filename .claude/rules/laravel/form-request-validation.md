@@ -13,6 +13,8 @@ HTTP リクエストの入力検証は Form Request オブジェクト経由に�
 - バリデーションルールは `app/Http/Requests/**` 配下の `FormRequest` サブクラスの `rules()` に定義する
 - Controller のアクション引数には用途別の Form Request を型指定する
 - Controller では `$request->validated()` で検証済みデータを取得する
+- Form Request を使う `POST` / `PUT` / `PATCH` / `DELETE` route には `HandlePrecognitiveRequests` middleware を付ける
+- React の入力フォームは `@inertiajs/react` の `useForm(route, data)` または `.withPrecognition(method, url)` を使い、入力単位で `validate('field')` を呼ぶ
 
 ## 例
 
@@ -30,6 +32,30 @@ public function store(Request $request): RedirectResponse
         'email' => ['required', 'email'],
     ]);
 }
+```
+
+## Live Validation
+
+Laravel Precognition を標準にする。Form Request のルールを二重実装せず、サーバ側のルールをそのままライブ検証に使う。
+
+```php
+use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+
+Route::post('/users', [UserController::class, 'store'])
+    ->middleware(HandlePrecognitiveRequests::class);
+```
+
+```tsx
+const form = useForm(storeUser(), {
+    name: '',
+    email: '',
+});
+
+<TextInput
+    value={form.data.email}
+    onChange={(event) => form.setData('email', event.target.value)}
+    onBlur={() => form.validate('email')}
+/>
 ```
 
 ## 例外
