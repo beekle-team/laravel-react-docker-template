@@ -39,6 +39,7 @@ Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life
 - Keep steering current and verify alignment with `/kiro:spec-status`
 - Follow the user's instructions precisely, and within that scope act autonomously: gather the necessary context and complete the requested work end-to-end in this run, asking questions only when essential information is missing or the instructions are critically ambiguous.
 - HTTP 入力検証は `.claude/rules/laravel/form-request-validation.md` に従い、Controller の `$request->validate()` ではなく Form Request 経由に統一する
+- Service クラスは禁止し、DB 永続化は Eloquent Model、外部接続は Gateway Model、共通振る舞いは Concerns に置く。詳細は `.claude/rules/laravel/model-layer-boundaries.md` を参照
 
 ## Steering Configuration
 - Load entire `.kiro/steering/` as project memory
