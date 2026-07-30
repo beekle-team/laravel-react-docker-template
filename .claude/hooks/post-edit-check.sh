@@ -12,6 +12,15 @@ PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
 case "$EXT" in
   php)
+    # Enforce Form Request based input validation in controllers.
+    if [[ "$FILE_PATH" == *"/app/Http/Controllers/"* ]]; then
+      if grep -nE '(\$request->validate\(|request\(\)->validate\()' "$FILE_PATH" >/tmp/form-request-validation-check.txt; then
+        echo "BLOCK: Controller input validation must use a Form Request object."
+        cat /tmp/form-request-validation-check.txt
+        echo "Move rules to app/Http/Requests/** and read validated data with \$request->validated()."
+      fi
+    fi
+
     # Run PHPStan on the file
     if [ -f "$PROJECT_ROOT/vendor/bin/phpstan" ]; then
       echo "📋 Analyzing: $(basename "$FILE_PATH")"
