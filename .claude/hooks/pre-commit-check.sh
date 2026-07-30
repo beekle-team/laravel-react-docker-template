@@ -18,6 +18,22 @@ if [ -n "$STAGED_PHP" ]; then
   echo ">>> PHP: Running Pint..."
   cd "$PROJECT_DIR"
 
+  CONTROLLER_VALIDATION=""
+  while IFS= read -r FILE; do
+    [ -z "$FILE" ] && continue
+    MATCHES=$(grep -nE '(\$request->validate\(|request\(\)->validate\()' "$FILE" 2>/dev/null || true)
+    if [ -n "$MATCHES" ]; then
+      CONTROLLER_VALIDATION="${CONTROLLER_VALIDATION}${FILE}:${MATCHES}
+"
+    fi
+  done < <(printf '%s\n' "$STAGED_PHP" | grep '^src/app/Http/Controllers/.*\.php$' || true)
+  if [ -n "$CONTROLLER_VALIDATION" ]; then
+    echo "BLOCK: Controller input validation must use Form Request objects."
+    echo "$CONTROLLER_VALIDATION"
+    echo "Move rules to app/Http/Requests/** and read validated data with \$request->validated()."
+    ERRORS=1
+  fi
+
   if ! ./vendor/bin/pint --test 2>&1; then
     echo "BLOCK: Pint found formatting issues. Run: composer pint"
     ERRORS=1
