@@ -39,8 +39,11 @@ Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life
 - Keep steering current and verify alignment with `/kiro:spec-status`
 - Follow the user's instructions precisely, and within that scope act autonomously: gather the necessary context and complete the requested work end-to-end in this run, asking questions only when essential information is missing or the instructions are critically ambiguous.
 - HTTP 入力検証は `.claude/rules/laravel/form-request-validation.md` に従い、Controller の `$request->validate()` ではなく Form Request 経由に統一する
+- Form Request を使う変更系 route は Laravel Precognition に対応し、React フォームは Inertia の Precognition API でライブ検証する
+- Inertia props は `.claude/rules/laravel/inertia-props.md` に従い、モデル/API レスポンス由来の構造化データを Data DTO 経由で渡す
 - Service クラスは禁止し、DB 永続化は Eloquent Model、外部接続は Gateway Model、共通振る舞いは Concerns に置く。詳細は `.claude/rules/laravel/model-layer-boundaries.md` を参照
 - React 側は Inertia の Pages を入口として残し、feature 固有 UI / hooks / helpers は `features/{feature}` に置く。詳細は `.claude/rules/frontend/architecture.md` を参照
+- フロント品質ゲートは `.claude/rules/frontend/quality-scans.md` に従い、Biome / TypeScript / knip / jscpd を CI で実行する
 
 ## Steering Configuration
 - Load entire `.kiro/steering/` as project memory

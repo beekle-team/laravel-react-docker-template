@@ -1,13 +1,13 @@
-import { store as loginStore } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { request as passwordRequest } from '@/routes/password';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import Checkbox from "@/Components/Checkbox";
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { store as loginStore } from "@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController";
+import { request as passwordRequest } from "@/routes/password";
+import { Head, Link, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
 
 export default function Login({
     status,
@@ -16,9 +16,17 @@ export default function Login({
     status?: string;
     canResetPassword: boolean;
 }) {
-    const { data, setData, submit: submitForm, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
+    const {
+        data,
+        setData,
+        submit: submitForm,
+        processing,
+        errors,
+        reset,
+        validate,
+    } = useForm(loginStore(), {
+        email: "",
+        password: "",
         remember: false as boolean,
     });
 
@@ -26,7 +34,7 @@ export default function Login({
         e.preventDefault();
 
         submitForm(loginStore(), {
-            onFinish: () => reset('password'),
+            onFinish: () => reset("password"),
         });
     };
 
@@ -34,11 +42,7 @@ export default function Login({
         <GuestLayout>
             <Head title="Log in" />
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    {status}
-                </div>
-            )}
+            {status && <div className="mb-4 text-sm font-medium text-green-600">{status}</div>}
 
             <form onSubmit={submit}>
                 <div>
@@ -52,7 +56,8 @@ export default function Login({
                         className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
-                        onChange={(e) => setData('email', e.target.value)}
+                        onChange={(e) => setData("email", e.target.value)}
+                        onBlur={() => validate("email")}
                     />
 
                     <InputError message={errors.email} className="mt-2" />
@@ -68,7 +73,8 @@ export default function Login({
                         value={data.password}
                         className="mt-1 block w-full"
                         autoComplete="current-password"
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => setData("password", e.target.value)}
+                        onBlur={() => validate("password")}
                     />
 
                     <InputError message={errors.password} className="mt-2" />
@@ -80,15 +86,10 @@ export default function Login({
                             name="remember"
                             checked={data.remember}
                             onChange={(e) =>
-                                setData(
-                                    'remember',
-                                    (e.target.checked || false) as false,
-                                )
+                                setData("remember", (e.target.checked || false) as false)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
-                        </span>
+                        <span className="ms-2 text-sm text-gray-600">Remember me</span>
                     </label>
                 </div>
 

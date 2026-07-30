@@ -19,7 +19,7 @@ Service クラスは禁止する。何でも入る便利な置き場になりや
 
 ## Eloquent Model
 
-DB 永続化を持つものは Eloquent Model に書く。ORM の責務は Eloquent に置く。
+DB 永続化を持つものは `App\Models\Eloquent` の Eloquent Model に書く。ORM の責務は Eloquent に置く。
 
 書くもの:
 
@@ -42,6 +42,8 @@ DB 永続化を持つものは Eloquent Model に書く。ORM の責務は Eloqu
 
 外部サービス/API 接続は `App\Models\Gateway` に置く。インフラサービスは Gateway Model として表現し、Controller や Eloquent Model に通信仕様を漏らさない。
 
+Gateway は `App\Models\Gateway\Model` を継承し、HTTP method validation、timeout、JSON response handling、HTTP error propagation は基底クラスに寄せる。provider 固有の header / auth / base URL は Gateway の `customPendingRequest()` や公開メソッドで閉じ込める。
+
 書くもの:
 
 - HTTP client 呼び出し
@@ -49,12 +51,15 @@ DB 永続化を持つものは Eloquent Model に書く。ORM の責務は Eloqu
 - provider 固有の認証
 - provider 固有のエラー変換
 - 外部リソースを表す軽量な Model
+- `config/services.php` の provider 設定を読む接続情報
 
 例:
 
 - `App\Models\Gateway\OpenRouter\ChatCompletion`
 - `App\Models\Gateway\SendGrid\Mail`
 - `App\Models\Gateway\WebPush\Subscription`
+
+Gateway Model は DB 永続化をしない。Eloquent Model から Gateway を直接呼ばず、Controller や job から明示的に両者を組み合わせる。
 
 ## Concerns / Traits
 

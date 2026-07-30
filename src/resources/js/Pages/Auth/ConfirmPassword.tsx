@@ -1,22 +1,30 @@
-import { store as confirmPasswordStore } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import InputError from "@/Components/InputError";
+import InputLabel from "@/Components/InputLabel";
+import PrimaryButton from "@/Components/PrimaryButton";
+import TextInput from "@/Components/TextInput";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { store as confirmPasswordStore } from "@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController";
+import { Head, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
 
 export default function ConfirmPassword() {
-    const { data, setData, submit: submitForm, processing, errors, reset } = useForm({
-        password: '',
+    const {
+        data,
+        setData,
+        submit: submitForm,
+        processing,
+        errors,
+        reset,
+        validate,
+    } = useForm(confirmPasswordStore(), {
+        password: "",
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         submitForm(confirmPasswordStore(), {
-            onFinish: () => reset('password'),
+            onFinish: () => reset("password"),
         });
     };
 
@@ -25,8 +33,8 @@ export default function ConfirmPassword() {
             <Head title="Confirm Password" />
 
             <div className="mb-4 text-sm text-gray-600">
-                This is a secure area of the application. Please confirm your
-                password before continuing.
+                This is a secure area of the application. Please confirm your password before
+                continuing.
             </div>
 
             <form onSubmit={submit}>
@@ -40,7 +48,8 @@ export default function ConfirmPassword() {
                         value={data.password}
                         className="mt-1 block w-full"
                         isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
+                        onChange={(e) => setData("password", e.target.value)}
+                        onBlur={() => validate("password")}
                     />
 
                     <InputError message={errors.password} className="mt-2" />

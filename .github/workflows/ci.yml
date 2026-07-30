@@ -40,6 +40,53 @@ jobs:
     - name: Execute Larastan (Static Analysis)
       run: ./vendor/bin/phpstan analyse --memory-limit=2G
 
+  frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src
+
+    name: Frontend Quality
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: src/package-lock.json
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.4
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+        coverage: none
+
+    - name: Install Composer Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Install NPM Dependencies
+      run: npm ci
+
+    - name: Generate Wayfinder Routes
+      run: php artisan wayfinder:generate --with-form
+
+    - name: Execute Biome
+      run: npm run lint:js
+
+    - name: Execute TypeScript
+      run: npm run types
+
+    - name: Execute Dead Code Scan
+      run: npm run lint:dead-code
+
+    - name: Execute Duplication Scan
+      run: npm run lint:duplication
+
   tests:
     runs-on: ubuntu-latest
     
