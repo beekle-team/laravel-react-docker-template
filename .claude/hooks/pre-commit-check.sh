@@ -82,6 +82,37 @@ if [ -n "$STAGED_TS" ]; then
   ORIGINAL_DIR=$(pwd)
   cd "$PROJECT_DIR/src"
 
+  TYPE_SAFETY_ERRORS=""
+  while IFS= read -r FILE; do
+    [ -z "$FILE" ] && continue
+
+    ADDED_LINES=$(git -C "$PROJECT_DIR" diff --cached -U0 -- "$FILE" | grep '^+' | grep -v '^+++' || true)
+
+    if [ -n "$ADDED_LINES" ]; then
+      ANY_MATCHES=$(printf '%s\n' "$ADDED_LINES" | grep -nE '(:| as |<|,|\(|\[|\{|=)\s*any\b|Array<\s*any\s*>|Record<[^>]*,\s*any\s*>' || true)
+      if [ -n "$ANY_MATCHES" ]; then
+        TYPE_SAFETY_ERRORS="${TYPE_SAFETY_ERRORS}${FILE}: TypeScript any is not allowed.
+${ANY_MATCHES}
+"
+      fi
+
+      if [[ "$FILE" == src/resources/js/types/* && "$FILE" != src/resources/js/types/generated.d.ts && "$FILE" != src/resources/js/types/vite-env.d.ts ]]; then
+        MANUAL_TYPES=$(printf '%s\n' "$ADDED_LINES" | grep -nE '^\+\s*export\s+(interface|type)\s+' || true)
+        if [ -n "$MANUAL_TYPES" ]; then
+          TYPE_SAFETY_ERRORS="${TYPE_SAFETY_ERRORS}${FILE}: Manual exported types under resources/js/types are not allowed.
+${MANUAL_TYPES}
+"
+        fi
+      fi
+    fi
+  done < <(printf '%s\n' "$STAGED_TS")
+  if [ -n "$TYPE_SAFETY_ERRORS" ]; then
+    echo "BLOCK: TypeScript types must come from Laravel Data generated types."
+    echo "$TYPE_SAFETY_ERRORS"
+    echo "Create app/Data/** with #[TypeScript], run php artisan typescript:transform, and avoid any."
+    ERRORS=1
+  fi
+
   if ! npm run lint:js 2>&1; then
     echo "BLOCK: Biome lint failed"
     ERRORS=1

@@ -18,6 +18,20 @@
 - `interface` または `type` を types/ 配下に書こうとした時
 - `export interface` を手動で追加しようとした時
 - Controller から Inertia にデータを渡す型が必要な時
+- `any` 型を追加しようとした時
+
+### 強制ブロック
+
+pre-commit hook は staged diff の追加行を検査し、以下をブロックする:
+
+- TypeScript / TSX / JS / JSX への `any` 型追加
+- `resources/js/types/**` 配下への手動 `export interface` / `export type` 追加
+
+例外:
+
+- `resources/js/types/generated.d.ts`: `php artisan typescript:transform` による自動生成のみ
+- `resources/js/types/vite-env.d.ts`: Vite の ambient reference
+- component 内のローカル Props 型。ただし `any` は使わない
 
 ### 許可される型定義
 
