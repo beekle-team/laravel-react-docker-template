@@ -37,6 +37,20 @@ case "$EXT" in
     fi
     ;;
   ts|tsx)
+    if grep -nE '(:| as |<|,|\(|\[|\{|=)\s*any\b|Array<\s*any\s*>|Record<[^>]*,\s*any\s*>' "$FILE_PATH" >/tmp/type-safety-any-check.txt; then
+      echo "BLOCK: TypeScript any is not allowed."
+      cat /tmp/type-safety-any-check.txt
+      echo "Use generated Data types, precise local Props, unknown, or a generic type parameter instead."
+    fi
+
+    if [[ "$FILE_PATH" == *"/resources/js/types/"* && "$FILE_PATH" != *"/resources/js/types/generated.d.ts" && "$FILE_PATH" != *"/resources/js/types/vite-env.d.ts" ]]; then
+      if grep -nE '^\s*export\s+(interface|type)\s+' "$FILE_PATH" >/tmp/type-safety-manual-types-check.txt; then
+        echo "BLOCK: Manual exported types under resources/js/types are not allowed."
+        cat /tmp/type-safety-manual-types-check.txt
+        echo "Create app/Data/** with #[TypeScript], run php artisan typescript:transform, and use resources/js/types/generated.d.ts."
+      fi
+    fi
+
     # Run TypeScript check
     if [ -f "$PROJECT_ROOT/node_modules/.bin/tsc" ]; then
       echo "📋 Type checking: $(basename "$FILE_PATH")"
@@ -45,6 +59,12 @@ case "$EXT" in
     fi
     ;;
   js|jsx)
+    if grep -nE '(:| as |<|,|\(|\[|\{|=)\s*any\b|Array<\s*any\s*>|Record<[^>]*,\s*any\s*>' "$FILE_PATH" >/tmp/type-safety-any-check.txt; then
+      echo "BLOCK: TypeScript any is not allowed."
+      cat /tmp/type-safety-any-check.txt
+      echo "Use generated Data types, precise local Props, unknown, or a generic type parameter instead."
+    fi
+
     # Run Biome lint
     if [ -f "$PROJECT_ROOT/node_modules/.bin/biome" ]; then
       echo "📋 Linting: $(basename "$FILE_PATH")"
