@@ -111,12 +111,27 @@ tests/
 ```
 
 ### Frontend Tests (Vitest)
+
+テスト対象と同じ場所に `*.test.tsx` / `*.test.ts` を置く。
+
 ```
 resources/js/
-├── __tests__/         # Test files
-│   ├── components/    # Component tests
-│   ├── hooks/         # Custom hook tests
-│   └── utils/         # Utility function tests
+├── Components/
+│   ├── TextInput.tsx
+│   └── TextInput.test.tsx    # 対象のとなりに置く
+├── features/{feature}/
+│   ├── hooks/useThing.ts
+│   └── hooks/useThing.test.ts
+└── test/
+    └── setup.ts              # jest-dom の登録
+```
+
+### E2E Tests (Playwright)
+
+```
+playwright/
+├── home.spec.ts       # ランディングページ
+└── auth.spec.ts       # 認証フロー
 ```
 
 ## Testing Strategy
@@ -246,6 +261,8 @@ describe('useForm', () => {
 ```
 
 ### E2E Browser Tests (Pest v4 + Playwright)
+
+> このプロジェクトの E2E は Playwright の runner (`playwright/**/*.spec.ts`, `npm run test:e2e`) で実行する。Pest v4 の Browser Testing は未セットアップなので、以下は参考情報として扱い、実際のテストは `.claude/rules/frontend/testing.md` に従って `playwright/` 配下に書く。
 
 Pest v4のBrowser Testing機能を使用して、実際のブラウザでE2Eテストを実行。
 
@@ -468,16 +485,26 @@ php artisan test --parallel
 
 ```bash
 # Run all tests
-npm run test
+npm run test:unit
 
 # Watch mode
-npm run test:watch
-
-# With coverage
-npm run test:coverage
+npm run test:unit:watch
 
 # Specific file
-npm run test -- PostCard
+npm run test:unit -- TextInput
+```
+
+### E2E (Playwright)
+
+```bash
+# Run all specs (php artisan serve は Playwright が自動起動する)
+npm run test:e2e
+
+# Chromium だけ
+npx playwright test --project=chromium
+
+# 起動済みの環境に対して実行する
+PLAYWRIGHT_BASE_URL=http://localhost:8080 npm run test:e2e
 ```
 
 ## BDD Implementation Workflow
