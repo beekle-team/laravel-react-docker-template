@@ -1,10 +1,10 @@
+import { Head, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
+import { store as passwordEmailStore } from "@/actions/App/Http/Controllers/Auth/PasswordResetLinkController";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { store as passwordEmailStore } from "@/actions/App/Http/Controllers/Auth/PasswordResetLinkController";
-import { Head, useForm } from "@inertiajs/react";
-import type { FormEventHandler } from "react";
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const {

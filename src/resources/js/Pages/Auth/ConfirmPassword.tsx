@@ -1,11 +1,11 @@
+import { Head, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
+import { store as confirmPasswordStore } from "@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { store as confirmPasswordStore } from "@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController";
-import { Head, useForm } from "@inertiajs/react";
-import type { FormEventHandler } from "react";
 
 export default function ConfirmPassword() {
     const {
