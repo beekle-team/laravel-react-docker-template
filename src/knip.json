@@ -5,9 +5,7 @@
         "resources/js/Pages/**/*.tsx",
         "playwright.config.ts",
         "scripts/*.mjs",
-        "vite.config.js",
-        "tailwind.config.js",
-        "postcss.config.js"
+        "vite.config.js"
     ],
     "project": ["resources/js/**/*.{ts,tsx}", "*.config.{js,ts}"],
     "ignoreBinaries": ["php"],
@@ -22,11 +20,9 @@
         "@laravel/vite-plugin-wayfinder",
         "@tailwindcss/forms",
         "@vitejs/plugin-react",
-        "autoprefixer",
         "concurrently",
         "laravel-vite-plugin",
         "playwright",
-        "postcss",
         "tailwindcss"
     ]
 }

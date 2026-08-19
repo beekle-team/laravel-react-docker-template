@@ -8,7 +8,7 @@ export default function Checkbox({
         <input
             {...props}
             type="checkbox"
-            className={`rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 ${className}`}
+            className={`rounded-sm border-gray-300 text-indigo-600 shadow-xs focus:ring-indigo-500 ${className}`}
         />
     );
 }
