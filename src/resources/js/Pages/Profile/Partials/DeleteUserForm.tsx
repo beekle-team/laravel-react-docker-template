@@ -1,18 +1,14 @@
+import { useForm } from "@inertiajs/react";
+import { type FormEventHandler, useRef, useState } from "react";
+import { destroy as profileDestroy } from "@/actions/App/Http/Controllers/ProfileController";
 import DangerButton from "@/Components/DangerButton";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import Modal from "@/Components/Modal";
 import SecondaryButton from "@/Components/SecondaryButton";
 import TextInput from "@/Components/TextInput";
-import { destroy as profileDestroy } from "@/actions/App/Http/Controllers/ProfileController";
-import { useForm } from "@inertiajs/react";
-import { type FormEventHandler, useRef, useState } from "react";
 
-export default function DeleteUserForm({
-    className = "",
-}: {
-    className?: string;
-}) {
+export default function DeleteUserForm({ className = "" }: { className?: string }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
     const passwordInput = useRef<HTMLInputElement>(null);
 

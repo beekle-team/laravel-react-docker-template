@@ -1,19 +1,13 @@
+import { Head, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
+import { store as passwordResetStore } from "@/actions/App/Http/Controllers/Auth/NewPasswordController";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { store as passwordResetStore } from "@/actions/App/Http/Controllers/Auth/NewPasswordController";
-import { Head, useForm } from "@inertiajs/react";
-import type { FormEventHandler } from "react";
 
-export default function ResetPassword({
-    token,
-    email,
-}: {
-    token: string;
-    email: string;
-}) {
+export default function ResetPassword({ token, email }: { token: string; email: string }) {
     const {
         data,
         setData,

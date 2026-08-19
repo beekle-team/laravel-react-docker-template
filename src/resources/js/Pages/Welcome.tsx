@@ -1,6 +1,6 @@
+import { Head, Link } from "@inertiajs/react";
 import { dashboard, login, register } from "@/routes";
 import type { PageProps } from "@/types";
-import { Head, Link } from "@inertiajs/react";
 
 export default function Welcome({
     auth,

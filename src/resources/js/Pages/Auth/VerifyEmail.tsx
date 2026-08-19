@@ -1,9 +1,9 @@
-import PrimaryButton from "@/Components/PrimaryButton";
-import GuestLayout from "@/Layouts/GuestLayout";
-import { store as verificationSendStore } from "@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController";
-import { logout } from "@/routes";
 import { Head, Link, useForm } from "@inertiajs/react";
 import type { FormEventHandler } from "react";
+import { store as verificationSendStore } from "@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController";
+import PrimaryButton from "@/Components/PrimaryButton";
+import GuestLayout from "@/Layouts/GuestLayout";
+import { logout } from "@/routes";
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { submit: submitForm, processing } = useForm({});

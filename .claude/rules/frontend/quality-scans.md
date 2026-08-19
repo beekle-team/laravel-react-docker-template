@@ -4,7 +4,7 @@ globs: ["src/resources/js/**/*.ts","src/resources/js/**/*.tsx","src/package.json
 
 # Frontend Quality Scans
 
-フロントエンドの品質ゲートは Biome / TypeScript / React Compiler / knip / jscpd を CI で必ず通す。
+フロントエンドの品質ゲートは Biome / TypeScript / React Compiler / knip / jscpd / Vitest を CI で必ず通す。E2E は別ジョブで Playwright を実行する。
 
 ## 必須コマンド
 
@@ -14,11 +14,16 @@ npm run types
 npm run lint:react-compiler
 npm run lint:dead-code
 npm run lint:duplication
+npm run test:unit
 ```
 
 ## React Compiler
 
 `npm run lint:react-compiler` でビルドと同じコンパイラを走らせ、最適化がスキップされたコンポーネント / フックを検出する。ビルドはスキップしても成功するため、この検査を落とさない。詳細は `.claude/rules/frontend/react-compiler.md` を参照。
+
+## テスト
+
+コンポーネント / hook は Vitest（`npm run test:unit`）、画面をまたぐフローは Playwright（CI の E2E ジョブ）で検証する。配置と書き方は `.claude/rules/frontend/testing.md` を参照。
 
 ## Dead Code
 

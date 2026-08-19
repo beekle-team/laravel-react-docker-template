@@ -1,13 +1,13 @@
+import { Head, Link, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
+import { store as loginStore } from "@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController";
 import Checkbox from "@/Components/Checkbox";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { store as loginStore } from "@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController";
 import { request as passwordRequest } from "@/routes/password";
-import { Head, Link, useForm } from "@inertiajs/react";
-import type { FormEventHandler } from "react";
 
 export default function Login({
     status,

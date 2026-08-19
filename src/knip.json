@@ -23,7 +23,6 @@
         "concurrently",
         "laravel-vite-plugin",
         "playwright",
-        "react-compiler-runtime",
         "tailwindcss"
     ]
 }
