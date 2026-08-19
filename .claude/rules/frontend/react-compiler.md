@@ -1,5 +1,5 @@
 ---
-globs: ["src/resources/js/**/*.tsx","src/resources/js/**/*.ts","src/vite.config.js","src/package.json","src/knip.json"]
+globs: ["src/resources/js/**/*.tsx","src/resources/js/**/*.ts","src/vite.config.js","src/react-compiler.config.js","src/scripts/check-react-compiler.mjs","src/package.json","src/knip.json"]
 ---
 
 # React Compiler
@@ -8,6 +8,7 @@ React Compiler (`babel-plugin-react-compiler`) をビルドに常時適用する
 
 ## セットアップ
 
+- コンパイラ設定は `react-compiler.config.js` に置き、ビルド (`vite.config.js`) と CI 検査 (`scripts/check-react-compiler.mjs`) の両方が同じ設定を import する。設定を二重に書かない
 - `vite.config.js` の `@vitejs/plugin-react` に Babel plugin として渡す。React Compiler は Babel pipeline の先頭で走らせる
 - 本プロジェクトは React 18 なので `target: "18"` を指定し、`react-compiler-runtime` の polyfill を経由する。React 19 へ上げたら `target` 指定を外す
 - `react-compiler-runtime` はソースから直接 import せずコンパイラ出力だけが参照するため、`knip.json` の `ignoreDependencies` に入れる
@@ -30,7 +31,16 @@ function LegacyWidget() {
 }
 ```
 
-これは恒久対応ではない。原因の Rules of React 違反を直して directive を消す。
+これは恒久対応ではない。原因の Rules of React 違反を直して directive を消す。opt-out した件数は後述の CI 検査がサマリに出すので、増え続けていないか確認する。
+
+## CI 検査
+
+`npm run lint:react-compiler` で、ビルドと同じコンパイラを `resources/js/**` に対して走らせ、最適化がスキップされた箇所を検出する。ビルドはスキップしても成功してしまうため、この検査がないと最適化の欠落に気づけない。
+
+- 検出対象は `CompileError` / `CompileSkip` / `PipelineError` / `CompileDiagnostic`。1 件でもあれば exit 1
+- `"use no memo"` で明示的に除外した関数は失敗にせず、opt-out 件数としてサマリに出す
+- ビルド設定より厳しい validation（render 中の不純関数、手動メモ化の保証、effect 内 setState / 派生計算）を検査側だけで有効化している
+- React Compiler の ESLint ルール (`eslint-plugin-react-hooks`) は導入していない。このリポジトリのフロント lint は Biome に統一しており、コンパイル阻害要因はこの検査で同等のメッセージが得られるため
 
 ## 検証
 
