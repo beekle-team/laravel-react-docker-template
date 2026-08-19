@@ -1,17 +1,13 @@
+import { Transition } from "@headlessui/react";
+import { useForm } from "@inertiajs/react";
+import { type FormEventHandler, useRef } from "react";
+import { update as passwordUpdate } from "@/actions/App/Http/Controllers/Auth/PasswordController";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
-import { update as passwordUpdate } from "@/actions/App/Http/Controllers/Auth/PasswordController";
-import { Transition } from "@headlessui/react";
-import { useForm } from "@inertiajs/react";
-import { type FormEventHandler, useRef } from "react";
 
-export default function UpdatePasswordForm({
-    className = "",
-}: {
-    className?: string;
-}) {
+export default function UpdatePasswordForm({ className = "" }: { className?: string }) {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
