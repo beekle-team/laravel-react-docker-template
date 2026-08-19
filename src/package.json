@@ -13,11 +13,13 @@
         "test:e2e:install": "playwright install --with-deps",
         "types": "tsc --noEmit",
         "lint:js": "biome lint .",
+        "lint:react-compiler": "node scripts/check-react-compiler.mjs",
         "lint:dead-code": "knip --no-config-hints",
         "lint:duplication": "jscpd --config jscpd.json --exit-code 1 resources/js app tests",
         "lint:architecture": "npm run lint:dead-code && npm run lint:duplication"
     },
     "devDependencies": {
+        "@babel/core": "^7.29.7",
         "@biomejs/biome": "^1.5.3",
         "@headlessui/react": "^2.0.0",
         "@inertiajs/react": "^2.3.0",
