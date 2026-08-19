@@ -11,7 +11,8 @@ React Compiler (`babel-plugin-react-compiler`) をビルドに常時適用する
 - コンパイラ設定は `react-compiler.config.js` に置き、ビルド (`vite.config.js`) と CI 検査 (`scripts/check-react-compiler.mjs`) の両方が同じ設定を import する。設定を二重に書かない
 - `vite.config.js` の `@vitejs/plugin-react` に Babel plugin として渡す。React Compiler は Babel pipeline の先頭で走らせる
 - 本プロジェクトは React 18 なので `target: "18"` を指定し、`react-compiler-runtime` の polyfill を経由する。React 19 へ上げたら `target` 指定を外す
-- `react-compiler-runtime` はソースから直接 import せずコンパイラ出力だけが参照するため、`knip.json` の `ignoreDependencies` に入れる
+- `react-compiler-runtime` はコンパイラ出力が実行時に import するため `dependencies` に置く（`devDependencies` ではない）。ソースから直接 import しないので `knip.json` の `ignoreDependencies` に入れる
+- `@vitejs/plugin-react` はインライン `babel` オプションを使う 4.x 系に固定する。Vite 7 を peerDependencies に含むのは 4.5.2 以降なので、宣言範囲を lockfile の解決版と揃える。v6 系へ上げる場合は `@rolldown/plugin-babel` + `reactCompilerPreset` への移行が必要
 
 ## コードの書き方
 
@@ -22,7 +23,7 @@ React Compiler (`babel-plugin-react-compiler`) をビルドに常時適用する
 
 ## Opt-out
 
-コンパイラ適用で壊れる component は `"use no memo"` directive で一時的に除外できる。
+コンパイラ適用で壊れる component は `"use no memo"` directive で一時的に除外できる。関数単位とファイル単位のどちらでも書ける。
 
 ```tsx
 function LegacyWidget() {
@@ -38,7 +39,7 @@ function LegacyWidget() {
 `npm run lint:react-compiler` で、ビルドと同じコンパイラを `resources/js/**` に対して走らせ、最適化がスキップされた箇所を検出する。ビルドはスキップしても成功してしまうため、この検査がないと最適化の欠落に気づけない。
 
 - 検出対象は `CompileError` / `CompileSkip` / `PipelineError` / `CompileDiagnostic`。1 件でもあれば exit 1
-- `"use no memo"` で明示的に除外した関数は失敗にせず、opt-out 件数としてサマリに出す
+- `"use no memo"` で明示的に除外した関数とファイルは失敗にせず、opt-out 件数としてサマリに出す
 - ビルド設定より厳しい validation（render 中の不純関数、手動メモ化の保証、effect 内 setState / 派生計算）を検査側だけで有効化している
 - React Compiler の ESLint ルール (`eslint-plugin-react-hooks`) は導入していない。このリポジトリのフロント lint は Biome に統一しており、コンパイル阻害要因はこの検査で同等のメッセージが得られるため
 
