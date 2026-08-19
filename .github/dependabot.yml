@@ -1,0 +1,82 @@
+version: 2
+
+updates:
+  # PHP 依存。minor / patch はまとめて 1 PR、major は個別 PR にして影響範囲を見て判断する。
+  - package-ecosystem: composer
+    directory: /src
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(composer)"
+    groups:
+      composer-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # フロント依存。React 19 への major 更新は React Compiler の target 変更を伴うため、
+  # まとめずに個別 PR で来るようにしておく。
+  - package-ecosystem: npm
+    directory: /src
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(npm)"
+    groups:
+      npm-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    commit-message:
+      prefix: "chore(actions)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Dockerfile のベースイメージ。
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    commit-message:
+      prefix: "chore(docker)"
+
+  # docker-compose.yml のサービスイメージ（postgres / redis / nginx）。
+  # Dockerfile とは別 ecosystem なので個別に定義する。
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Tokyo
+    commit-message:
+      prefix: "chore(docker)"
+    groups:
+      docker-compose:
+        patterns:
+          - "*"
