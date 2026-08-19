@@ -29,6 +29,8 @@
             "storage",
             "bootstrap/cache",
             "public/build",
+            "test-results",
+            "playwright-report",
             "*.blade.php",
             "resources/js/actions",
             "resources/js/routes",
