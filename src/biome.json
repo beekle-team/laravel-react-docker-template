@@ -7,7 +7,6 @@
             "preset": "recommended",
             "a11y": {
                 "noLabelWithoutControl": "off",
-                "noStaticElementInteractions": "off",
                 "noSvgWithoutTitle": "off",
                 "useAltText": "off",
                 "useKeyWithClickEvents": "off"
@@ -33,6 +32,18 @@
         "indentWidth": 4,
         "lineWidth": 100
     },
+    "overrides": [
+        {
+            "includes": ["**/resources/js/Components/Dropdown.tsx"],
+            "linter": {
+                "rules": {
+                    "a11y": {
+                        "noStaticElementInteractions": "off"
+                    }
+                }
+            }
+        }
+    ],
     "files": {
         "includes": [
             "**",
