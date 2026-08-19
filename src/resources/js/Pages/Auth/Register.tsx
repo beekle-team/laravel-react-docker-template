@@ -1,12 +1,12 @@
+import { Head, Link, useForm } from "@inertiajs/react";
+import type { FormEventHandler } from "react";
+import { store as registerStore } from "@/actions/App/Http/Controllers/Auth/RegisteredUserController";
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
 import TextInput from "@/Components/TextInput";
 import GuestLayout from "@/Layouts/GuestLayout";
-import { store as registerStore } from "@/actions/App/Http/Controllers/Auth/RegisteredUserController";
 import { login } from "@/routes";
-import { Head, Link, useForm } from "@inertiajs/react";
-import type { FormEventHandler } from "react";
 
 export default function Register() {
     const {

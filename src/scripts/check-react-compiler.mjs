@@ -4,7 +4,7 @@
 // ビルド時のコンパイラはスキップしても警告を出さず成功するため、
 // 静的検査としてビルドと同じプラグインを走らせ、スキップを CI で失敗させる。
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 import { parseAsync, transformAsync, traverse } from "@babel/core";
 import { OPT_OUT_DIRECTIVES } from "babel-plugin-react-compiler";
