@@ -10,12 +10,7 @@ React Compiler (`babel-plugin-react-compiler`) をビルドに常時適用する
 
 - コンパイラ設定は `react-compiler.config.js` に置き、ビルド (`vite.config.js`) と CI 検査 (`scripts/check-react-compiler.mjs`) の両方が同じ設定を import する。設定を二重に書かない
 - `vite.config.js` の `@vitejs/plugin-react` に Babel plugin として渡す。React Compiler は Babel pipeline の先頭で走らせる
-<<<<<<< HEAD
 - React 19 は compiler runtime を本体に同梱するため `target` 指定は不要（既定が `"19"`）。コンパイラ出力は `react/compiler-runtime` から import する。React 17 / 18 に戻す場合だけ `target` と `react-compiler-runtime` の polyfill が必要になる
-=======
-- 本プロジェクトは React 18 なので `target: "18"` を指定し、`react-compiler-runtime` の polyfill を経由する。React 19 へ上げたら `target` 指定を外す
-- `react-compiler-runtime` はコンパイラ出力が実行時に import するため `dependencies` に置く（`devDependencies` ではない）。ソースから直接 import しないので `knip.json` の `ignoreDependencies` に入れる
->>>>>>> origin/main
 - `@vitejs/plugin-react` はインライン `babel` オプションを使う 4.x 系に固定する。Vite 7 を peerDependencies に含むのは 4.5.2 以降なので、宣言範囲を lockfile の解決版と揃える。v6 系へ上げる場合は `@rolldown/plugin-babel` + `reactCompilerPreset` への移行が必要
 
 ## コードの書き方

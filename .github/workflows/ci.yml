@@ -176,12 +176,9 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
 
-<<<<<<< HEAD
-=======
     # ブラウザ導入やサーバ起動で詰まったときに走り続けないよう上限を切る
     timeout-minutes: 20
 
->>>>>>> origin/main
     defaults:
       run:
         working-directory: ./src
@@ -228,18 +225,11 @@ jobs:
     - name: Directory Permissions
       run: chmod -R 777 storage bootstrap/cache
 
-<<<<<<< HEAD
-    # Playwright の webServer が php artisan serve を起動するため、
-    # ここではブラウザだけ用意する。3 ブラウザ分の依存は重いので CI は chromium に絞る。
-    - name: Install Playwright Browser
-      run: npx playwright install --with-deps chromium
-=======
     # Playwright の webServer が php artisan serve を起動するため、ここではブラウザだけ用意する。
     # 3 ブラウザ分は重いので CI は chromium に絞る。--with-deps は付けない
     # （runner に必要な共有ライブラリが揃っており、apt 経由の導入で待たされることがある）。
     - name: Install Playwright Browser
       run: npx playwright install chromium
->>>>>>> origin/main
 
     - name: Execute E2E Tests
       run: npx playwright test --project=chromium
