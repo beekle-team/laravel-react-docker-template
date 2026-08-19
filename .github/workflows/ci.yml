@@ -81,6 +81,9 @@ jobs:
     - name: Execute TypeScript
       run: npm run types
 
+    - name: Execute React Compiler Check
+      run: npm run lint:react-compiler
+
     - name: Execute Dead Code Scan
       run: npm run lint:dead-code
 

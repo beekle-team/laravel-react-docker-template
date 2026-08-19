@@ -128,5 +128,6 @@ Feature テストを直接作成することはできません。
 |------|----------|------|
 | Feature テスト | requirements.md + Gherkin 必須 | 必須 |
 | Unit テスト | 実装コードがあれば可 | 不要 |
+| Arch テスト | 規約が決まっていれば可 | 不要 |
 
-Unit テスト (`tests/Unit/`) はこのルールの対象外。
+Unit テスト (`tests/Unit/`) と Arch テスト (`tests/Arch/`) はこのルールの対象外。Arch テストの方針は `.claude/rules/testing/architecture-tests.md` を参照。

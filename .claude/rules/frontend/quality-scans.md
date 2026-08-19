@@ -4,16 +4,21 @@ globs: ["src/resources/js/**/*.ts","src/resources/js/**/*.tsx","src/package.json
 
 # Frontend Quality Scans
 
-フロントエンドの品質ゲートは Biome / TypeScript / knip / jscpd を CI で必ず通す。
+フロントエンドの品質ゲートは Biome / TypeScript / React Compiler / knip / jscpd を CI で必ず通す。
 
 ## 必須コマンド
 
 ```bash
 npm run lint:js
 npm run types
+npm run lint:react-compiler
 npm run lint:dead-code
 npm run lint:duplication
 ```
+
+## React Compiler
+
+`npm run lint:react-compiler` でビルドと同じコンパイラを走らせ、最適化がスキップされたコンポーネント / フックを検出する。ビルドはスキップしても成功するため、この検査を落とさない。詳細は `.claude/rules/frontend/react-compiler.md` を参照。
 
 ## Dead Code
 
