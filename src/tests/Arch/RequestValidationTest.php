@@ -34,7 +34,9 @@ function controllerSources(): array
 function validateCallsIn(string $code): array
 {
     $accessors = [T_OBJECT_OPERATOR, T_NULLSAFE_OBJECT_OPERATOR];
-    $methods = ['validate', 'validateWithBag'];
+    // PHP のメソッド名と関数名は大文字小文字を区別しないため、小文字で比較する。
+    $methods = ['validate', 'validatewithbag'];
+    $names = [T_STRING, T_NAME_FULLY_QUALIFIED];
     $ignored = [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING];
 
     $tokens = array_values(array_filter(
@@ -51,28 +53,32 @@ function validateCallsIn(string $code): array
 
         $method = $tokens[$index + 1] ?? null;
 
-        if (! is_array($method) || $method[0] !== T_STRING || ! in_array($method[1], $methods, true)) {
+        if (! is_array($method) || $method[0] !== T_STRING) {
+            continue;
+        }
+
+        if (! in_array(strtolower($method[1]), $methods, true)) {
             continue;
         }
 
         $previous = $tokens[$index - 1] ?? null;
 
-        // $request->validate(...)
+        // $request->validate(...) （変数名は大文字小文字を区別する）
         if (is_array($previous) && $previous[0] === T_VARIABLE && $previous[1] === '$request') {
             $found[] = '$request->'.$method[1].'()';
 
             continue;
         }
 
-        // request()->validate(...)
+        // request()->validate(...) （\request() も対象にする）
         $helper = $tokens[$index - 3] ?? null;
 
         if (
             $previous === ')'
             && ($tokens[$index - 2] ?? null) === '('
             && is_array($helper)
-            && $helper[0] === T_STRING
-            && $helper[1] === 'request'
+            && in_array($helper[0], $names, true)
+            && strtolower(ltrim($helper[1], '\\')) === 'request'
         ) {
             $found[] = 'request()->'.$method[1].'()';
         }
