@@ -12,16 +12,31 @@ use Illuminate\Support\Facades\Route as RouteFacade;
 // これが漏れるとフロントの validate() がライブ検証ではなく本処理を実行してしまう。
 
 it('Form Request を使う変更系 route には Precognition middleware が付いている', function () {
-    $usesFormRequest = function (Route $route): bool {
+    // controller action だけでなくクロージャ route も対象にする。
+    $reflectAction = function (Route $route): ?ReflectionFunctionAbstract {
+        $action = $route->getAction('uses');
+
+        if ($action instanceof Closure) {
+            return new ReflectionFunction($action);
+        }
+
         $controller = $route->getControllerClass();
 
         if ($controller === null || ! class_exists($controller)) {
-            return false;
+            return null;
         }
 
         try {
-            $method = new ReflectionMethod($controller, $route->getActionMethod());
+            return new ReflectionMethod($controller, $route->getActionMethod());
         } catch (ReflectionException) {
+            return null;
+        }
+    };
+
+    $usesFormRequest = function (Route $route) use ($reflectAction): bool {
+        $method = $reflectAction($route);
+
+        if ($method === null) {
             return false;
         }
 

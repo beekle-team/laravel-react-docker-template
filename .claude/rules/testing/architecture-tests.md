@@ -14,6 +14,7 @@ globs: ["src/tests/Arch/**/*.php","src/app/**/*.php","src/phpunit.xml"]
 | `tests/Arch/LayerBoundariesTest.php` | Model 層境界と Controller の責務（`model-layer-boundaries.md` / `form-request-validation.md` 由来） |
 | `tests/Arch/CodingStandardsTest.php` | strict types（`php.md` 由来） |
 | `tests/Arch/PrecognitionTest.php` | Form Request を使う変更系 route の Precognition middleware（`form-request-validation.md` 由来） |
+| `tests/Arch/RequestValidationTest.php` | Controller での `$request->validate()` / `request()->validate()` 禁止（`form-request-validation.md` 由来） |
 
 `phpunit.xml` に `Arch` testsuite を定義してあるので、`php artisan test` で他のスイートと一緒に走る。arch だけ流すときは `php artisan test --testsuite=Arch`。
 
@@ -21,7 +22,7 @@ globs: ["src/tests/Arch/**/*.php","src/app/**/*.php","src/phpunit.xml"]
 
 - 1 つの `arch()` に 1 つのルールを書き、説明文に日本語でルール名を書く。失敗時にどの規約に違反したか分かるようにする
 - 対応する規約ファイルをコメントで示し、規約とテストが対で追えるようにする
-- ディレクトリの不存在のように arch API で表現できないものは通常の `it()` で書く
+- ディレクトリの不存在やメソッド呼び出しのように arch API で表現できないものは通常の `it()` で書く。呼び出しの検査は正規表現ではなく `token_get_all()` のトークン列で判定し、コメントや文字列リテラルを誤検出しない
 - `laravel` preset は Eloquent Model 前提の検査を含むため、DB 永続化しない `App\Models\Gateway` は `ignoring()` で対象外にする
 
 ## 規約を追加したとき
