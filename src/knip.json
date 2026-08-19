@@ -4,6 +4,7 @@
         "resources/js/app.tsx",
         "resources/js/Pages/**/*.tsx",
         "playwright.config.ts",
+        "scripts/*.mjs",
         "vite.config.js"
     ],
     "project": ["resources/js/**/*.{ts,tsx}", "*.config.{js,ts}"],
@@ -22,6 +23,7 @@
         "concurrently",
         "laravel-vite-plugin",
         "playwright",
+        "react-compiler-runtime",
         "tailwindcss"
     ]
 }

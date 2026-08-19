@@ -1222,22 +1222,25 @@ export default function Dashboard({ data }: Props) {
 }
 ```
 
-### 3. メモ化
+### 3. メモ化（React Compiler）
+
+本プロジェクトは React Compiler をビルドに適用しているため、メモ化は自動で入る。派生値もハンドラもそのまま書く。
 
 ```tsx
-import { memo, useMemo } from 'react';
+export default function UserList({ users }: Props) {
+  const sortedUsers = [...users].sort((a, b) => a.name.localeCompare(b.name));
 
-// コンポーネントのメモ化
-const UserCard = memo(function UserCard({ user }: { user: User }) {
-  return <div>{user.name}</div>;
-});
-
-// 計算結果のメモ化
-const sortedUsers = useMemo(
-  () => users.sort((a, b) => a.name.localeCompare(b.name)),
-  [users]
-);
+  return (
+    <ul>
+      {sortedUsers.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
 ```
+
+`memo` / `useMemo` / `useCallback` を手で書くのは、計測して効果が確認できた場合か、参照同一性が外部 API の契約になっている場合に限る。詳細は `.claude/rules/frontend/react-compiler.md` を参照。
 
 ## ディレクトリ構造
 

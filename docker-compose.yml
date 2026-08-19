@@ -23,6 +23,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - mailpit
 
   nginx:
     image: nginx:alpine
@@ -85,6 +86,22 @@ services:
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - app-network
+
+  # 開発用のメールキャッチャー。Web UI は http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.30
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_UI_PORT:-8025}:8025"
+    environment:
+      # 開発中のメールは使い捨てなので永続化せずメモリ上限だけ決める。
+      MP_MAX_MESSAGES: 500
+      # MAIL_USERNAME / MAIL_PASSWORD を設定した場合も接続できるようにする。
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - app-network
 

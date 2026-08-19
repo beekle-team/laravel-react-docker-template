@@ -13,11 +13,16 @@
         "test:e2e:install": "playwright install --with-deps",
         "types": "tsc --noEmit",
         "lint:js": "biome lint .",
+        "lint:react-compiler": "node scripts/check-react-compiler.mjs",
         "lint:dead-code": "knip --no-config-hints",
         "lint:duplication": "jscpd --config jscpd.json --exit-code 1 resources/js app tests",
         "lint:architecture": "npm run lint:dead-code && npm run lint:duplication"
     },
+    "dependencies": {
+        "react-compiler-runtime": "^1.0.0"
+    },
     "devDependencies": {
+        "@babel/core": "^7.29.7",
         "@biomejs/biome": "^1.5.3",
         "@headlessui/react": "^2.0.0",
         "@inertiajs/react": "^2.3.0",
@@ -27,8 +32,9 @@
         "@types/node": "^20.19.0",
         "@types/react": "^18.0.28",
         "@types/react-dom": "^18.0.10",
-        "@vitejs/plugin-react": "^4.2.0",
+        "@vitejs/plugin-react": "^4.7.0",
         "axios": "^1.11.0",
+        "babel-plugin-react-compiler": "^1.0.0",
         "concurrently": "^9.0.1",
         "jscpd": "^5.0.14",
         "knip": "^6.29.0",
