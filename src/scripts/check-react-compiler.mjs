@@ -47,17 +47,25 @@ function collectSourceFiles(dir) {
     return files;
 }
 
+function hasOptOutDirective(directives) {
+    return directives.some((directive) => OPT_OUT_DIRECTIVES.has(directive.value.value));
+}
+
 // コンパイラは opt-out された関数でも検証イベントを出すため、
-// 明示的に除外された関数の範囲を集めて報告対象から外す。
+// 明示的に除外された範囲を集めて報告対象から外す。
+// directive はファイル先頭にも書けるので、その場合はファイル全体を除外する。
 async function collectOptedOutRanges(code, parserOpts) {
     const ast = await parseAsync(code, { babelrc: false, configFile: false, parserOpts });
+
+    if (hasOptOutDirective(ast.program.directives ?? [])) {
+        return [[0, code.length]];
+    }
+
     const ranges = [];
 
     traverse(ast, {
         Function(path) {
-            const directives = path.node.body?.directives ?? [];
-
-            if (directives.some((directive) => OPT_OUT_DIRECTIVES.has(directive.value.value))) {
+            if (hasOptOutDirective(path.node.body?.directives ?? [])) {
                 ranges.push([path.node.start, path.node.end]);
             }
         },
