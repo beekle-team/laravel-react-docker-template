@@ -7,7 +7,7 @@
         "dev": "vite",
         "lint": "biome lint .",
         "format": "biome format --write .",
-        "check": "biome check --apply .",
+        "check": "biome check --write .",
         "test:e2e": "playwright test",
         "test:e2e:ui": "playwright test --ui",
         "test:e2e:install": "playwright install --with-deps",
@@ -18,7 +18,7 @@
         "lint:architecture": "npm run lint:dead-code && npm run lint:duplication"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.5.3",
+        "@biomejs/biome": "^2.5.9",
         "@headlessui/react": "^2.0.0",
         "@inertiajs/react": "^2.3.0",
         "@laravel/vite-plugin-wayfinder": "^0.1.7",

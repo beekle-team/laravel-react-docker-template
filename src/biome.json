@@ -1,17 +1,24 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
-    "organizeImports": {
-        "enabled": true
-    },
+    "$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
+    "assist": { "actions": { "source": { "organizeImports": "on" } } },
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": true,
+            "preset": "recommended",
             "a11y": {
                 "noLabelWithoutControl": "off",
+                "noStaticElementInteractions": "off",
                 "noSvgWithoutTitle": "off",
                 "useAltText": "off",
                 "useKeyWithClickEvents": "off"
+            },
+            "suspicious": {
+                "noUnknownAtRules": {
+                    "level": "error",
+                    "options": {
+                        "ignore": ["tailwind", "apply", "layer", "variants", "screen", "config"]
+                    }
+                }
             }
         }
     },
@@ -22,18 +29,23 @@
         "lineWidth": 100
     },
     "files": {
-        "ignore": [
-            "node_modules",
-            "public",
-            "vendor",
-            "storage",
-            "bootstrap/cache",
-            "public/build",
-            "*.blade.php",
-            "resources/js/actions",
-            "resources/js/routes",
-            "resources/js/types/generated.d.ts",
-            "resources/js/wayfinder"
+        "includes": [
+            "**",
+            "!**/node_modules",
+            "!**/public",
+            "!**/vendor",
+            "!**/storage",
+            "!**/bootstrap/cache",
+            "!**/public/build",
+            "!**/*.blade.php",
+            "!**/test-results",
+            "!**/playwright-report",
+            "!**/package-lock.json",
+            "!**/composer.lock",
+            "!**/resources/js/actions",
+            "!**/resources/js/routes",
+            "!**/resources/js/types/generated.d.ts",
+            "!**/resources/js/wayfinder"
         ]
     }
 }
