@@ -27,7 +27,6 @@
         "laravel-vite-plugin",
         "playwright",
         "postcss",
-        "react-compiler-runtime",
         "tailwindcss"
     ]
 }
