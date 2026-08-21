@@ -22,7 +22,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4]
+        # PR は本命の 8.4 だけで回し、テンプレートが約束する両バージョン互換は
+        # main への push (マージ時) で検証する (Actions 消費の削減。PR 時点の
+        # 8.3 退行はマージ後の main CI で検知される)。
+        php: ${{ github.event_name == 'pull_request' && fromJSON('["8.4"]') || fromJSON('["8.3", "8.4"]') }}
 
     name: Lint (PHP ${{ matrix.php }})
 
@@ -124,7 +127,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.3, 8.4]
+        # PR は本命の 8.4 だけで回し、テンプレートが約束する両バージョン互換は
+        # main への push (マージ時) で検証する (Actions 消費の削減。PR 時点の
+        # 8.3 退行はマージ後の main CI で検知される)。
+        php: ${{ github.event_name == 'pull_request' && fromJSON('["8.4"]') || fromJSON('["8.3", "8.4"]') }}
 
     name: Tests (PHP ${{ matrix.php }})
 
