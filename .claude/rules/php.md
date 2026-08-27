@@ -35,6 +35,17 @@ PHPStan Level 5 + Larastan。
 
 **設定**: `phpstan.neon` → `level: 5`
 
+## 自動リファクタ
+
+Rector（PHP 8.3 + Laravel composer-based）。フォーマットは Pint に任せる。
+
+```bash
+./vendor/bin/rector process --dry-run  # 変更確認（CI と同じ）
+./vendor/bin/rector process            # 適用
+```
+
+**設定**: `rector.php` → `withPhpSets(php83: true)` / `PhpVersion::PHP_83`
+
 ## 型宣言
 
 - 引数の型宣言: 必須
@@ -76,5 +87,5 @@ php artisan ide-helper:models -W  # モデルの DocBlock を更新
 
 ```bash
 # コード品質チェック（CI/プッシュ前に実行）
-./vendor/bin/pint --test && ./vendor/bin/phpstan analyse
+./vendor/bin/pint --test && ./vendor/bin/phpstan analyse && ./vendor/bin/rector process --dry-run
 ```

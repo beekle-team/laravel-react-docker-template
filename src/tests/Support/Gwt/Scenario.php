@@ -20,8 +20,6 @@ use PHPUnit\Framework\Assert;
  */
 final class Scenario
 {
-    private string $description;
-
     /** @var array<int, array{description: string, action: Closure, result: mixed}> */
     private array $givens = [];
 
@@ -33,10 +31,7 @@ final class Scenario
 
     private mixed $context = null;
 
-    public function __construct(string $description)
-    {
-        $this->description = $description;
-    }
+    public function __construct(private readonly string $description) {}
 
     /**
      * Define a precondition or setup step.

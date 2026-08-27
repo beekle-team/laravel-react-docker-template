@@ -462,9 +462,10 @@ php artisan ide-helper:models -W
 ### コード品質
 ```bash
 # PHP
-composer lint          # Pint + PHPStan
-composer pint          # フォーマットチェック
+composer lint          # Pint + PHPStan + Rector dry-run
+composer pint          # フォーマット
 composer stan          # 静的解析
+composer rector        # Rector dry-run
 composer test          # Pest テスト
 
 # TypeScript

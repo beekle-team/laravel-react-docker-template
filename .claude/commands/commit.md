@@ -7,9 +7,8 @@
 1. `git status` と `git diff` で変更内容を確認
 2. **品質ゲート (MANDATORY)**: Lintを実行して全てパスすること
    ```bash
-   # PHP (Pint + PHPStan) - srcディレクトリ内で実行
-   cd src && composer pint
-   cd src && composer stan
+   # PHP (Pint + PHPStan + Rector) - srcディレクトリ内で実行
+   cd src && composer lint
 
    # TypeScript/React (Biome)
    cd src && npm run lint:js

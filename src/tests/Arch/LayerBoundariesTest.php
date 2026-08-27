@@ -29,8 +29,8 @@ arch('Eloquent Model から外部 API を呼ばない')
 arch('Gateway Model は Gateway の基底クラスを継承する')
     ->expect('App\Models\Gateway')
     ->classes()
-    ->toExtend('App\Models\Gateway\Model')
-    ->ignoring('App\Models\Gateway\Model');
+    ->toExtend(App\Models\Gateway\Model::class)
+    ->ignoring(App\Models\Gateway\Model::class);
 
 arch('Gateway Model は DB 永続化しない')
     ->expect('App\Models\Gateway')

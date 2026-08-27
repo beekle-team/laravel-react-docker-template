@@ -24,7 +24,7 @@ Task(
   subagent_type: "quality-engineer",
   description: "Backend verification",
   prompt: "Verify Laravel backend:
-    1. Run: composer lint (Pint + PHPStan)
+    1. Run: composer lint (Pint + PHPStan + Rector)
     2. Run: composer test (Pest)
     3. Report: lint errors, test failures, coverage stats
     4. Fix auto-fixable issues with: composer pint",
@@ -68,9 +68,10 @@ TaskOutputで両方の結果を取得し、統合レポートを生成。
 
 ### Backend (Laravel/PHP)
 ```bash
-composer lint      # Pint + PHPStan
+composer lint      # Pint + PHPStan + Rector dry-run
 composer pint      # コードフォーマット
 composer stan      # 静的解析
+composer rector    # Rector dry-run
 composer test      # Pest テスト
 ```
 

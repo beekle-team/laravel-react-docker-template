@@ -20,17 +20,13 @@ uses(RefreshDatabase::class);
 describe('UC-01: ユーザー登録', function () {
     it('Scenario 1.1: 有効なデータで新規ユーザーを登録できる', function () {
         scenario('新規ユーザー登録フロー')
-            ->given('有効なユーザーデータ（名前、メール、パスワード）', function () {
-                return [
-                    'name' => 'Test User',
-                    'email' => 'test@example.com',
-                    'password' => 'password',
-                    'password_confirmation' => 'password',
-                ];
-            })
-            ->when('登録APIを呼び出す', function (array $userData) {
-                return $this->post('/register', $userData);
-            })
+            ->given('有効なユーザーデータ（名前、メール、パスワード）', fn () => [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => 'password',
+                'password_confirmation' => 'password',
+            ])
+            ->when('登録APIを呼び出す', fn (array $userData) => $this->post('/register', $userData))
             ->then('ユーザーが作成される', function ($response) {
                 expect(User::where('email', 'test@example.com')->exists())->toBeTrue();
             })
@@ -55,9 +51,7 @@ describe('UC-01: ユーザー登録', function () {
                     'password_confirmation' => 'password',
                 ];
             })
-            ->when('登録APIを呼び出す', function (array $userData) {
-                return $this->post('/register', $userData);
-            })
+            ->when('登録APIを呼び出す', fn (array $userData) => $this->post('/register', $userData))
             ->then('バリデーションエラーになる', function ($response) {
                 $response->assertSessionHasErrors('email');
             })
@@ -75,24 +69,18 @@ describe('UC-01: ユーザー登録', function () {
 describe('UC-02: ログイン', function () {
     it('Scenario 2.1: 正しい認証情報でログインできる', function () {
         scenario('正常ログインフロー')
-            ->given('登録済みユーザーが存在する', function () {
-                return User::factory()->create([
+            ->given('登録済みユーザーが存在する', fn () => User::factory()->create([
+                'email' => 'user@example.com',
+                'password' => bcrypt('correct-password'),
+            ]))
+            ->and('正しいメールアドレスとパスワード', fn (User $user) => [
+                'user' => $user,
+                'credentials' => [
                     'email' => 'user@example.com',
-                    'password' => bcrypt('correct-password'),
-                ]);
-            })
-            ->and('正しいメールアドレスとパスワード', function (User $user) {
-                return [
-                    'user' => $user,
-                    'credentials' => [
-                        'email' => 'user@example.com',
-                        'password' => 'correct-password',
-                    ],
-                ];
-            })
-            ->when('ログインAPIを呼び出す', function (array $context) {
-                return $this->post('/login', $context['credentials']);
-            })
+                    'password' => 'correct-password',
+                ],
+            ])
+            ->when('ログインAPIを呼び出す', fn (array $context) => $this->post('/login', $context['credentials']))
             ->then('認証済み状態になる', function ($response) {
                 $this->assertAuthenticated();
             })
@@ -104,24 +92,18 @@ describe('UC-02: ログイン', function () {
 
     it('Scenario 2.2: 間違ったパスワードではログインできない', function () {
         scenario('パスワード誤りでログイン失敗')
-            ->given('登録済みユーザーが存在する', function () {
-                return User::factory()->create([
+            ->given('登録済みユーザーが存在する', fn () => User::factory()->create([
+                'email' => 'user@example.com',
+                'password' => bcrypt('correct-password'),
+            ]))
+            ->and('間違ったパスワード', fn (User $user) => [
+                'user' => $user,
+                'credentials' => [
                     'email' => 'user@example.com',
-                    'password' => bcrypt('correct-password'),
-                ]);
-            })
-            ->and('間違ったパスワード', function (User $user) {
-                return [
-                    'user' => $user,
-                    'credentials' => [
-                        'email' => 'user@example.com',
-                        'password' => 'wrong-password',
-                    ],
-                ];
-            })
-            ->when('ログインAPIを呼び出す', function (array $context) {
-                return $this->post('/login', $context['credentials']);
-            })
+                    'password' => 'wrong-password',
+                ],
+            ])
+            ->when('ログインAPIを呼び出す', fn (array $context) => $this->post('/login', $context['credentials']))
             ->then('ゲスト状態のまま', function ($response) {
                 $this->assertGuest();
             })
@@ -145,9 +127,7 @@ describe('UC-03: ログアウト', function () {
 
                 return $user;
             })
-            ->when('ログアウトAPIを呼び出す', function (User $user) {
-                return $this->post('/logout');
-            })
+            ->when('ログアウトAPIを呼び出す', fn (User $user) => $this->post('/logout'))
             ->then('ゲスト状態になる', function ($response) {
                 $this->assertGuest();
             })

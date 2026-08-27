@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.5-fpm
 
 # Arguments defined in docker-compose.yml
 ARG user=laravel-user
