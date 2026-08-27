@@ -37,7 +37,7 @@
         "@vitejs/plugin-react": "^4.7.0",
         "axios": "^1.19.0",
         "babel-plugin-react-compiler": "^1.0.0",
-        "concurrently": "^9.0.1",
+        "concurrently": "^10.0.5",
         "jscpd": "^5.0.15",
         "jsdom": "^29.1.1",
         "knip": "^6.32.2",
