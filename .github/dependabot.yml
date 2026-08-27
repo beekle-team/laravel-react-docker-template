@@ -22,6 +22,8 @@ updates:
 
   # フロント依存。React 19 への major 更新は React Compiler の target 変更を伴うため、
   # まとめずに個別 PR で来るようにしておく。
+  # Vite 8 / plugin-react 6 / TypeScript 7 は toolchain の専用作業にする。
+  # Dependabot の単独 major PR は CI が落ちるか、緑でも方針判断が必要なので無視する。
   - package-ecosystem: npm
     directory: /src
     schedule:
@@ -32,6 +34,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: "chore(npm)"
+    ignore:
+      - dependency-name: vite
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitejs/plugin-react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
     groups:
       npm-minor-and-patch:
         patterns:
@@ -55,6 +64,7 @@ updates:
           - "*"
 
   # Dockerfile のベースイメージ。
+  # テンプレートの約束は PHP 8.3 / 8.4。8.5 への major は CI matrix / 方針の専用作業。
   - package-ecosystem: docker
     directory: /
     schedule:
@@ -64,9 +74,13 @@ updates:
       timezone: Asia/Tokyo
     commit-message:
       prefix: "chore(docker)"
+    ignore:
+      - dependency-name: php
+        update-types: ["version-update:semver-major"]
 
   # docker-compose.yml のサービスイメージ（postgres / redis / nginx）。
   # Dockerfile とは別 ecosystem なので個別に定義する。
+  # Postgres 18 は既存 volume 非互換で、CI の service container もまだ 16。
   - package-ecosystem: docker-compose
     directory: /
     schedule:
@@ -76,6 +90,9 @@ updates:
       timezone: Asia/Tokyo
     commit-message:
       prefix: "chore(docker)"
+    ignore:
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
     groups:
       docker-compose:
         patterns:
