@@ -21,7 +21,7 @@
         "lint:architecture": "npm run lint:dead-code && npm run lint:duplication"
     },
     "devDependencies": {
-        "@babel/core": "^7.29.7",
+        "@babel/core": "^8.0.1",
         "@biomejs/biome": "^2.5.9",
         "@headlessui/react": "^2.2.10",
         "@inertiajs/react": "^2.3.0",
