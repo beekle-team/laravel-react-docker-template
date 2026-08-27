@@ -22,8 +22,8 @@ updates:
 
   # フロント依存。React 19 への major 更新は React Compiler の target 変更を伴うため、
   # まとめずに個別 PR で来るようにしておく。
-  # Vite 8 / plugin-react 6 / TypeScript 7 は toolchain の専用作業にする。
-  # Dependabot の単独 major PR は CI が落ちるか、緑でも方針判断が必要なので無視する。
+  # Vite 8 / plugin-react 6 / TypeScript 7 / laravel-vite-plugin 3 は toolchain の専用作業。
+  # Babel 8 / jsdom 30 / concurrently 10 は Node 22+ 前提で、CI はまだ Node 20。
   - package-ecosystem: npm
     directory: /src
     schedule:
@@ -40,6 +40,14 @@ updates:
       - dependency-name: "@vitejs/plugin-react"
         update-types: ["version-update:semver-major"]
       - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: laravel-vite-plugin
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@babel/core"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: jsdom
+        update-types: ["version-update:semver-major"]
+      - dependency-name: concurrently
         update-types: ["version-update:semver-major"]
     groups:
       npm-minor-and-patch:
