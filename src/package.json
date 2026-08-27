@@ -22,7 +22,7 @@
     },
     "devDependencies": {
         "@babel/core": "^7.29.7",
-        "@biomejs/biome": "^2.5.9",
+        "@biomejs/biome": "^2.5.10",
         "@headlessui/react": "^2.2.10",
         "@inertiajs/react": "^2.3.0",
         "@laravel/vite-plugin-wayfinder": "^0.1.7",
@@ -30,15 +30,15 @@
         "@tailwindcss/vite": "^4.3.3",
         "@testing-library/jest-dom": "^7.0.1",
         "@testing-library/react": "^16.3.2",
-        "@testing-library/user-event": "^14.6.5",
+        "@testing-library/user-event": "^14.6.6",
         "@types/node": "^20.19.0",
         "@types/react": "^19.2.18",
-        "@types/react-dom": "^19.2.4",
+        "@types/react-dom": "^19.2.5",
         "@vitejs/plugin-react": "^4.7.0",
         "axios": "^1.19.0",
         "babel-plugin-react-compiler": "^1.0.0",
         "concurrently": "^9.0.1",
-        "jscpd": "^5.0.15",
+        "jscpd": "^5.0.16",
         "jsdom": "^29.1.1",
         "knip": "^6.32.2",
         "laravel-vite-plugin": "^2.0.0",
@@ -46,8 +46,8 @@
         "react": "^19.2.8",
         "react-dom": "^19.2.8",
         "tailwindcss": "^4.3.3",
-        "typescript": "^5.0.2",
-        "vite": "^7.0.4",
+        "typescript": "^5.9.3",
+        "vite": "^7.3.6",
         "vitest": "^4.1.11"
     }
 }
