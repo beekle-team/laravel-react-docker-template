@@ -87,7 +87,7 @@ function validateCallsIn(string $code): array
     return $found;
 }
 
-it('Controller で $request->validate() を使わない', function () {
+it('Controller で $request->validate() を使わない', function (): void {
     $violations = [];
 
     foreach (controllerSources() as $file) {

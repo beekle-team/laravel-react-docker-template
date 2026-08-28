@@ -8,24 +8,24 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/auto-format.sh",
-            "timeout": 10000
+            "timeout": 10
           },
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/post-edit-check.sh",
-            "timeout": 30000
+            "timeout": 30
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash(git commit:*)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-commit-check.sh",
-            "timeout": 120000
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/pre-bash-check.sh",
+            "timeout": 120
           }
         ]
       }

@@ -1,0 +1,26 @@
+# ビルドコンテキストから外す。src/ は compose の bind mount で渡るため、
+# 依存物と履歴をイメージに入れない。
+.git
+.github
+.kiro
+.claude
+
+src/vendor
+src/node_modules
+src/public/build
+src/public/hot
+src/public/storage
+src/storage/framework/cache/data
+src/storage/framework/sessions
+src/storage/framework/views
+src/storage/logs
+src/bootstrap/cache
+src/.phpunit.cache
+src/test-results
+src/playwright-report
+
+**/.env
+**/.env.*
+!**/.env.example
+
+**/.DS_Store

@@ -8,9 +8,9 @@ declare(strict_types=1);
  * データベース不要なシンプルなロジックのテストでも
  * GWT パターンは有効です。
  */
-describe('GWT Unit Test Examples', function () {
-    describe('配列操作', function () {
-        it('配列をフィルタリングできる', function () {
+describe('GWT Unit Test Examples', function (): void {
+    describe('配列操作', function (): void {
+        it('配列をフィルタリングできる', function (): void {
             scenario('偶数のみフィルタリング')
                 ->given('数値の配列', fn () => [1, 2, 3, 4, 5, 6])
                 ->when('偶数のみフィルタリングする', fn (array $numbers) => array_values(array_filter($numbers, fn ($n) => $n % 2 === 0)))
@@ -18,7 +18,7 @@ describe('GWT Unit Test Examples', function () {
                 ->run();
         });
 
-        it('配列をマッピングできる', function () {
+        it('配列をマッピングできる', function (): void {
             scenario('配列の各要素を2倍にする')
                 ->given('数値の配列', fn () => [1, 2, 3])
                 ->when('各要素を2倍にする', fn (array $numbers) => array_map(fn ($n) => $n * 2, $numbers))
@@ -27,8 +27,8 @@ describe('GWT Unit Test Examples', function () {
         });
     });
 
-    describe('文字列操作', function () {
-        it('文字列を大文字に変換できる', function () {
+    describe('文字列操作', function (): void {
+        it('文字列を大文字に変換できる', function (): void {
             scenario('大文字変換')
                 ->given('小文字の文字列', fn () => 'hello world')
                 ->when('大文字に変換する', fn (string $text) => strtoupper($text))
@@ -36,7 +36,7 @@ describe('GWT Unit Test Examples', function () {
                 ->run();
         });
 
-        it('文字列を分割できる', function () {
+        it('文字列を分割できる', function (): void {
             scenario('カンマ区切り分割')
                 ->given('カンマ区切りの文字列', fn () => 'apple,banana,cherry')
                 ->when('カンマで分割する', fn (string $text) => explode(',', $text))
@@ -46,8 +46,8 @@ describe('GWT Unit Test Examples', function () {
         });
     });
 
-    describe('計算ロジック', function () {
-        it('税込価格を計算できる', function () {
+    describe('計算ロジック', function (): void {
+        it('税込価格を計算できる', function (): void {
             $taxRate = 0.10;
 
             scenario('税込価格計算')
@@ -57,7 +57,7 @@ describe('GWT Unit Test Examples', function () {
                 ->run();
         });
 
-        it('割引価格を計算できる', function () {
+        it('割引価格を計算できる', function (): void {
             scenario('20%割引計算')
                 ->given('元の価格', fn () => ['price' => 1000, 'discount' => 0.20])
                 ->when('割引を適用する', fn (array $data) => (int) ($data['price'] * (1 - $data['discount'])))
@@ -66,8 +66,8 @@ describe('GWT Unit Test Examples', function () {
         });
     });
 
-    describe('複数のGiven条件', function () {
-        it('複数の前提条件を組み合わせられる', function () {
+    describe('複数のGiven条件', function (): void {
+        it('複数の前提条件を組み合わせられる', function (): void {
             scenario('複合条件でのテスト')
                 ->given('ユーザー名', fn () => ['name' => 'John'])
                 ->and('メールアドレス', fn () => ['email' => 'john@example.com'])

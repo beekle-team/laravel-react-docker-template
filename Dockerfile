@@ -40,8 +40,9 @@ RUN mkdir -p /home/$user/.composer && \
 # Set working directory
 WORKDIR /var/www
 
-# Copy existing application directory permissions
-COPY --chown=$user:$user . /var/www
+# アプリ本体は src/ 配下。ルートごと COPY すると /var/www/src/... になり
+# nginx の root (/var/www/public) と php-fpm の想定から外れる。
+COPY --chown=$user:$user src/ /var/www
 
 USER $user
 

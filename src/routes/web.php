@@ -17,7 +17,7 @@ Route::get('/', fn () => Inertia::render('Welcome', [
 
 Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function (): void {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])
         ->middleware(HandlePrecognitiveRequests::class)

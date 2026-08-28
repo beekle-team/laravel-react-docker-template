@@ -8,7 +8,7 @@ use App\Models\Eloquent\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ProfileTest extends TestCase
+final class ProfileTest extends TestCase
 {
     use RefreshDatabase;
 
