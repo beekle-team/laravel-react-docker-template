@@ -19,7 +19,7 @@
    docker compose exec app npm run lint:js
    ```
    - **Lint失敗時は絶対にコミットしない**
-   - 修正: `cd src && composer pint -- --fix` または `cd src && npm run lint:js:fix`
+   - 修正: `docker compose exec app composer pint` または `docker compose exec app npm run check`
 3. 変更の目的を分析（新機能、バグ修正、リファクタ等）
 4. Conventional Commits形式でメッセージを作成
 5. コミットを実行

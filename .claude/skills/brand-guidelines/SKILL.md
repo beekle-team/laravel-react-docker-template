@@ -126,22 +126,28 @@ spacing: {
 
 ### Accessing Design Tokens
 
-```typescript
-import { colors, spacing, typography, effects } from '@/design-system/theme';
+Tailwind CSS v4 は CSS-first 設定。token は `resources/css/app.css` の `@theme` に定義し、
+コンポーネントからは Tailwind utility として参照する。TypeScript の theme オブジェクトは持たない。
 
-// Primary colors
-const primaryColor = colors.primary[500];
-const lightBackground = colors.neutral[50];
+```css
+/* resources/css/app.css */
+@theme {
+    --color-primary-500: oklch(58% 0.2 250);
+    --color-primary-600: oklch(50% 0.18 250);
+    --color-success: oklch(70% 0.25 145);
 
-// Semantic colors
-const successColor = colors.semantic.success;
-
-// Spacing
-const padding = spacing.medium; // 24px
-
-// Typography
-const headingFont = typography.fontFamily.display;
+    --spacing-medium: 24px;
+}
 ```
+
+```tsx
+<div className="bg-primary-500 p-medium text-white">
+    <span className="text-success">保存しました</span>
+</div>
+```
+
+JS 側から値そのものが必要になった場合だけ `getComputedStyle(document.documentElement)`
+で CSS variable を読む。token を TypeScript 側に二重定義しない。
 
 ### Effects & Glassmorphism
 
@@ -188,9 +194,11 @@ effects: {
 
 ## File Locations
 
-- **Theme Definition**: `resources/js/design-system/theme.ts`
-- **UI Components**: `resources/js/components/ui/`
-- **Design Tokens**: `resources/js/constants/designTokens.ts`
+- **Theme / Design Tokens**: `resources/css/app.css` の `@theme` block
+- **汎用 UI Components**: `resources/js/shared/components/`
+- **feature 固有 UI**: `resources/js/features/{feature}/components/`
+
+配置の正本は `.claude/rules/frontend/architecture.md`。
 
 ## Dark Mode
 

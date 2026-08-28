@@ -1,143 +1,124 @@
 #!/bin/bash
-# Pre-commit hook: Run lint and tests before allowing commit
-# Blocks commit if lint errors or test failures exist
-
-set -e
+# PreToolUse hook for `git commit`: architecture guards, lint and tests.
+# Exits 2 on failure so Claude Code actually blocks the commit.
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+
+# shellcheck source=lib-project.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib-project.sh"
+
 ERRORS=0
+REPORT=""
+
+fail() {
+  REPORT="${REPORT}$1
+"
+  ERRORS=1
+}
 
 echo "=== Pre-commit Check ==="
 
-# Get staged files
-STAGED_PHP=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.php$' || true)
-STAGED_TS=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
+STAGED_PHP=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep '\.php$' || true)
+STAGED_TS=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
 
-# PHP checks (Laravel)
 if [ -n "$STAGED_PHP" ]; then
-  echo ">>> PHP: Running Pint..."
-  cd "$PROJECT_DIR"
-
   SERVICE_LAYER_FILES=""
+  CONTROLLER_VALIDATION=""
+
   while IFS= read -r FILE; do
     [ -z "$FILE" ] && continue
 
     if [[ "$FILE" == src/app/Services/* || "$FILE" == src/app/Actions/* ]]; then
       SERVICE_LAYER_FILES="${SERVICE_LAYER_FILES}${FILE}
 "
-      continue
+    elif [[ "$FILE" == src/app/*Service.php && "$FILE" != src/app/Providers/*ServiceProvider.php ]]; then
+      SERVICE_LAYER_FILES="${SERVICE_LAYER_FILES}${FILE}
+"
     fi
 
-    if [[ "$FILE" == src/app/*Service.php || "$FILE" == src/app/**/*Service.php ]]; then
-      if [[ "$FILE" != src/app/Providers/*ServiceProvider.php ]]; then
-        SERVICE_LAYER_FILES="${SERVICE_LAYER_FILES}${FILE}
+    if [[ "$FILE" == src/app/Http/Controllers/*.php ]]; then
+      MATCHES=$(grep -nE '(\$request->validate\(|request\(\)->validate\()' "$PROJECT_DIR/$FILE" 2>/dev/null || true)
+      if [ -n "$MATCHES" ]; then
+        CONTROLLER_VALIDATION="${CONTROLLER_VALIDATION}${FILE}:${MATCHES}
 "
       fi
     fi
   done < <(printf '%s\n' "$STAGED_PHP")
+
   if [ -n "$SERVICE_LAYER_FILES" ]; then
-    echo "BLOCK: Service / Action classes are not allowed."
-    echo "$SERVICE_LAYER_FILES"
-    echo "Place DB logic in Eloquent Models, external API logic in Models/Gateway, and shared model behavior in Models/Concerns."
-    ERRORS=1
+    fail "BLOCK: Service / Action classes are not allowed.
+${SERVICE_LAYER_FILES}Place DB logic in Eloquent Models, external API logic in App\\Models\\Gateway, and shared model behavior in App\\Models\\Concerns."
   fi
 
-  CONTROLLER_VALIDATION=""
-  while IFS= read -r FILE; do
-    [ -z "$FILE" ] && continue
-    MATCHES=$(grep -nE '(\$request->validate\(|request\(\)->validate\()' "$FILE" 2>/dev/null || true)
-    if [ -n "$MATCHES" ]; then
-      CONTROLLER_VALIDATION="${CONTROLLER_VALIDATION}${FILE}:${MATCHES}
-"
-    fi
-  done < <(printf '%s\n' "$STAGED_PHP" | grep '^src/app/Http/Controllers/.*\.php$' || true)
   if [ -n "$CONTROLLER_VALIDATION" ]; then
-    echo "BLOCK: Controller input validation must use Form Request objects."
-    echo "$CONTROLLER_VALIDATION"
-    echo "Move rules to app/Http/Requests/** and read validated data with \$request->validated()."
-    ERRORS=1
+    fail "BLOCK: Controller input validation must use Form Request objects.
+${CONTROLLER_VALIDATION}Move rules to app/Http/Requests/** and read validated data with \$request->validated()."
   fi
 
-  if ! ./vendor/bin/pint --test 2>&1; then
-    echo "BLOCK: Pint found formatting issues. Run: composer pint"
-    ERRORS=1
-  fi
+  if ! php_tooling_available; then
+    fail "BLOCK: the app container is not running, so PHP checks cannot run.
+Start it with: docker compose up -d"
+  else
+    echo ">>> PHP: Running Pint..."
+    php_exec ./vendor/bin/pint --test 2>&1 || fail "BLOCK: Pint found formatting issues. Run: docker compose exec app ./vendor/bin/pint"
 
-  echo ">>> PHP: Running PHPStan..."
-  if ! ./vendor/bin/phpstan analyze --no-progress 2>&1; then
-    echo "BLOCK: PHPStan found issues"
-    ERRORS=1
-  fi
+    echo ">>> PHP: Running PHPStan..."
+    php_exec ./vendor/bin/phpstan analyse --no-progress --memory-limit=2G 2>&1 || fail "BLOCK: PHPStan found issues."
 
-  echo ">>> PHP: Running Pest tests..."
-  if ! php artisan test --stop-on-failure 2>&1; then
-    echo "BLOCK: Pest tests failed"
-    ERRORS=1
+    echo ">>> PHP: Running Pest..."
+    php_exec php artisan test --stop-on-failure 2>&1 || fail "BLOCK: Pest tests failed."
   fi
 fi
 
-# TypeScript/JavaScript checks (React)
 if [ -n "$STAGED_TS" ]; then
-  echo ">>> TypeScript: Running Biome lint..."
-  ORIGINAL_DIR=$(pwd)
-  cd "$PROJECT_DIR/src"
-
   TYPE_SAFETY_ERRORS=""
+
   while IFS= read -r FILE; do
     [ -z "$FILE" ] && continue
 
     ADDED_LINES=$(git -C "$PROJECT_DIR" diff --cached -U0 -- "$FILE" | grep '^+' | grep -v '^+++' || true)
+    [ -z "$ADDED_LINES" ] && continue
 
-    if [ -n "$ADDED_LINES" ]; then
-      ANY_MATCHES=$(printf '%s\n' "$ADDED_LINES" | grep -nE '(:| as |<|,|\(|\[|\{|=)\s*any\b|Array<\s*any\s*>|Record<[^>]*,\s*any\s*>' || true)
-      if [ -n "$ANY_MATCHES" ]; then
-        TYPE_SAFETY_ERRORS="${TYPE_SAFETY_ERRORS}${FILE}: TypeScript any is not allowed.
+    ANY_MATCHES=$(printf '%s\n' "$ADDED_LINES" | grep -nE '(:| as |<|,|\(|\[|\{|=)\s*any\b|Array<\s*any\s*>|Record<[^>]*,\s*any\s*>' || true)
+    if [ -n "$ANY_MATCHES" ]; then
+      TYPE_SAFETY_ERRORS="${TYPE_SAFETY_ERRORS}${FILE}: TypeScript any is not allowed.
 ${ANY_MATCHES}
 "
-      fi
+    fi
 
-      if [[ "$FILE" == src/resources/js/types/* && "$FILE" != src/resources/js/types/generated.d.ts && "$FILE" != src/resources/js/types/vite-env.d.ts ]]; then
-        MANUAL_TYPES=$(printf '%s\n' "$ADDED_LINES" | grep -nE '^\+\s*export\s+(interface|type)\s+' || true)
-        if [ -n "$MANUAL_TYPES" ]; then
-          TYPE_SAFETY_ERRORS="${TYPE_SAFETY_ERRORS}${FILE}: Manual exported types under resources/js/types are not allowed.
+    if [[ "$FILE" == src/resources/js/types/* \
+       && "$FILE" != src/resources/js/types/generated.d.ts \
+       && "$FILE" != src/resources/js/types/vite-env.d.ts ]]; then
+      MANUAL_TYPES=$(printf '%s\n' "$ADDED_LINES" | grep -nE '^\+\s*export\s+(interface|type)\s+' || true)
+      if [ -n "$MANUAL_TYPES" ]; then
+        TYPE_SAFETY_ERRORS="${TYPE_SAFETY_ERRORS}${FILE}: Manual exported types under resources/js/types are not allowed.
 ${MANUAL_TYPES}
 "
-        fi
       fi
     fi
   done < <(printf '%s\n' "$STAGED_TS")
+
   if [ -n "$TYPE_SAFETY_ERRORS" ]; then
-    echo "BLOCK: TypeScript types must come from Laravel Data generated types."
-    echo "$TYPE_SAFETY_ERRORS"
-    echo "Create app/Data/** with #[TypeScript], run php artisan typescript:transform, and avoid any."
-    ERRORS=1
+    fail "BLOCK: TypeScript types must come from Laravel Data generated types.
+${TYPE_SAFETY_ERRORS}Create app/Data/** with #[TypeScript], run php artisan typescript:transform, and avoid any."
   fi
 
-  if ! npm run lint:js 2>&1; then
-    echo "BLOCK: Biome lint failed"
-    ERRORS=1
-  fi
+  echo ">>> TypeScript: Running Biome lint..."
+  (cd "$APP_DIR" && npm run lint:js 2>&1) || fail "BLOCK: Biome lint failed."
 
   echo ">>> TypeScript: Type checking..."
-  if ! npm run types 2>&1; then
-    echo "BLOCK: TypeScript type check failed"
-    ERRORS=1
-  fi
+  (cd "$APP_DIR" && npm run types 2>&1) || fail "BLOCK: TypeScript type check failed."
 
   echo ">>> TypeScript: Running Vitest..."
-  if ! npm run test -- --run 2>&1; then
-    echo "BLOCK: Vitest tests failed"
-    ERRORS=1
-  fi
-
-  cd "$ORIGINAL_DIR"
+  (cd "$APP_DIR" && npm run test:unit 2>&1) || fail "BLOCK: Vitest tests failed."
 fi
 
 if [ $ERRORS -ne 0 ]; then
-  echo ""
-  echo "BLOCKED: Fix the above issues before committing."
-  echo "Use '/verify --quick' for quick lint-only validation."
-  exit 1
+  {
+    printf '%s' "$REPORT"
+    echo "BLOCKED: Fix the above issues before committing."
+  } >&2
+  exit 2
 fi
 
 echo "=== Pre-commit Check Passed ==="

@@ -35,11 +35,13 @@ Task(
   subagent_type: "quality-engineer",
   description: "Frontend verification",
   prompt: "Verify React frontend:
-    1. Run: npm run lint (Biome + ESLint)
+    1. Run: npm run lint:js (Biome)
     2. Run: npm run types (TypeScript check)
-    3. Run: npm run test (Vitest)
-    4. Report: lint errors, type errors, test failures
-    5. Fix auto-fixable issues",
+    3. Run: npm run lint:react-compiler (React Compiler)
+    4. Run: npm run lint:dead-code / npm run lint:duplication (knip / jscpd)
+    5. Run: npm run test:unit (Vitest)
+    6. Report: lint errors, type errors, test failures
+    7. Fix auto-fixable issues",
   run_in_background: true
 )
 ```
@@ -77,17 +79,21 @@ composer test      # Pest テスト
 
 ### Frontend (React/TypeScript)
 ```bash
-npm run lint       # Biome + ESLint
-npm run lint:js    # Biome のみ
-npm run types      # TypeScript 型チェック
-npm run test       # Vitest テスト
-npm run format     # Prettier フォーマット
+npm run lint:js               # Biome lint
+npm run types                 # TypeScript 型チェック
+npm run lint:react-compiler   # React Compiler 最適化スキップ検出
+npm run lint:dead-code        # knip
+npm run lint:duplication      # jscpd
+npm run test:unit             # Vitest
+npm run test:e2e              # Playwright E2E
+npm run format                # Biome フォーマット
 ```
 
 ### Full Stack
 ```bash
-composer dev       # 開発サーバー起動（Laravel + Vite + Queue）
-npm run lint:all   # JS + PHP 全体 lint
+composer dev            # 開発サーバー起動（Laravel + Vite + Queue）
+composer lint           # Pint + PHPStan + Rector (dry-run)
+npm run lint:architecture   # knip + jscpd
 ```
 
 ## カバレッジ基準

@@ -809,6 +809,6 @@ This skill works with `/kiro:spec-impl`:
 composer lint      # Pint + PHPStan + Rector dry-run
 composer test      # Pest tests
 npm run lint       # Biome + ESLint
-npm run test       # Vitest tests
+npm run test:unit  # Vitest tests
 npm run types      # TypeScript check
 ```
