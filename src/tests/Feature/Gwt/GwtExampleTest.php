@@ -12,8 +12,8 @@ uses(RefreshDatabase::class);
  *
  * @see .kiro/specs/auth/requirements.md
  */
-describe('UC-01: ユーザー登録', function () {
-    it('Scenario 1.1: 新規ユーザーを登録できる', function () {
+describe('UC-01: ユーザー登録', function (): void {
+    it('Scenario 1.1: 新規ユーザーを登録できる', function (): void {
         scenario('新規ユーザー登録')
             ->given('有効なユーザーデータ', fn () => [
                 'name' => 'テストユーザー',
@@ -27,7 +27,7 @@ describe('UC-01: ユーザー登録', function () {
             ->run();
     });
 
-    it('Scenario 1.2: 重複メールアドレスでは登録できない', function () {
+    it('Scenario 1.2: 重複メールアドレスでは登録できない', function (): void {
         scenario('重複メールでの登録失敗')
             ->given('既存ユーザーと同じメールアドレス', fn () => User::factory()->create(['email' => 'existing@example.com']))
             ->and('登録データを準備', fn () => [
@@ -42,8 +42,8 @@ describe('UC-01: ユーザー登録', function () {
     });
 });
 
-describe('UC-02: ログイン', function () {
-    it('Scenario 2.1: 正しい認証情報でログインできる', function () {
+describe('UC-02: ログイン', function (): void {
+    it('Scenario 2.1: 正しい認証情報でログインできる', function (): void {
         scenario('正常ログイン')
             ->given('登録済みユーザーが存在する', fn () => User::factory()->create([
                 'email' => 'user@example.com',
@@ -58,7 +58,7 @@ describe('UC-02: ログイン', function () {
             ->run();
     });
 
-    it('Scenario 2.2: 間違ったパスワードではログインできない', function () {
+    it('Scenario 2.2: 間違ったパスワードではログインできない', function (): void {
         scenario('パスワード間違いでログイン失敗')
             ->given('登録済みユーザーが存在する', fn () => User::factory()->create([
                 'email' => 'user@example.com',
@@ -74,8 +74,8 @@ describe('UC-02: ログイン', function () {
     });
 });
 
-describe('UC-03: ログアウト', function () {
-    it('Scenario 3.1: ログアウトできる', function () {
+describe('UC-03: ログアウト', function (): void {
+    it('Scenario 3.1: ログアウトできる', function (): void {
         scenario('ログアウト')
             ->given('ログイン済みユーザー', function () {
                 $user = User::factory()->create();

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 // .claude/rules/laravel/model-layer-boundaries.md を実行可能な形にした検査。
 
-it('Service / Action レイヤーを作らない', function () {
+it('Service / Action レイヤーを作らない', function (): void {
     expect(is_dir(app_path('Services')))->toBeFalse()
         ->and(is_dir(app_path('Actions')))->toBeFalse();
 });

@@ -21,9 +21,12 @@ services:
     networks:
       - app-network
     depends_on:
-      - postgres
-      - redis
-      - mailpit
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
 
   nginx:
     image: nginx:alpine
@@ -88,6 +91,11 @@ services:
       - "${REDIS_PORT:-6379}:6379"
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # 開発用のメールキャッチャー。Web UI は http://localhost:8025
   mailpit:

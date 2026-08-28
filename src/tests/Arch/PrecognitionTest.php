@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route as RouteFacade;
 // Form Request を使う変更系 route には HandlePrecognitiveRequests を付ける。
 // これが漏れるとフロントの validate() がライブ検証ではなく本処理を実行してしまう。
 
-it('Form Request を使う変更系 route には Precognition middleware が付いている', function () {
+it('Form Request を使う変更系 route には Precognition middleware が付いている', function (): void {
     // controller action だけでなくクロージャ route も対象にする。
     $reflectAction = function (Route $route): ?ReflectionFunctionAbstract {
         $action = $route->getAction('uses');
