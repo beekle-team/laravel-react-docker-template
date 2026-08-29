@@ -10,4 +10,9 @@ if [[ " $install_line " == *" opcache "* ]]; then
     exit 1
 fi
 
-printf 'PASS: Dockerfile does not reinstall the OPcache bundled with PHP 8.5.\n'
+if ! grep -F 'install -d -o "$user" -g "$user" /var/www/vendor /var/www/node_modules' "$PROJECT_ROOT/Dockerfile" >/dev/null; then
+    printf 'FAIL: dependency volume mount points are not owned by the non-root app user.\n' >&2
+    exit 1
+fi
+
+printf 'PASS: Dockerfile is compatible with PHP 8.5 and non-root dependency volumes.\n'

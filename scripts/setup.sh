@@ -18,8 +18,6 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 "$COMPOSE" build app
-"$COMPOSE" run --rm --no-deps --user root app sh -c \
-    'chown "$(stat -c "%u:%g" /var/www)" /var/www/vendor /var/www/node_modules'
 "$COMPOSE" run --rm --no-deps app composer install --no-interaction --prefer-dist
 "$COMPOSE" run --rm --no-deps app npm ci
 
