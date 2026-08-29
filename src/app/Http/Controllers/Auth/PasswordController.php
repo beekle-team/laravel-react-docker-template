@@ -16,10 +16,10 @@ class PasswordController extends Controller
      */
     public function update(UpdatePasswordRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
+        $user = $this->authenticatedUser($request);
 
-        $request->user()->update([
-            'password' => Hash::make($validated['password']),
+        $user->update([
+            'password' => Hash::make($request->password()),
         ]);
 
         return back();

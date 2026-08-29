@@ -4,15 +4,27 @@ includes:
 parameters:
     paths:
         - app/
+        - database/
+        - routes/
+        - tests/
 
     # Level 9 is the highest level
-    level: 5
+    level: 9
 
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
-#
-#    excludePaths:
-#        - ./*/*/FileToBeExcluded.php
-#
-#    checkMissingIterableValueType: false
+    ignoreErrors:
+        # Pest のテストクロージャは実行時に TestCase へ束縛されるため、静的解析からは
+        # 継承元の PHPUnit\Framework\TestCase しか見えない。$this->post() 等は実在する。
+        -
+            identifier: method.notFound
+            message: '#^Call to an undefined method PHPUnit\\Framework\\TestCase::#'
+            paths:
+                - tests/Feature
+        # arch() / preset() の流暢 API は PendingCalls 経由で解決されるため同様。
+        -
+            identifier: method.notFound
+            message: '#^Call to an undefined method Pest\\PendingCalls\\TestCall::#'
+            paths:
+                - tests/Arch
 
+rules:
+    - Tests\PHPStan\Rules\ControllerValidationRule

@@ -22,4 +22,12 @@ class UpdatePasswordRequest extends FormRequest
             'password' => ['required', Password::defaults(), 'confirmed'],
         ];
     }
+
+    /**
+     * バリデーション済みのパスワード。validated() は mixed を返すため型付きで公開する。
+     */
+    public function password(): string
+    {
+        return $this->string('password')->value();
+    }
 }

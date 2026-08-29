@@ -24,4 +24,12 @@ class RegisterUserRequest extends FormRequest
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
+
+    /**
+     * バリデーション済みのパスワード。validated() は mixed を返すため型付きで公開する。
+     */
+    public function password(): string
+    {
+        return $this->string('password')->value();
+    }
 }
