@@ -24,7 +24,7 @@ it('Feature テストは scenario ヘルパーを使う', function (): void {
     $output = $process->getOutput().$process->getErrorOutput();
 
     expect($process->getExitCode())->toBe(1)
-        ->and(substr_count($output, 'Feature テストは scenario() ヘルパーを使い、Given-When-Then 形式で記述してください。'))->toBe(8)
+        ->and(substr_count($output, 'Feature テストは scenario() ヘルパーを使い、Given-When-Then 形式で記述してください。'))->toBe(14)
         ->and($output)->toContain('ClassStyleFeatureTest.php.inc:11')
         ->and($output)->toContain('PestStyleFeatureTest.php.inc:7');
 });

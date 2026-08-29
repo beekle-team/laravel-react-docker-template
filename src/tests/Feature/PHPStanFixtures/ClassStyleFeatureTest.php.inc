@@ -47,6 +47,23 @@ final class ClassStyleFeatureTest extends TestCase
         }
     }
 
+    public function test_valid_scenario_mixed_with_a_conditional_scenario_is_rejected(): void
+    {
+        scenario('top-level helper based test')
+            ->given('a value', fn (): bool => true)
+            ->when('the value is read', fn (bool $value): bool => $value)
+            ->then('it remains true', fn (bool $result) => self::assertTrue($result))
+            ->run();
+
+        if (getenv('RUN_SCENARIO') === 'yes') {
+            scenario('conditionally executed helper based test')
+                ->given('a value', fn (): bool => true)
+                ->when('the value is read', fn (bool $value): bool => $value)
+                ->then('it remains true', fn (bool $result) => self::assertTrue($result))
+                ->run();
+        }
+    }
+
     public function test_scenario_helper_is_allowed(): void
     {
         scenario('helper based test')
