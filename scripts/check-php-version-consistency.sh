@@ -13,7 +13,7 @@ if [ "$(tr -d '[:space:]' < .php-version)" != "$EXPECTED_VERSION" ]; then
   fail ".php-version must be $EXPECTED_VERSION"
 fi
 
-if ! grep -Fq '"php": "^8.5"' src/composer.json; then
+if ! grep -Eq '"php"[[:space:]]*:[[:space:]]*"\^8\.5"' src/composer.json; then
   fail "src/composer.json must require PHP ^8.5"
 fi
 
