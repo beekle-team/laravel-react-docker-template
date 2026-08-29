@@ -30,6 +30,7 @@ PATH="$FRESH_PROJECT/bin:$PATH" \
 test -f "$FRESH_PROJECT/src/.env"
 grep -Fx 'compose version' "$FRESH_PROJECT/docker.calls" >/dev/null
 grep -Fx 'compose --env-file src/.env build app' "$FRESH_PROJECT/docker.calls" >/dev/null
+grep -Fx 'compose --env-file src/.env run --rm --no-deps --user root app sh -c chown "$(stat -c "%u:%g" /var/www)" /var/www/vendor /var/www/node_modules' "$FRESH_PROJECT/docker.calls" >/dev/null
 grep -Fx 'compose --env-file src/.env run --rm --no-deps app composer install --no-interaction --prefer-dist' "$FRESH_PROJECT/docker.calls" >/dev/null
 grep -Fx 'compose --env-file src/.env run --rm --no-deps app npm ci' "$FRESH_PROJECT/docker.calls" >/dev/null
 grep -Fx 'compose --env-file src/.env run --rm --no-deps app php artisan key:generate --ansi' "$FRESH_PROJECT/docker.calls" >/dev/null
