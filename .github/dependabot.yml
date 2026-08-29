@@ -72,7 +72,8 @@ updates:
           - "*"
 
   # Dockerfile のベースイメージ。テンプレートは PHP 8.5 に統一する。
-  # 8.6 への major は Composer / Rector / CI と同時に更新する専用作業にする。
+  # PHP 8.6 は semver minor なので、minor / major を無視し、8.5系のタグだけを使う。
+  # 8.6 以降へ上げる場合は Composer / Rector / CI と同時に更新する専用作業にする。
   - package-ecosystem: docker
     directory: /
     schedule:
@@ -84,7 +85,9 @@ updates:
       prefix: "chore(docker)"
     ignore:
       - dependency-name: php
-        update-types: ["version-update:semver-major"]
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
 
   # docker-compose.yml のサービスイメージ（postgres / redis / nginx）。
   # Dockerfile とは別 ecosystem なので個別に定義する。
