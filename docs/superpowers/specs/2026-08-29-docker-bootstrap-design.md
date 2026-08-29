@@ -42,7 +42,7 @@ Compose が自動読込するルート `.env` を Laravel にも直接マウン�
 
 依存をイメージへ含めること自体はセキュリティ上の問題ではない。lockfile 固定、multi-stage build、秘密情報を build layer に残さないこと、不要な開発依存を本番 runtime に含めないことを守れば、実行物を不変化できる利点がある。
 
-今回は `./src:/var/www` の bind mount がイメージ内の `/var/www/vendor` と `/var/www/node_modules` を隠すこと、lockfile 更新のたびに開発用イメージの再ビルドが必要になることから採用しない。依存はセットアップ時に bind mount 先へ導入する。
+今回は `./src:/var/www` の bind mount がイメージ内の `/var/www/vendor` と `/var/www/node_modules` を隠すこと、lockfile 更新のたびに開発用イメージの再ビルドが必要になることから採用しない。依存はセットアップ時に Docker named volume へ導入する。
 
 ## 設計
 
@@ -67,7 +67,7 @@ Compose が自動読込するルート `.env` を Laravel にも直接マウン�
 1. Docker と Docker Compose が利用可能か確認する。
 2. `src/.env` がなければ `src/.env.example` から作る。
 3. app イメージをビルドする。
-4. `--no-deps` を付けた一時 app コンテナで、bind mount 先へ `composer install` と `npm ci` を実行する。
+4. `--no-deps` を付けた一時 app コンテナで、`composer-vendor` と `node-modules` named volume へ `composer install` と `npm ci` を実行する。
 5. `--no-deps` を付けた一時 app コンテナで、APP_KEY が空の場合だけ生成する。
 6. PostgreSQL、Redis、Mailpit を起動して health check を待つ。
 7. migration を実行する。
@@ -79,6 +79,8 @@ Compose が自動読込するルート `.env` を Laravel にも直接マウン�
 
 - app は PHP-FPM に専念する。
 - Vite は app と同じイメージと bind mount を使う専用サービスとして起動する。
+- app と Vite は `composer-vendor:/var/www/vendor` と `node-modules:/var/www/node_modules` を共有する。
+- named volume により Docker Desktop の bind mount 上で依存の大量ファイルを更新せず、依存を image layer にも含めない。
 - Vite の公開ポートは app から Vite サービスへ移す。
 - Vite サービスは `npm run dev -- --host 0.0.0.0` を実行する。
 - nginx は app に依存し、既存どおり `http://localhost:8080` を公開する。
@@ -101,6 +103,7 @@ Compose が自動読込するルート `.env` を Laravel にも直接マウン�
 ## セキュリティ境界
 
 - `.env`、Composer/npm の認証情報、秘密鍵を Dockerfile の build context や image layer に追加しない。
+- Composer/npm の依存は named volume に保存し、Docker image layer へ含めない。
 - setup のログへ APP_KEY や環境変数の値を表示しない。
 - Dockerfile の既存 `.dockerignore` により `.env`、`vendor`、`node_modules` を除外し続ける。
 - 永続 volume の削除は setup や通常の停止処理に含めない。
@@ -139,4 +142,5 @@ GitHub Actions の専用 job で次を行う。
 - セットアップ後、アプリが HTTP 200 を返し、Vite HMR と Mailpit を利用できる。
 - Laravel と Compose が `src/.env` の PostgreSQL、Redis、Mailpit 設定を共有する。
 - setup の再実行で APP_KEY と永続データが保持される。
+- setup が依存を Docker named volume へ導入し、ホストの `vendor` と `node_modules` を必須にしない。
 - shell test、既存 CI、Docker スモークテストが成功する。

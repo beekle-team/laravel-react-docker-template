@@ -4,7 +4,7 @@
 
 **Goal:** Git と Docker だけを用意したクリーンチェックアウトから、1つの冪等なコマンドで Laravel・Vite・PostgreSQL・Redis・Mailpit を起動できるようにする。
 
-**Architecture:** `src/.env.example` を唯一の設定テンプレートとし、すべての Compose 操作を `scripts/compose.sh` から `--env-file src/.env` 付きで実行する。`scripts/setup.sh` が bind mount 先へ依存を導入し、APP_KEY と DB を初期化した後、PHP-FPM・nginx・専用 Vite サービスを起動する。shell 回帰テストは fake Docker CLI で制御フローを検証し、GitHub Actions は実コンテナで HTTP・Vite・DB の疎通を検証する。
+**Architecture:** `src/.env.example` を唯一の設定テンプレートとし、すべての Compose 操作を `scripts/compose.sh` から `--env-file src/.env` 付きで実行する。`scripts/setup.sh` が Docker named volume へ依存を導入し、APP_KEY と DB を初期化した後、PHP-FPM・nginx・専用 Vite サービスを起動する。shell 回帰テストは fake Docker CLI で制御フローを検証し、GitHub Actions は実コンテナで HTTP・Vite・DB の疎通を検証する。
 
 **Tech Stack:** Bash, Docker Compose, PHP 8.5 / Laravel 13, Node.js 20 / Vite 7, GitHub Actions
 
@@ -15,7 +15,7 @@
 - 対象はローカル開発用 Docker Compose とし、本番イメージやデプロイ方式は変更しない。
 - Node.js のメジャーバージョンは 20 のままとする。
 - `.env`、APP_KEY、Composer/npm 認証情報を image layer やログへ出さない。
-- `vendor` と `node_modules` は Docker イメージへ焼き込まず、bind mount 先へ導入する。
+- `vendor` と `node_modules` は Docker イメージへ焼き込まず、`composer-vendor` と `node-modules` named volume へ導入する。
 - 既存の `src/.env`、APP_KEY、PostgreSQL volume は setup の再実行で上書き・削除しない。
 - volume 削除は通常の停止フローへ含めない。
 - shell test は Docker daemon を使わず、実機確認だけを専用 smoke test で行う。
@@ -217,7 +217,7 @@ git commit -m "feat: 冪等なDocker初期化コマンドを追加する"
 
 ---
 
-### Task 3: Vite 専用サービス
+### Task 3: 依存用 named volume と Vite 専用サービス
 
 **Files:**
 - Modify: `docker-compose.yml`
@@ -225,7 +225,7 @@ git commit -m "feat: 冪等なDocker初期化コマンドを追加する"
 
 **Interfaces:**
 - Consumes: Task 1 の `src/.env.example`、既存 `app-backend` image と `./src:/var/www` bind mount。
-- Produces: Compose service `vite`。`npm run dev -- --host 0.0.0.0` を実行し、`${VITE_PORT:-5173}:5173` を公開する。
+- Produces: Compose service `vite` と volumes `composer-vendor`、`node-modules`。app と Vite が依存volumeを共有し、Viteは `npm run dev -- --host 0.0.0.0` を実行して `${VITE_PORT:-5173}:5173` を公開する。
 
 - [ ] **Step 1: Vite service の失敗する構成テストを書く**
 
@@ -249,6 +249,10 @@ service_block() {
 }
 
 service_block vite | grep -F 'target: 5173'
+service_block app | grep -F 'source: composer-vendor'
+service_block app | grep -F 'source: node-modules'
+service_block vite | grep -F 'source: composer-vendor'
+service_block vite | grep -F 'source: node-modules'
 if service_block app | grep -F 'target: 5173'; then
     echo 'FAIL: app still publishes the Vite port' >&2
     exit 1
@@ -273,13 +277,23 @@ Expected: FAIL。`config --services` に `vite` がない。
     command: npm run dev -- --host 0.0.0.0
     volumes:
       - ./src:/var/www
+      - composer-vendor:/var/www/vendor
+      - node-modules:/var/www/node_modules
     ports:
       - "${VITE_PORT:-5173}:5173"
     networks:
       - app-network
     depends_on:
       - app
+
+volumes:
+  composer-vendor:
+    driver: local
+  node-modules:
+    driver: local
 ```
+
+app にも同じ2つの named volume mount を追加する。既存 `postgres-data` volume は維持する。
 
 - [ ] **Step 4: Compose 構成テストを通す**
 
@@ -347,7 +361,7 @@ scripts/compose.sh exec app composer lint
 scripts/compose.sh exec app npm run lint:architecture
 ```
 
-URL、`src/.env` の責務、ポート変数、既存ルート `.env` からの移行、`down -v` が PostgreSQL データを削除することも記載する。`src/README.md` は削除する。
+URL、`src/.env` の責務、ポート変数、既存ルート `.env` からの移行、依存が named volume に入ること、`down -v` が PostgreSQL データと依存volumeを削除することも記載する。ホストIDEが依存ソースを必要とする場合だけ、ホスト側で Composer/npm を任意実行できることを補足する。`src/README.md` は削除する。
 
 - [ ] **Step 4: README 契約テストを通す**
 
