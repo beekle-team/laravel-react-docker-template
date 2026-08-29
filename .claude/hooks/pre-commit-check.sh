@@ -23,9 +23,9 @@ STAGED_COMPOSER=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=
 STAGED_TYPES_SOURCE=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMRD | grep -E '^src/(app/(Data|Enums)/.*\.php|config/typescript-transformer\.php|resources/js/types/generated\.d\.ts)$' || true)
 STAGED_TS=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
 
-# composer.json / composer.lock の更新だけでも、インストール済みの
-# PHP・Laravel バージョンに応じた Rector セットを検証する。
-if [ -n "$STAGED_PHP" ] || [ -n "$STAGED_COMPOSER" ]; then
+# composer更新や生成型だけの変更でも、PHP/Laravelバージョンと
+# PHPから生成されるTypeScript型の契約を検証する。
+if [ -n "$STAGED_PHP" ] || [ -n "$STAGED_COMPOSER" ] || [ -n "$STAGED_TYPES_SOURCE" ]; then
   SERVICE_LAYER_FILES=""
   CONTROLLER_VALIDATION=""
 
