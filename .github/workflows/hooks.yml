@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -13,10 +16,18 @@ concurrency:
 jobs:
   hooks:
     runs-on: ubuntu-latest
-    name: Claude Code Hooks
+    name: Repository Guards
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
-      - name: Execute pre-commit hook regression tests
-        run: bash .claude/hooks/tests/pre-commit-check-test.sh
+      - name: Verify PHP version consistency
+        run: bash scripts/check-php-version-consistency.sh
+
+      - name: Execute hook regression tests
+        run: |
+          for test_file in .claude/hooks/tests/*-test.sh; do
+            bash "$test_file"
+          done

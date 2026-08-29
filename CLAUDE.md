@@ -38,13 +38,15 @@ Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life
 - Human review required each phase; use `-y` only for intentional fast-track
 - Keep steering current and verify alignment with `/kiro:spec-status`
 - Follow the user's instructions precisely, and within that scope act autonomously: gather the necessary context and complete the requested work end-to-end in this run, asking questions only when essential information is missing or the instructions are critically ambiguous.
+- PHP はローカル、Docker、Composer、Rector、CI のすべてで 8.5 に統一する
 - HTTP 入力検証は `.claude/rules/laravel/form-request-validation.md` に従い、Controller の `$request->validate()` ではなく Form Request 経由に統一する
 - Form Request を使う変更系 route は Laravel Precognition に対応し、React フォームは Inertia の Precognition API でライブ検証する
 - Inertia props は `.claude/rules/laravel/inertia-props.md` に従い、モデル/API レスポンス由来の構造化データを Data DTO 経由で渡す
+- `app/` 配下の Data DTO・Enum・`#[TypeScript]` 対象、または `config/typescript-transformer.php` を変更したら `composer types` で TypeScript 型を再生成し、`composer types:check` が差分なしで通ることを確認する
 - Service クラスは禁止し、DB 永続化は Eloquent Model、外部接続は Gateway Model、共通振る舞いは Concerns に置く。詳細は `.claude/rules/laravel/model-layer-boundaries.md` を参照
 - React 側は Inertia の Pages を入口として残し、feature 固有 UI / hooks / helpers は `features/{feature}` に置く。詳細は `.claude/rules/frontend/architecture.md` を参照
 - React Compiler をビルドに常時適用する。メモ化はコンパイラ任せにし、手書きの `useMemo` / `useCallback` / `memo` を既定にしない。詳細は `.claude/rules/frontend/react-compiler.md` を参照
-- PHP の自動リファクタは `.claude/rules/laravel/rector.md` に従い、Rector の `process --dry-run` を CI で実行する。適用時の PHP バージョンは 8.3（下限）に固定する
+- PHP の自動リファクタは `.claude/rules/laravel/rector.md` に従い、Rector の `process --dry-run` を CI で実行する。適用時の PHP バージョンは 8.5 に固定する
 - フロント品質ゲートは `.claude/rules/frontend/quality-scans.md` に従い、Biome / TypeScript / React Compiler 検査 / knip / jscpd / Vitest を CI で実行する
 - フロントのテストはコンポーネント / hook を Vitest、画面をまたぐフローを Playwright で書く。詳細は `.claude/rules/frontend/testing.md` を参照
 
