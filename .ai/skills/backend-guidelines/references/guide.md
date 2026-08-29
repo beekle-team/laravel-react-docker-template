@@ -304,14 +304,14 @@ app/
 |-----------|------|
 | `spatie/laravel-data` | DTOクラス、Inertia連携 |
 | `spatie/laravel-typescript-transformer` | PHP→TypeScript型生成 |
-| `tightenco/ziggy` | フロントエンドへのルート共有 |
+| `laravel/wayfinder` | 型付きroute / actionの生成 |
 
 ### Frontend
 | パッケージ | 用途 |
 |-----------|------|
-| `@inertiajs/react` | SPA連携 |
-| `@radix-ui/*` | アクセシブルUIプリミティブ |
-| `laravel-precognition-react` | バリデーション先行実行 |
+| `@inertiajs/react` | SPA連携、`useForm`、Precognitionフォーム |
+| `@laravel/vite-plugin-wayfinder` | WayfinderのTypeScript route / action生成 |
+| `@headlessui/react` | アクセシブルUIプリミティブ |
 
 ## Laravel Data + TypeScript 型同期
 
@@ -320,7 +320,7 @@ app/
 ```
 1. app/Data/*.php を作成・変更
 2. php artisan typescript:transform を実行
-3. resources/types/generated.d.ts が更新される
+3. src/resources/js/types/generated.d.ts が更新される
 4. フロントエンドで型が自動補完される
 ```
 
@@ -354,7 +354,7 @@ class UserData extends Data
 ### 生成される TypeScript 型
 
 ```typescript
-// resources/types/generated.d.ts
+// src/resources/js/types/generated.d.ts
 declare namespace App.Data {
   export type UserData = {
     id: number;
@@ -371,7 +371,7 @@ declare namespace App.Data {
 ### フロントエンドでの使用
 
 ```tsx
-// resources/js/pages/users/index.tsx
+// src/resources/js/Pages/Users/Index.tsx
 import { PageProps } from '@/types';
 
 interface Props extends PageProps {

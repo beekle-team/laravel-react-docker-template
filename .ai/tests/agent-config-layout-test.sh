@@ -74,11 +74,51 @@ if grep -RInE 'Task\(|\$ARGUMENTS|allowed-tools:' "$PROJECT_ROOT/.ai/skills"; th
   fail "tool-specific syntax found in shared skills"
 fi
 
+if grep -RInE 'tightenco/ziggy|@radix-ui|laravel-precognition-react|resources/types/generated\.d\.ts' \
+  "$PROJECT_ROOT/.ai/skills"; then
+  fail "shared skills reference packages or generated paths that this repository does not use"
+fi
+
+if grep -RInE 'composer require --dev sebastian/phpcpd|npm install -g jscpd|vendor/bin/phpcpd' \
+  "$PROJECT_ROOT/.ai/skills"; then
+  fail "shared skills recommend undeclared duplication tools"
+fi
+
+if grep -RInE 'tests/Browser|tasks\.md' "$PROJECT_ROOT/.ai/skills"; then
+  fail "shared skills reference unsupported test or task locations"
+fi
+
+BACKEND_GUIDE="$PROJECT_ROOT/.ai/skills/backend-guidelines/references/guide.md"
+while IFS= read -r package; do
+  if ! grep -Fq "\"$package\"" "$PROJECT_ROOT/src/composer.json" \
+    && ! grep -Fq "\"$package\"" "$PROJECT_ROOT/src/package.json"; then
+    fail "backend guide references an undeclared package: $package"
+  fi
+done < <(
+  sed -n '/^## 主要ライブラリ$/,/^## Laravel Data/p' "$BACKEND_GUIDE" \
+    | sed -n 's/^| `\([^`]*\)` |.*/\1/p'
+)
+
+GENERATED_TYPES_PATHS="$(grep -oE '[[:alnum:]_./-]+/generated\.d\.ts' "$BACKEND_GUIDE" | sort -u || true)"
+[ -n "$GENERATED_TYPES_PATHS" ] || fail "backend guide does not identify the generated TypeScript declaration"
+while IFS= read -r generated_types_path; do
+  [ -f "$PROJECT_ROOT/$generated_types_path" ] \
+    || fail "backend guide points to a missing generated TypeScript declaration: $generated_types_path"
+done <<< "$GENERATED_TYPES_PATHS"
+
 duplicate_names="$(find "$PROJECT_ROOT/.ai/skills" -name SKILL.md -exec sed -n 's/^name: //p' {} \; | sort | uniq -d)"
 [ -z "$duplicate_names" ] || fail "duplicate skill names: $duplicate_names"
 
 [ ! -d "$PROJECT_ROOT/.claude/hooks" ] || fail ".claude/hooks must not contain shared hook bodies"
 assert_file .codex/config.toml
+
+grep -Fq '[mcp_servers.laravel-boost]' "$PROJECT_ROOT/.codex/config.toml" \
+  || fail "Codex config does not declare MCP server: laravel-boost"
+grep -Fq 'command = "docker"' "$PROJECT_ROOT/.codex/config.toml" \
+  || fail "Codex laravel-boost MCP does not use Docker"
+grep -Fq 'args = ["compose", "exec", "-T", "app", "php", "artisan", "boost:mcp"]' \
+  "$PROJECT_ROOT/.codex/config.toml" \
+  || fail "Codex laravel-boost MCP command does not match the repository container"
 
 for hook_path in auto-format.sh post-edit-check.sh pre-bash-check.sh; do
   grep -Fq ".ai/hooks/$hook_path" "$PROJECT_ROOT/.codex/config.toml" \
