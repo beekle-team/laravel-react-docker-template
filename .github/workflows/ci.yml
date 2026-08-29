@@ -276,9 +276,11 @@ jobs:
     - name: Verify HTTP
       run: |
         for attempt in {1..30}; do
-          if curl --fail --silent --show-error http://localhost:8080 > /dev/null; then
+          http_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' http://localhost:8080 || true)"
+          if [[ "$http_status" == '200' ]]; then
             exit 0
           fi
+          printf 'HTTP is not ready (%d/30; status: %s)\n' "$attempt" "${http_status:-unavailable}"
           sleep 2
         done
         exit 1
@@ -286,9 +288,11 @@ jobs:
     - name: Verify Vite
       run: |
         for attempt in {1..30}; do
-          if curl --fail --silent --show-error http://localhost:5173/@vite/client > /dev/null; then
+          http_status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' http://localhost:5173/@vite/client || true)"
+          if [[ "$http_status" == '200' ]]; then
             exit 0
           fi
+          printf 'Vite is not ready (%d/30; status: %s)\n' "$attempt" "${http_status:-unavailable}"
           sleep 2
         done
         exit 1

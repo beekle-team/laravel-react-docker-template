@@ -13,6 +13,12 @@ fi
 
 docker compose version >/dev/null
 
+# Docker Desktop translates bind-mount ownership for its VM. Native Linux does
+# not, so match the image user to the developer/runner that owns the checkout.
+if [[ -z "${DOCKER_UID:-}" && "$(uname -s)" == 'Linux' ]]; then
+    export DOCKER_UID="$(id -u)"
+fi
+
 if [[ ! -f "$ENV_FILE" ]]; then
     cp "$ENV_EXAMPLE" "$ENV_FILE"
 fi

@@ -15,7 +15,7 @@ Laravel 13、Inertia 3、React 19、PostgreSQL、Redis、MailpitをDockerで起�
 scripts/setup.sh
 ```
 
-このコマンドは、未作成の場合だけ`src/.env`を生成し、Dockerイメージのビルド、Composer/npm依存の導入、APP_KEY生成、migration、全サービスの起動を順に行います。再実行しても既存の`src/.env`、APP_KEY、PostgreSQLデータは削除しません。
+このコマンドは、未作成の場合だけ`src/.env`を生成し、Dockerイメージのビルド、Composer/npm依存の導入、APP_KEY生成、migration、主要な開発サービスの起動を順に行います。再実行しても既存の`src/.env`、APP_KEY、PostgreSQLデータは削除しません。
 
 依存は`composer-vendor`と`node-modules`というDocker named volumeに保存します。Dockerイメージには依存、`.env`、認証情報を含めません。
 
@@ -55,13 +55,14 @@ scripts/compose.sh exec app npm run test:unit
 | --- | --- | --- |
 | `APP_PORT` | `8080` | nginx |
 | `VITE_PORT` | `5173` | Vite / HMR |
-| `DB_PORT` | `5432` | PostgreSQL |
+| `DB_HOST_PORT` | `5432` | PostgreSQLのホスト公開ポート |
 | `DB_TEST_PORT` | `5433` | テスト用PostgreSQL |
-| `REDIS_PORT` | `6379` | Redis |
+| `REDIS_HOST_PORT` | `6379` | Redisのホスト公開ポート |
 | `MAILPIT_SMTP_PORT` | `1025` | Mailpit SMTP |
 | `MAILPIT_UI_PORT` | `8025` | Mailpit UI |
 
 ポートが競合する場合は、`src/.env`で該当変数のコメントを外して変更し、サービスを再起動してください。
+Laravelがコンテナ間通信に使う`DB_PORT=5432`と`REDIS_PORT=6379`は変更せず、ホスト側だけを`DB_HOST_PORT`と`REDIS_HOST_PORT`で変更します。
 
 ## 品質ゲート
 
