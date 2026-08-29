@@ -32,3 +32,9 @@ jobs:
           for test_file in .ai/hooks/tests/*-test.sh; do
             bash "$test_file"
           done
+
+      - name: Execute bootstrap script regression tests
+        run: |
+          for test_file in tests/shell/*-test.sh; do
+            bash "$test_file"
+          done

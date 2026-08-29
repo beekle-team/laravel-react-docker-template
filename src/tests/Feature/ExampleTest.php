@@ -14,8 +14,10 @@ final class ExampleTest extends TestCase
      */
     public function test_the_application_returns_a_successful_response(): void
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+        scenario('トップページを表示する')
+            ->given('未認証のユーザー', fn () => null)
+            ->when('トップページへアクセスする', fn () => $this->get('/'))
+            ->then('正常なレスポンスが返る', fn ($response) => $response->assertStatus(200))
+            ->run();
     }
 }

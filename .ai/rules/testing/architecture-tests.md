@@ -24,6 +24,9 @@ arch テストで書けるものは arch テストに置く。宣言的で読め
 | `tests/Arch/CodingStandardsTest.php` | strict types（`php.md` 由来） |
 | `tests/Arch/PrecognitionTest.php` | Form Request を使う変更系 route の Precognition middleware（`form-request-validation.md` 由来） |
 | `tests/PHPStan/Rules/ControllerValidationRule.php` | Controller での `$request->validate()` / `request()->validate()` 禁止（`form-request-validation.md` 由来） |
+| `tests/PHPStan/Rules/FeatureTestMethodUsesScenarioRule.php` | PHPUnit形式のFeature testに完全なGWT Scenarioを強制（`.ai/rules/testing.md` 由来） |
+| `tests/PHPStan/Rules/FeaturePestTestUsesScenarioRule.php` | Pest形式のFeature testに完全なGWT Scenarioを強制（`.ai/rules/testing.md` 由来） |
+| `tests/PHPStan/Rules/ScenarioCallFinder.php` | `scenario()->given()->when()->then()->run()`チェーンの共通検出 |
 
 `phpunit.xml` に `Arch` testsuite を定義してあるので、`php artisan test` で他のスイートと一緒に走る。arch だけ流すときは `php artisan test --testsuite=Arch`。
 
@@ -37,7 +40,7 @@ arch テストで書けるものは arch テストに置く。宣言的で読め
 
 ## カスタム PHPStan ルール
 
-`tests/PHPStan/Rules/**` に `PHPStan\Rules\Rule` の実装を置き、`phpstan.neon` の `rules:` に登録する。namespace は `Tests\PHPStan\Rules`（composer の `autoload-dev` の `Tests\` に乗る）。
+`tests/PHPStan/Rules/**` に `PHPStan\Rules\Rule` の実装を置き、`phpstan-rules.neon` の `rules:` に登録する。`phpstan.neon` とfixture用設定はこの共通ファイルを読み込む。namespace は `Tests\PHPStan\Rules`（composer の `autoload-dev` の `Tests\` に乗る）。
 
 - `getNodeType()` で対象ノードを絞り、`processNode()` で違反だけ `RuleErrorBuilder` で返す
 - `identifier()` は必須。`laravel.controllerValidation` のように規約が分かる名前を付ける
