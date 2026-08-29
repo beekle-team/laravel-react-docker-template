@@ -114,7 +114,7 @@ Then ...
 
 ```
 生成予定のテスト:
-- tests/Feature/{Feature}/{Feature}GwtTest.php
+- src/tests/Feature/{Feature}/{Feature}GwtTest.php
   - UC-01: {ユースケース名}
     - Scenario 1.1: {シナリオ名}
     - Scenario 1.2: {シナリオ名}
@@ -151,7 +151,7 @@ describe('UC-01: {ユースケース名}', function () {
 ### 5. ファイル配置
 
 - Spec: `docs/specs/{feature}/requirements.md`
-- Test: `tests/Feature/{Feature}/{Feature}GwtTest.php`
+- Test: `src/tests/Feature/{Feature}/{Feature}GwtTest.php`
 
 ### 6. テスト実行
 
@@ -195,12 +195,12 @@ requirements.md にシナリオが定義されていません。
 `/bdd auth` 実行時:
 
 1. `docs/specs/auth/requirements.md` - 要件定義 (GWT形式)
-2. `tests/Feature/Auth/AuthGwtTest.php` - BDD テスト
+2. `src/tests/Feature/Auth/AuthGwtTest.php` - BDD テスト
 
 ---
 
 ## 参照
 
 - `.ai/rules/testing.md` - BDD ガイドライン
-- `tests/Support/Gwt/Scenario.php` - GWT ヘルパー
-- `tests/Feature/Gwt/GwtExampleTest.php` - サンプルテスト
+- `src/tests/Support/Gwt/Scenario.php` - GWT ヘルパー
+- `src/tests/Feature/Gwt/GwtExampleTest.php` - サンプルテスト
