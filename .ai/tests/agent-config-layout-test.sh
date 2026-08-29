@@ -50,21 +50,26 @@ assert_link .claude/rules ../.ai/rules
 assert_link .claude/skills ../.ai/skills
 assert_link .agents/skills ../.ai/skills
 
-EXISTING_SKILLS=(
-  backend-guidelines
-  brand-guidelines
-  dry-check
-  frontend-design
-  inertia-react
-  tdd-methodology
+EXPECTED_SKILLS=(
+  backend-guidelines brand-guidelines dry-check frontend-design inertia-react
+  tdd-methodology bdd commit review simplify verify
 )
 
-for skill in "${EXISTING_SKILLS[@]}"; do
+for skill in "${EXPECTED_SKILLS[@]}"; do
   skill_file="$PROJECT_ROOT/.ai/skills/$skill/SKILL.md"
   [ -f "$skill_file" ] || fail "missing skill: $skill"
   rg -q '^name: ' "$skill_file" || fail "missing name: $skill"
   rg -q '^description: ' "$skill_file" || fail "missing description: $skill"
   [ "$(wc -l < "$skill_file")" -le 500 ] || fail "SKILL.md exceeds 500 lines: $skill"
 done
+
+[ ! -d "$PROJECT_ROOT/.claude/commands" ] || fail ".claude/commands must not contain shared workflows"
+
+if rg -n 'Task\(|\$ARGUMENTS|allowed-tools:' "$PROJECT_ROOT/.ai/skills"; then
+  fail "tool-specific syntax found in shared skills"
+fi
+
+duplicate_names="$(find "$PROJECT_ROOT/.ai/skills" -name SKILL.md -exec sed -n 's/^name: //p' {} \; | sort | uniq -d)"
+[ -z "$duplicate_names" ] || fail "duplicate skill names: $duplicate_names"
 
 printf 'PASS: shared rule layout is valid.\n'
