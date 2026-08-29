@@ -71,9 +71,8 @@ updates:
         patterns:
           - "*"
 
-  # Dockerfile のベースイメージ。
-  # テンプレートの本命は PHP 8.5。composer 下限は Laravel 13 に合わせて 8.3。
-  # 8.6 への major は CI matrix / 方針の専用作業。
+  # Dockerfile のベースイメージ。テンプレートは PHP 8.5 に統一する。
+  # 8.6 への major は Composer / Rector / CI と同時に更新する専用作業にする。
   - package-ecosystem: docker
     directory: /
     schedule:
