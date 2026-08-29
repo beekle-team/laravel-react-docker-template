@@ -7,9 +7,11 @@
 
 ## Laravel
 
+- PHP はローカル、Docker、Composer、Rector、CI のすべてで 8.5 に統一
 - Form Request / Precognition
 - Inertia props は Data DTO
 - Service class 禁止、Eloquent / Gateway / Concerns の境界
+- Data DTO、Enum、`#[TypeScript]` 対象、または `config/typescript-transformer.php` の変更時は `composer types` で再生成し、`composer types:check` で差分がないことを確認
 - 詳細は .claude/rules/laravel/ と .claude/rules/php.md
 
 ## React
@@ -21,7 +23,7 @@
 
 ## Quality Gates
 
-- PHP: Pint、PHPStan、Rector dry-run、Pest
+- PHP: バージョン整合性、Pint、生成TypeScript差分、PHPStan、Rector dry-run、Pest
 - Frontend: Biome、TypeScript、React Compiler、knip、jscpd、Vitest
 - User flow: Playwright
 - Testing は .ai/rules/testing.md

@@ -6,7 +6,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.5",
         "inertiajs/inertia-laravel": "^3.3",
         "laravel/framework": "^13.0",
         "laravel/sanctum": "^4.0",
@@ -63,8 +63,11 @@
         "stan": ["@php vendor/bin/phpstan analyse --memory-limit=2G --ansi"],
         "rector": ["@php vendor/bin/rector process --dry-run --ansi"],
         "rector:fix": ["@php vendor/bin/rector process --ansi"],
+        "types": ["@php artisan typescript:transform"],
+        "types:check": ["bash scripts/check-generated-types.sh"],
         "lint": [
             "@php vendor/bin/pint --test --ansi",
+            "@types:check",
             "@stan",
             "@rector"
         ],

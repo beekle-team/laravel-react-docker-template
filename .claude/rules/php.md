@@ -1,5 +1,10 @@
 # PHP Coding Rules
 
+## 実行バージョン
+
+PHP はローカル、Docker、Composer、Rector、CI のすべてで **8.5** に統一する。
+下位バージョン互換のために PHP 8.5 の構文や標準機能を避けない。
+
 ## Strict Types
 
 全PHPファイルに `declare(strict_types=1);` を必須とする。
@@ -42,14 +47,14 @@ Pest arch テストで表現できるもの（クラスの有無・継承・依�
 
 ## 自動リファクタ
 
-Rector（PHP 8.3 + Laravel composer-based）。フォーマットは Pint に任せる。
+Rector（PHP 8.5 + Laravel composer-based）。フォーマットは Pint に任せる。
 
 ```bash
 ./vendor/bin/rector process --dry-run  # 変更確認（CI と同じ）
 ./vendor/bin/rector process            # 適用
 ```
 
-**設定**: `rector.php` → `withPhpSets(php83: true)` / `PhpVersion::PHP_83` /
+**設定**: `rector.php` → `withPhpSets(php85: true)` / `PhpVersion::PHP_85` /
 `withPreparedSets(deadCode, codeQuality, typeDeclarations, earlyReturn, instanceOf, phpunitCodeQuality)`
 
 ## 型宣言

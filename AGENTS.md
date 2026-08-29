@@ -16,8 +16,10 @@
 - リポジトリルートで、変更対象に応じて次を実行する。
 
 ```bash
+bash scripts/check-php-version-consistency.sh
 docker compose exec app composer lint
 docker compose exec app composer test
+docker compose exec app composer types:check # Data DTO・Enum・TypeScript変換対象の変更時
 docker compose exec app npm run lint:js
 docker compose exec app npm run types
 docker compose exec app npm run lint:react-compiler

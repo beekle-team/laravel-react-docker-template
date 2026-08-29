@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php","src/bootstrap/**/*.php","src/config/**/*.php","src/database/**/*.php","src/routes/**/*.php","src/tests/**/*.php","src/rector.php","src/composer.json","src/composer.lock"]
+globs: ["src/app/**/*.php","src/bootstrap/**/*.php","src/config/**/*.php","src/database/**/*.php","src/public/index.php","src/routes/**/*.php","src/tests/**/*.php","src/rector.php","src/composer.json","src/composer.lock"]
 ---
 
 # Rector 自動リファクタ
@@ -8,7 +8,7 @@ PHP の構文アップグレードと Laravel 向けリファクタは Rector �
 
 ## トリガー条件
 
-- `app/**/*.php`, `bootstrap/**/*.php`, `config/**/*.php`, `database/**/*.php`, `routes/**/*.php`, `tests/**/*.php` を編集・作成した時
+- `app/**/*.php`, `bootstrap/**/*.php`, `config/**/*.php`, `database/**/*.php`, `public/index.php`, `routes/**/*.php`, `tests/**/*.php` を編集・作成した時
 - `rector.php` を変更した時
 - `composer.json` または `composer.lock` を変更した時。PHP ファイルに差分がなくても、依存更新後の PHP・Laravel バージョンに対応した Rector を実行する
 
@@ -31,7 +31,7 @@ composer rector:fix  # 適用
 
 ## 有効な基盤セット
 
-- PHP 8.3 までの構文変換
+- PHP 8.5 までの構文変換
 - 汎用的な死蔵コード除去
 - コード品質改善
 - 型宣言追加
@@ -60,7 +60,8 @@ Rector の dry-run が差分ゼロでも、「利用できるルールがない�
 
 ## 方針
 
-- `phpVersion` は PHP 8.3（composer / Laravel 13 の下限）。`withPhpSets(php83: true)` も 8.3 まで。Docker / CI 本命の 8.5 専用構文は入れない
+- PHP は Composer、Docker、Rector、CI のすべてで 8.5 に統一する
+- `withPhpSets(php85: true)` と `PhpVersion::PHP_85` を使い、PHP 8.5 の構文変換を有効にする
 - Laravel のバージョン移行ルールは `withComposerBased(laravel: true)` で installed バージョンに合わせる
 - 品質セット（`deadCode` / `codeQuality` / `typeDeclarations` / `earlyReturn` / `instanceOf` / `phpunitCodeQuality`）を `withPreparedSets()` で有効にする。バージョン移行セットだけでは死蔵コードと型宣言漏れを拾えない
 - Laravel 固有の追加品質ルールは、必要性と差分を確認して `withSets()` に加える

@@ -203,4 +203,4 @@ requirements.md にシナリオが定義されていません。
 
 - `.ai/rules/testing.md` - BDD ガイドライン
 - `src/tests/Support/Gwt/Scenario.php` - GWT ヘルパー
-- `src/tests/Feature/Gwt/GwtExampleTest.php` - サンプルテスト
+- `src/tests/Feature/Auth/AuthGwtTest.php` - サンプルテスト
