@@ -1,6 +1,6 @@
 #!/bin/bash
 # PreToolUse hook for `git commit`: architecture guards, lint and tests.
-# Exits 2 on failure so Claude Code actually blocks the commit.
+# Exits 2 on failure so the invoking agent client blocks the commit.
 
 PROJECT_DIR="${AI_PROJECT_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}"
 PROJECT_ROOT="$PROJECT_DIR"

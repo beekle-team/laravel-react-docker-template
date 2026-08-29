@@ -27,7 +27,7 @@ for FILE in "$@"; do
       ;;
     ts|tsx)
       echo "=== TypeScript: $REPO_PATH ==="
-      (cd "$APP_DIR" && npm run types 2>&1 | head -30) || ERRORS=1
+      (cd "$APP_DIR" && npm run types 2>&1) || ERRORS=1
       ;;
     js|jsx)
       echo "=== Biome: $REPO_PATH ==="

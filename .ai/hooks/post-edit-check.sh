@@ -1,7 +1,7 @@
 #!/bin/bash
 # PostToolUse hook: architecture guards + per-file lint.
 #
-# Architecture violations exit 2 so the message is fed back to Claude.
+# Architecture violations exit 2 so the message is fed back to the invoking agent.
 # Lint output is informational and never blocks (tests run on commit).
 
 INPUT="$(cat)"
