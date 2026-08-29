@@ -55,10 +55,15 @@ EXPECTED_SKILLS=(
   tdd-methodology bdd commit review simplify verify
 )
 
+expected_skill_names="$(printf '%s\n' "${EXPECTED_SKILLS[@]}" | sort)"
+actual_skill_names="$(find "$PROJECT_ROOT/.ai/skills" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)"
+[ "$actual_skill_names" = "$expected_skill_names" ] || fail "unexpected shared skill set:
+$actual_skill_names"
+
 for skill in "${EXPECTED_SKILLS[@]}"; do
   skill_file="$PROJECT_ROOT/.ai/skills/$skill/SKILL.md"
   [ -f "$skill_file" ] || fail "missing skill: $skill"
-  rg -q '^name: ' "$skill_file" || fail "missing name: $skill"
+  rg -q "^name: $skill$" "$skill_file" || fail "name does not match directory: $skill"
   rg -q '^description: ' "$skill_file" || fail "missing description: $skill"
   [ "$(wc -l < "$skill_file")" -le 500 ] || fail "SKILL.md exceeds 500 lines: $skill"
 done
@@ -78,6 +83,8 @@ assert_file .codex/config.toml
 for hook_path in auto-format.sh post-edit-check.sh pre-bash-check.sh; do
   rg -q "\\.ai/hooks/$hook_path" "$PROJECT_ROOT/.codex/config.toml" \
     || fail "Codex config does not reference shared hook: $hook_path"
+  rg -q "\\.ai/hooks/$hook_path" "$PROJECT_ROOT/.claude/settings.json" \
+    || fail "Claude settings do not reference shared hook: $hook_path"
 done
 
 if rg -q '\.claude/hooks' "$PROJECT_ROOT/.claude/settings.json"; then
@@ -94,4 +101,4 @@ ACTIVE_OLD_REFERENCES="$(
 [ -z "$ACTIVE_OLD_REFERENCES" ] || fail "active Claude-only references remain:
 $ACTIVE_OLD_REFERENCES"
 
-printf 'PASS: shared rule layout is valid.\n'
+printf 'PASS: shared AI-agent configuration layout is valid.\n'

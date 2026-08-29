@@ -38,6 +38,28 @@ ROOT_EVENT="$(jq -cn --arg cwd "$TMP_ROOT/repo/src" '{cwd: $cwd, tool_input: {}}
 EXPECTED_ROOT="$(git -C "$TMP_ROOT/repo" rev-parse --show-toplevel)"
 assert_lines "$EXPECTED_ROOT" "$(event_project_root "$ROOT_EVENT")"
 
+ABSOLUTE_CODEX_EVENT="$(jq -cn \
+  --arg cwd "$EXPECTED_ROOT" \
+  --arg command "*** Begin Patch
+*** Update File: $EXPECTED_ROOT/src/app/User.php
+*** Add File: $EXPECTED_ROOT/src/resources/js/new.ts
+*** End Patch" \
+  '{cwd: $cwd, tool_name: "apply_patch", tool_input: {command: $command}}')"
+assert_lines \
+  $'src/app/User.php\nsrc/resources/js/new.ts' \
+  "$(event_repo_paths "$ABSOLUTE_CODEX_EVENT" "$EXPECTED_ROOT")"
+
+MOVE_EVENT='{"cwd":"/repo","tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: src/old.ts\n*** Move to: src/new.ts\n*** End Patch"}}'
+assert_lines \
+  $'src/old.ts\nsrc/new.ts' \
+  "$(event_repo_paths "$MOVE_EVENT" /repo)"
+
+UNSAFE_EVENT='{"cwd":"/repo","tool_name":"apply_patch","tool_input":{"command":"*** Begin Patch\n*** Update File: ../../outside.ts\n*** Add File: /tmp/outside.ts\n*** End Patch"}}'
+assert_lines '' "$(event_repo_paths "$UNSAFE_EVENT" /repo)"
+
+EXTERNAL_CLAUDE_EVENT='{"cwd":"/repo","tool_name":"Edit","tool_input":{"file_path":"/tmp/outside.ts"}}'
+assert_lines '' "$(event_repo_paths "$EXTERNAL_CLAUDE_EVENT" /repo)"
+
 printf 'unchanged\n' > "$TMP_ROOT/repo/sentinel.txt"
 UNKNOWN_EVENT="$(jq -cn --arg cwd "$TMP_ROOT/repo" '{cwd: $cwd, tool_name: "unknown", tool_input: {}}')"
 assert_lines '' "$(event_repo_paths "$UNKNOWN_EVENT" "$TMP_ROOT/repo")"
