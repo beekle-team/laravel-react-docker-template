@@ -59,7 +59,7 @@ it('Form Request を使う変更系 route には Precognition middleware が付�
     $checked = 0;
     $missing = [];
 
-    foreach (RouteFacade::getRoutes() as $route) {
+    foreach (RouteFacade::getRoutes()->getRoutes() as $route) {
         if (array_intersect($writeMethods, $route->methods()) === [] || ! $usesFormRequest($route)) {
             continue;
         }

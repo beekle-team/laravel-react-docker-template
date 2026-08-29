@@ -58,6 +58,14 @@ const form = useForm(storeUser(), {
 />
 ```
 
+## 強制
+
+`tests/PHPStan/Rules/ControllerValidationRule.php`（カスタム PHPStan ルール）が
+`App\Http\Controllers\**` 内の `Illuminate\Http\Request` 型レシーバに対する
+`validate()` / `validateWithBag()` 呼び出しを検出する。変数名ではなく型で判定するため、
+`$req` のように別名を付けても検出される。
+
 ## 例外
 
 `Auth::guard()->validate([...])` のような、Laravel 認証ガードや外部サービスの `validate` メソッドは対象外。
+レシーバが `Illuminate\Http\Request` でないため上記ルールには掛からない。

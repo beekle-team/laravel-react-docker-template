@@ -96,7 +96,14 @@ abstract class Model
             ->send($method, $url, ['json' => $params])
             ->throw();
 
-        return $response->json() ?? [];
+        $json = $response->json();
+
+        if (! is_array($json)) {
+            return [];
+        }
+
+        /** @var array<string, mixed> $json */
+        return $json;
     }
 
     protected function customPendingRequest(PendingRequest $pendingRequest): PendingRequest

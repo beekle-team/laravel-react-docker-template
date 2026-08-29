@@ -62,7 +62,9 @@ Rector の dry-run が差分ゼロでも、「利用できるルールがない�
 
 - `phpVersion` は PHP 8.3（composer / Laravel 13 の下限）。`withPhpSets(php83: true)` も 8.3 まで。Docker / CI 本命の 8.5 専用構文は入れない
 - Laravel のバージョン移行ルールは `withComposerBased(laravel: true)` で installed バージョンに合わせる
-- 継続的な品質ルールは `withPreparedSets()`、Laravel 固有の追加品質ルールは必要性と差分を確認して `withSets()` に加える
+- 品質セット（`deadCode` / `codeQuality` / `typeDeclarations` / `earlyReturn` / `instanceOf` / `phpunitCodeQuality`）を `withPreparedSets()` で有効にする。バージョン移行セットだけでは死蔵コードと型宣言漏れを拾えない
+- Laravel 固有の追加品質ルールは、必要性と差分を確認して `withSets()` に加える
+- `AddArrowFunctionReturnTypeRector` は `tests/` で skip する。GWT の `fn () => expect(...)` に Pest 内部型（`\Pest\Mixins\Expectation`）を書かせても読みづらいだけのため
 - `LongArrayToShortArrayRector` は Pint と重複するので skip する
 - CI は `--dry-run` のみ。自動書き換えはしない
 - 新しいセットを足すときは、先に dry-run の差分を見てからにする
