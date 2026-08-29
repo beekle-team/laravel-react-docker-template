@@ -21,6 +21,30 @@ if ! grep -Fq 'FROM php:8.5-fpm' Dockerfile; then
   fail "Dockerfile must use php:8.5-fpm"
 fi
 
+DOCKER_PHP_EXTENSIONS="$(awk '
+  /docker-php-ext-install/ {
+    collecting = 1
+    sub(/^.*docker-php-ext-install[[:space:]]*/, "")
+  }
+
+  collecting {
+    continuing = ($0 ~ /\\[[:space:]]*$/)
+    sub(/[[:space:]]*\\[[:space:]]*$/, "")
+    printf "%s ", $0
+
+    if (!continuing) {
+      print ""
+      collecting = 0
+    }
+  }
+' Dockerfile)"
+
+for bundled_extension in pdo mbstring opcache; do
+  if grep -Eq "(^|[[:space:]])${bundled_extension}([[:space:]]|$)" <<< "$DOCKER_PHP_EXTENSIONS"; then
+    fail "Dockerfile must not reinstall extensions bundled with php:8.5-fpm: $bundled_extension"
+  fi
+done
+
 if ! grep -Fq 'withPhpSets(php85: true)' src/rector.php \
   || ! grep -Fq 'PhpVersion::PHP_85' src/rector.php; then
   fail "src/rector.php must target PHP 8.5"
