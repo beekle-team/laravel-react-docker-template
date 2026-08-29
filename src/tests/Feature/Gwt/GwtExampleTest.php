@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 /**
  * 認証機能 BDD テスト
  *
- * @see .kiro/specs/auth/requirements.md
+ * @see docs/specs/auth/requirements.md
  */
 describe('UC-01: ユーザー登録', function (): void {
     it('Scenario 1.1: 新規ユーザーを登録できる', function (): void {
