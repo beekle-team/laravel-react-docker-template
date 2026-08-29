@@ -63,14 +63,14 @@ $actual_skill_names"
 for skill in "${EXPECTED_SKILLS[@]}"; do
   skill_file="$PROJECT_ROOT/.ai/skills/$skill/SKILL.md"
   [ -f "$skill_file" ] || fail "missing skill: $skill"
-  rg -q "^name: $skill$" "$skill_file" || fail "name does not match directory: $skill"
-  rg -q '^description: ' "$skill_file" || fail "missing description: $skill"
+  grep -Eq "^name: $skill$" "$skill_file" || fail "name does not match directory: $skill"
+  grep -Eq '^description: ' "$skill_file" || fail "missing description: $skill"
   [ "$(wc -l < "$skill_file")" -le 500 ] || fail "SKILL.md exceeds 500 lines: $skill"
 done
 
 [ ! -d "$PROJECT_ROOT/.claude/commands" ] || fail ".claude/commands must not contain shared workflows"
 
-if rg -n 'Task\(|\$ARGUMENTS|allowed-tools:' "$PROJECT_ROOT/.ai/skills"; then
+if grep -RInE 'Task\(|\$ARGUMENTS|allowed-tools:' "$PROJECT_ROOT/.ai/skills"; then
   fail "tool-specific syntax found in shared skills"
 fi
 
@@ -81,22 +81,22 @@ duplicate_names="$(find "$PROJECT_ROOT/.ai/skills" -name SKILL.md -exec sed -n '
 assert_file .codex/config.toml
 
 for hook_path in auto-format.sh post-edit-check.sh pre-bash-check.sh; do
-  rg -q "\\.ai/hooks/$hook_path" "$PROJECT_ROOT/.codex/config.toml" \
+  grep -Fq ".ai/hooks/$hook_path" "$PROJECT_ROOT/.codex/config.toml" \
     || fail "Codex config does not reference shared hook: $hook_path"
-  rg -q "\\.ai/hooks/$hook_path" "$PROJECT_ROOT/.claude/settings.json" \
+  grep -Fq ".ai/hooks/$hook_path" "$PROJECT_ROOT/.claude/settings.json" \
     || fail "Claude settings do not reference shared hook: $hook_path"
 done
 
-if rg -q '\.claude/hooks' "$PROJECT_ROOT/.claude/settings.json"; then
+if grep -Fq '.claude/hooks' "$PROJECT_ROOT/.claude/settings.json"; then
   fail "Claude settings still reference .claude/hooks"
 fi
 
 ACTIVE_OLD_REFERENCES="$(
   cd "$PROJECT_ROOT"
-  rg -n '\.claude/(rules|hooks|commands)/' \
+  git grep -n -E '\.claude/(rules|hooks|commands)/' -- \
     AGENTS.md CLAUDE.md .ai .codex docs/specs src/tests .github \
-    --glob '!docs/superpowers/**' \
-    --glob '!.ai/tests/agent-config-layout-test.sh' || true
+    ':(exclude)docs/superpowers/**' \
+    ':(exclude).ai/tests/agent-config-layout-test.sh' || true
 )"
 [ -z "$ACTIVE_OLD_REFERENCES" ] || fail "active Claude-only references remain:
 $ACTIVE_OLD_REFERENCES"
