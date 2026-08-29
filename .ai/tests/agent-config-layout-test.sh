@@ -99,7 +99,7 @@ done < <(
     | sed -n 's/^| `\([^`]*\)` |.*/\1/p'
 )
 
-GENERATED_TYPES_PATHS="$(grep -oE '[[:alnum:]_./-]+/generated\.d\.ts' "$BACKEND_GUIDE" | sort -u)"
+GENERATED_TYPES_PATHS="$(grep -oE '[[:alnum:]_./-]+/generated\.d\.ts' "$BACKEND_GUIDE" | sort -u || true)"
 [ -n "$GENERATED_TYPES_PATHS" ] || fail "backend guide does not identify the generated TypeScript declaration"
 while IFS= read -r generated_types_path; do
   [ -f "$PROJECT_ROOT/$generated_types_path" ] \
