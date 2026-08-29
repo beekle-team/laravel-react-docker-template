@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 /**
  * 認証機能 - GWT テスト
  *
- * @see .kiro/specs/auth/requirements.md
+ * @see docs/specs/auth/requirements.md
  */
 
 // =============================================================================
