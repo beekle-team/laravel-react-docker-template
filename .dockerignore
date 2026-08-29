@@ -2,7 +2,6 @@
 # 依存物と履歴をイメージに入れない。
 .git
 .github
-.kiro
 .claude
 
 src/vendor

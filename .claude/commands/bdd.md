@@ -17,7 +17,7 @@
 ### 絶対禁止事項
 
 1. **requirements.md なしでの Feature テスト作成は禁止**
-   - `.kiro/specs/{feature}/requirements.md` が存在しない状態で Feature テストを書いてはならない
+   - `docs/specs/{feature}/requirements.md` が存在しない状態で Feature テストを書いてはならない
    - 「とりあえずテスト書く」は BDD 違反
 
 2. **Gherkin シナリオなしでの実装は禁止**
@@ -61,7 +61,7 @@
 
 ### 1. 要件定義の確認/作成
 
-`.kiro/specs/$ARGUMENTS/requirements.md` を確認:
+`docs/specs/$ARGUMENTS/requirements.md` を確認:
 
 **存在しない場合**:
 1. ユーザーに以下をヒアリング:
@@ -79,7 +79,7 @@
 
 ### 2. requirements.md フォーマット
 
-`.kiro/steering/bdd.md` のフォーマットに従って作成:
+`.ai/rules/testing.md` のフォーマットに従って作成:
 
 ```markdown
 # {機能名} - 要件定義
@@ -114,7 +114,7 @@ Then ...
 
 ```
 生成予定のテスト:
-- tests/Feature/{Feature}/{Feature}GwtTest.php
+- src/tests/Feature/{Feature}/{Feature}GwtTest.php
   - UC-01: {ユースケース名}
     - Scenario 1.1: {シナリオ名}
     - Scenario 1.2: {シナリオ名}
@@ -150,8 +150,8 @@ describe('UC-01: {ユースケース名}', function () {
 
 ### 5. ファイル配置
 
-- Spec: `.kiro/specs/{feature}/requirements.md`
-- Test: `tests/Feature/{Feature}/{Feature}GwtTest.php`
+- Spec: `docs/specs/{feature}/requirements.md`
+- Test: `src/tests/Feature/{Feature}/{Feature}GwtTest.php`
 
 ### 6. テスト実行
 
@@ -173,7 +173,7 @@ BDD アプローチでは、まず要件定義が必要です:
 2. または、要件を教えていただければ requirements.md を作成します
 
 現在の状態:
-- .kiro/specs/{feature}/requirements.md: 存在しません
+- docs/specs/{feature}/requirements.md: 存在しません
 ```
 
 ### Gherkin シナリオがない場合
@@ -194,14 +194,13 @@ requirements.md にシナリオが定義されていません。
 
 `/bdd auth` 実行時:
 
-1. `.kiro/specs/auth/spec.json` - メタ情報
-2. `.kiro/specs/auth/requirements.md` - 要件定義 (GWT形式)
-3. `tests/Feature/Auth/AuthGwtTest.php` - BDD テスト
+1. `docs/specs/auth/requirements.md` - 要件定義 (GWT形式)
+2. `src/tests/Feature/Auth/AuthGwtTest.php` - BDD テスト
 
 ---
 
 ## 参照
 
-- `.kiro/steering/bdd.md` - BDD ガイドライン
-- `tests/Support/Gwt/Scenario.php` - GWT ヘルパー
-- `tests/Feature/Gwt/GwtExampleTest.php` - サンプルテスト
+- `.ai/rules/testing.md` - BDD ガイドライン
+- `src/tests/Support/Gwt/Scenario.php` - GWT ヘルパー
+- `src/tests/Feature/Auth/AuthGwtTest.php` - サンプルテスト

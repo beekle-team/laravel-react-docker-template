@@ -58,7 +58,7 @@ it('registers a user', function () {
 
 When implementing ANY feature or behavior:
 
-1. **Check** `.kiro/specs/{feature}/requirements.md` for existing requirement
+1. **Check** `docs/specs/{feature}/requirements.md` for existing requirement
 2. **If NOT documented**: Add requirement in Gherkin format BEFORE implementing
 3. **If documented**: Proceed with implementation
 
@@ -563,7 +563,7 @@ uses(RefreshDatabase::class);
 /**
  * 投稿公開 - GWT テスト
  *
- * @see .kiro/specs/post/requirements.md
+ * @see docs/specs/post/requirements.md
  */
 
 describe('UC-01: 投稿公開', function () {
@@ -792,15 +792,12 @@ Before completing any implementation task:
 - [ ] No skipped or commented tests
 - [ ] Implementation report added to tasks.md
 
-## Integration with Spec-Driven Development
+## AI Agent Workflow Integration
 
-This skill works with `/kiro:spec-impl`:
-
-1. `/kiro:spec-impl` loads requirements.md
-2. TDD skill ensures Gherkin format compliance
-3. Implementation follows RED-GREEN-REFACTOR
-4. New behaviors are documented before coding
-5. **Implementation report added to tasks.md after completion**
+1. docs/specs/{feature}/requirements.md のGherkin scenarioを読む。
+2. .ai/rules/testing.md の境界と承認条件を確認する。
+3. 対象scenarioを1件選びRed → Green → Refactorする。
+4. テスト成功後に次のscenarioへ進む。
 
 ## Quality Commands
 

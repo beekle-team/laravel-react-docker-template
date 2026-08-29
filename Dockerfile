@@ -23,8 +23,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd opcache sockets zip
+# Install extensions that are not bundled with the PHP 8.5 FPM image.
+RUN docker-php-ext-install pdo_pgsql pgsql exif pcntl bcmath gd sockets zip
 
 # Install Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
@@ -36,6 +36,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
+RUN install -d -o "$user" -g "$user" /var/www/vendor /var/www/node_modules
 
 # Set working directory
 WORKDIR /var/www

@@ -21,6 +21,60 @@ if ! grep -Fq 'FROM php:8.5-fpm' Dockerfile; then
   fail "Dockerfile must use php:8.5-fpm"
 fi
 
+DOCKER_PHP_EXTENSIONS="$(awk '
+  function print_extensions(instruction, segments, segment_count, segment_index, argument_count, arguments, argument_index, argument) {
+    if (instruction !~ /^[[:space:]]*[Rr][Uu][Nn][[:space:]]+/) {
+      return
+    }
+
+    sub(/^[[:space:]]*[Rr][Uu][Nn][[:space:]]+/, "", instruction)
+    segment_count = split(instruction, segments, /&&|[|]+|;/)
+
+    for (segment_index = 1; segment_index <= segment_count; segment_index++) {
+      if (segments[segment_index] !~ /^[[:space:]]*docker-php-ext-install[[:space:]]+/) {
+        continue
+      }
+
+      sub(/^[[:space:]]*docker-php-ext-install[[:space:]]+/, "", segments[segment_index])
+      argument_count = split(segments[segment_index], arguments, /[[:space:]]+/)
+
+      for (argument_index = 1; argument_index <= argument_count; argument_index++) {
+        argument = arguments[argument_index]
+
+        if (argument == "" || argument ~ /^#/) {
+          break
+        }
+
+        gsub(/^["\047]+/, "", argument)
+        gsub(/["\047]+$/, "", argument)
+        print argument
+      }
+    }
+  }
+
+  /^[[:space:]]*#/ {
+    next
+  }
+
+  {
+    line = $0
+    continuing = (line ~ /\\[[:space:]]*$/)
+    sub(/[[:space:]]*\\[[:space:]]*$/, " ", line)
+    instruction = instruction line " "
+
+    if (!continuing) {
+      print_extensions(instruction)
+      instruction = ""
+    }
+  }
+' Dockerfile)"
+
+for bundled_extension in pdo mbstring opcache; do
+  if grep -Eq "(^|[[:space:]])${bundled_extension}([[:space:]]|$)" <<< "$DOCKER_PHP_EXTENSIONS"; then
+    fail "Dockerfile must not reinstall extensions bundled with php:8.5-fpm: $bundled_extension"
+  fi
+done
+
 if ! grep -Fq 'withPhpSets(php85: true)' src/rector.php \
   || ! grep -Fq 'PhpVersion::PHP_85' src/rector.php; then
   fail "src/rector.php must target PHP 8.5"
