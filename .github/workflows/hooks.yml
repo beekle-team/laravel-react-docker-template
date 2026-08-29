@@ -1,0 +1,22 @@
+name: Hook Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hooks:
+    runs-on: ubuntu-latest
+    name: Claude Code Hooks
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Execute pre-commit hook regression tests
+        run: bash .claude/hooks/tests/pre-commit-check-test.sh
