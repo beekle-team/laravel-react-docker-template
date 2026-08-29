@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php","src/tests/**/*.php"]
+globs: ["src/app/**/*.php","src/database/**/*.php","src/routes/**/*.php","src/tests/**/*.php","src/phpstan.neon"]
 ---
 
 # Larastan 静的解析ルール
@@ -7,7 +7,7 @@ globs: ["src/app/**/*.php","src/tests/**/*.php"]
 PHP ファイル編集後は Larastan (PHPStan) で静的解析を実行する。
 
 ## トリガー条件
-- `app/**/*.php`, `tests/**/*.php` を編集・作成した時
+- `app/**/*.php`, `database/**/*.php`, `routes/**/*.php`, `tests/**/*.php` を編集・作成した時
 
 ## 実行コマンド
 ```bash
