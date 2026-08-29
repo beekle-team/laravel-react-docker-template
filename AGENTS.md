@@ -18,6 +18,7 @@
 ```bash
 bash scripts/check-php-version-consistency.sh
 scripts/compose.sh exec app composer lint
+scripts/compose.sh up -d --wait postgres-test
 scripts/compose.sh exec app composer test
 scripts/compose.sh exec app composer types:check # Data DTO・Enum・TypeScript変換対象の変更時
 scripts/compose.sh exec app npm run lint:js

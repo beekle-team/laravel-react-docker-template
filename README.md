@@ -42,6 +42,7 @@ scripts/compose.sh logs -f app nginx vite
 
 # Artisan、Composer、npm
 scripts/compose.sh exec app php artisan migrate
+scripts/compose.sh up -d --wait postgres-test
 scripts/compose.sh exec app composer test
 scripts/compose.sh exec app npm run test:unit
 ```
@@ -67,6 +68,7 @@ scripts/compose.sh exec app npm run test:unit
 ```bash
 bash scripts/check-php-version-consistency.sh
 scripts/compose.sh exec app composer lint
+scripts/compose.sh up -d --wait postgres-test
 scripts/compose.sh exec app composer test
 scripts/compose.sh exec app npm run lint:js
 scripts/compose.sh exec app npm run types
