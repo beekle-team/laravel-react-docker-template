@@ -190,7 +190,7 @@ Issue #23 で合意した次の分類表をそのまま残す。
 
 1. `find .kiro` が対象なしになる。
 2. `.claude/commands/kiro/` が存在しない。
-3. `.git`、依存物を除く `rg -i '\.kiro|kiro:'` が0件になる。
+3. `.git`、依存物、この移行を記録する `docs/superpowers/**` を除く `rg -i '\.kiro|kiro:'` が0件になる。
 4. `docs/specs/auth/requirements.md` と `docs/specs/error-handling/requirements.md` が存在する。
 5. GWT test の `@see` が新しい要件文書を指す。
 6. `CLAUDE.md` と `AGENTS.md` の双方から同じ `.ai/rules/**` へ到達できる。
