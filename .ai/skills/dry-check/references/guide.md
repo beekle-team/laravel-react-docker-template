@@ -428,24 +428,12 @@ function DataFetcher<T>({ url, children }: DataFetcherProps<T>) {
 
 ## 検出コマンド
 
-### PHP重複検出
+### 重複・アーキテクチャ検出
 
 ```bash
-# PHPCPDで重複検出（インストール: composer require --dev sebastian/phpcpd）
-./vendor/bin/phpcpd app/ --min-lines=5 --min-tokens=70
-
-# PHPStanでコード品質チェック
-./vendor/bin/phpstan analyse app/ --level=max
-```
-
-### TypeScript/React重複検出
-
-```bash
-# jscpdで重複検出（インストール: npm install -g jscpd）
-npx jscpd resources/js --min-lines 5 --reporters console
-
-# ESLintでコード品質チェック
-npm run lint
+# プロジェクトに宣言済みのローカルツールだけを使用する
+scripts/compose.sh exec app npm run lint:duplication
+scripts/compose.sh exec app npm run lint:architecture
 ```
 
 ## リファクタリング判断基準
