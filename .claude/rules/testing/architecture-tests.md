@@ -50,4 +50,4 @@ arch テストで書けるものは arch テストに置く。宣言的で読め
 
 ## BDD フローとの関係
 
-`tests/Arch/**` は `.claude/rules/testing/feature-test-policy.md` の BDD フロー（requirements.md と Gherkin シナリオ必須）の対象外。ユーザー向け振る舞いではなく実装構造の検査なので、`scenario()` ヘルパーも使わない。
+`tests/Arch/**` は `.ai/rules/testing.md` の BDD フロー（requirements.md と Gherkin シナリオ必須）の対象外。ユーザー向け振る舞いではなく実装構造の検査なので、`scenario()` ヘルパーも使わない。

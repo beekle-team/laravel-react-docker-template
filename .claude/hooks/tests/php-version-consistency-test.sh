@@ -39,7 +39,8 @@ git -C "$TMP_ROOT" commit -qm initial
   bash scripts/check-php-version-consistency.sh >/dev/null
 )
 
-sed -i 's/php-version: 8.5/php-version: 8.6/' "$TMP_ROOT/.github/workflows/ci.yml"
+sed -i.bak 's/php-version: 8.5/php-version: 8.6/' "$TMP_ROOT/.github/workflows/ci.yml"
+rm "$TMP_ROOT/.github/workflows/ci.yml.bak"
 
 set +e
 OUTPUT="$(cd "$TMP_ROOT" && bash scripts/check-php-version-consistency.sh 2>&1)"

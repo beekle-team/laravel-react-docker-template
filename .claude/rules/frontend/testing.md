@@ -46,6 +46,6 @@ globs: ["src/resources/js/**/*.test.ts","src/resources/js/**/*.test.tsx","src/pl
 
 ## Laravel 側のテストとの境界
 
-- HTTP レスポンスや Inertia props の検証は Pest の Feature テスト（BDD フロー必須。`.claude/rules/testing/feature-test-policy.md`）
+- HTTP レスポンスや Inertia props の検証は Pest の Feature テスト（BDD フロー必須。`.ai/rules/testing.md`）
 - 実装構造の検査は arch テスト（`.claude/rules/testing/architecture-tests.md`）
 - フロントの Vitest / Playwright は BDD フローの対象外。requirements.md や `scenario()` ヘルパーは不要
