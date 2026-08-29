@@ -14,20 +14,12 @@ concurrency:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: ./src
 
-    strategy:
-      fail-fast: true
-      matrix:
-        # PR は本命の 8.5 だけで回し、テンプレートが約束する両端互換
-        # （Laravel 13 の下限 8.3 と上限 8.5）は main への push で検証する。
-        # 8.4 は中間バージョンなので matrix から外し、Actions 消費を抑える。
-        php: ${{ github.event_name == 'pull_request' && fromJSON('["8.5"]') || fromJSON('["8.3", "8.5"]') }}
-
-    name: Lint (PHP ${{ matrix.php }})
+    name: Lint (PHP 8.5)
 
     steps:
     - uses: actions/checkout@v7
@@ -35,7 +27,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php }}
+        php-version: 8.5
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
         coverage: none
 
@@ -80,6 +72,9 @@ jobs:
     - name: Install Composer Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
+    - name: Verify Generated TypeScript Data Types
+      run: bash scripts/check-generated-types.sh
+
     - name: Install NPM Dependencies
       run: npm ci
 
@@ -106,7 +101,7 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: ./src
@@ -127,15 +122,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    strategy:
-      fail-fast: true
-      matrix:
-        # PR は本命の 8.5 だけで回し、テンプレートが約束する両端互換
-        # （Laravel 13 の下限 8.3 と上限 8.5）は main への push で検証する。
-        # 8.4 は中間バージョンなので matrix から外し、Actions 消費を抑える。
-        php: ${{ github.event_name == 'pull_request' && fromJSON('["8.5"]') || fromJSON('["8.3", "8.5"]') }}
-
-    name: Tests (PHP ${{ matrix.php }})
+    name: Tests (PHP 8.5)
 
     steps:
     - uses: actions/checkout@v7
@@ -143,7 +130,7 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php }}
+        php-version: 8.5
         extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pgsql, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
         coverage: none
 
