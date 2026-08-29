@@ -12,7 +12,7 @@
 - Inertia props は Data DTO
 - Service class 禁止、Eloquent / Gateway / Concerns の境界
 - Data DTO、Enum、`#[TypeScript]` 対象、または `config/typescript-transformer.php` の変更時は `composer types` で再生成し、`composer types:check` で差分がないことを確認
-- 詳細は .claude/rules/laravel/ と .claude/rules/php.md
+- 詳細は .ai/rules/laravel/ と .ai/rules/php.md
 
 ## React
 

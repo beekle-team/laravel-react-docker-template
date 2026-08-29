@@ -43,7 +43,7 @@ PHPStan Level 9 + Larastan。解析対象は `app/` だけでなく `database/` 
 プロジェクト固有の設計ルールのうち、AST を見ないと判定できないものはカスタムルールとして
 `tests/PHPStan/Rules/**` に置き、`phpstan.neon` の `rules:` に登録する。
 Pest arch テストで表現できるもの（クラスの有無・継承・依存）は arch テスト側に置く。
-使い分けは `.claude/rules/testing/architecture-tests.md` を参照。
+使い分けは `.ai/rules/testing/architecture-tests.md` を参照。
 
 ## 自動リファクタ
 

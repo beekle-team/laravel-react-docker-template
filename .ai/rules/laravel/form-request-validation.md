@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/Http/Controllers/**/*.php","src/app/Http/Requests/**/*.php"]
+paths: ["src/app/Http/Controllers/**/*.php","src/app/Http/Requests/**/*.php"]
 ---
 
 # Form Request Validation

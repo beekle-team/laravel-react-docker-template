@@ -1,5 +1,5 @@
 ---
-globs: ["src/resources/js/**/*.tsx","src/resources/js/**/*.ts","src/vite.config.js","src/react-compiler.config.js","src/scripts/check-react-compiler.mjs","src/package.json","src/knip.json"]
+paths: ["src/resources/js/**/*.tsx","src/resources/js/**/*.ts","src/vite.config.js","src/react-compiler.config.js","src/scripts/check-react-compiler.mjs","src/package.json","src/knip.json"]
 ---
 
 # React Compiler

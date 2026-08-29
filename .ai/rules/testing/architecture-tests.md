@@ -1,10 +1,10 @@
 ---
-globs: ["src/tests/Arch/**/*.php","src/tests/PHPStan/**/*.php","src/app/**/*.php","src/phpunit.xml","src/phpstan.neon"]
+paths: ["src/tests/Arch/**/*.php","src/tests/PHPStan/**/*.php","src/app/**/*.php","src/phpunit.xml","src/phpstan.neon"]
 ---
 
 # Architecture Tests
 
-`.claude/rules/**` に書いた設計ルールのうち、機械的に判定できるものは CI で強制する。文書だけのルールは守られないため、レビュー待ちにせず落とす。
+`.ai/rules/**` に書いた設計ルールのうち、機械的に判定できるものは CI で強制する。文書だけのルールは守られないため、レビュー待ちにせず落とす。
 
 強制の置き場は 2 つある。
 
@@ -46,7 +46,7 @@ arch テストで書けるものは arch テストに置く。宣言的で読め
 
 ## 規約を追加したとき
 
-`.claude/rules/**` に新しい設計ルールを追加したら、機械判定できるかを検討し、可能なら arch テストかカスタム PHPStan ルールを足す。判定できない場合はレビュー観点として規約側に残す。
+`.ai/rules/**` に新しい設計ルールを追加したら、機械判定できるかを検討し、可能なら arch テストかカスタム PHPStan ルールを足す。判定できない場合はレビュー観点として規約側に残す。
 
 ## BDD フローとの関係
 

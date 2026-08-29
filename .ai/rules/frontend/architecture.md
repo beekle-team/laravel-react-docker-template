@@ -1,5 +1,5 @@
 ---
-globs: ["src/resources/js/**/*.tsx","src/resources/js/**/*.ts"]
+paths: ["src/resources/js/**/*.tsx","src/resources/js/**/*.ts"]
 ---
 
 # React Frontend Architecture

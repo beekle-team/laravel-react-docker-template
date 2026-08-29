@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php","src/tests/**/*.php"]
+paths: ["src/app/**/*.php","src/tests/**/*.php"]
 ---
 
 # Pint 自動フォーマット

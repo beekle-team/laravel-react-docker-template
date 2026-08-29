@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php"]
+paths: ["src/app/**/*.php"]
 ---
 
 # Model Layer Boundaries

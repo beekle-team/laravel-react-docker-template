@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php","src/config/typescript-transformer.php","src/resources/js/types/generated.d.ts"]
+paths: ["src/app/**/*.php","src/config/typescript-transformer.php","src/resources/js/types/generated.d.ts"]
 ---
 
 # TypeScript 型生成ルール

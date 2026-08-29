@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php","src/bootstrap/**/*.php","src/config/**/*.php","src/database/**/*.php","src/public/index.php","src/routes/**/*.php","src/tests/**/*.php","src/rector.php","src/composer.json","src/composer.lock"]
+paths: ["src/app/**/*.php","src/bootstrap/**/*.php","src/config/**/*.php","src/database/**/*.php","src/public/index.php","src/routes/**/*.php","src/tests/**/*.php","src/rector.php","src/composer.json","src/composer.lock"]
 ---
 
 # Rector 自動リファクタ

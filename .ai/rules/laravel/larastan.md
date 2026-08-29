@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/**/*.php","src/database/**/*.php","src/routes/**/*.php","src/tests/**/*.php","src/phpstan.neon"]
+paths: ["src/app/**/*.php","src/database/**/*.php","src/routes/**/*.php","src/tests/**/*.php","src/phpstan.neon"]
 ---
 
 # Larastan 静的解析ルール

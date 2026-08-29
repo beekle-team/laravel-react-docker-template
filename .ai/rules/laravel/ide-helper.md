@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/Models/**/*.php"]
+paths: ["src/app/Models/**/*.php"]
 ---
 
 # IDE Helper Auto-Update Rule

@@ -1,5 +1,5 @@
 ---
-globs: ["src/app/Http/Controllers/**/*.php","src/app/Data/**/*.php","src/resources/js/**/*.ts","src/resources/js/**/*.tsx"]
+paths: ["src/app/Http/Controllers/**/*.php","src/app/Data/**/*.php","src/resources/js/**/*.ts","src/resources/js/**/*.tsx"]
 ---
 
 # Inertia Props

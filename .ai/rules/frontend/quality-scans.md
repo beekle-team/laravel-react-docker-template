@@ -1,5 +1,5 @@
 ---
-globs: ["src/resources/js/**/*.ts","src/resources/js/**/*.tsx","src/package.json","src/knip.json","src/jscpd.json",".github/workflows/*.yml"]
+paths: ["src/resources/js/**/*.ts","src/resources/js/**/*.tsx","src/package.json","src/knip.json","src/jscpd.json",".github/workflows/*.yml"]
 ---
 
 # Frontend Quality Scans
@@ -19,11 +19,11 @@ npm run test:unit
 
 ## React Compiler
 
-`npm run lint:react-compiler` でビルドと同じコンパイラを走らせ、最適化がスキップされたコンポーネント / フックを検出する。ビルドはスキップしても成功するため、この検査を落とさない。詳細は `.claude/rules/frontend/react-compiler.md` を参照。
+`npm run lint:react-compiler` でビルドと同じコンパイラを走らせ、最適化がスキップされたコンポーネント / フックを検出する。ビルドはスキップしても成功するため、この検査を落とさない。詳細は `.ai/rules/frontend/react-compiler.md` を参照。
 
 ## テスト
 
-コンポーネント / hook は Vitest（`npm run test:unit`）、画面をまたぐフローは Playwright（CI の E2E ジョブ）で検証する。配置と書き方は `.claude/rules/frontend/testing.md` を参照。
+コンポーネント / hook は Vitest（`npm run test:unit`）、画面をまたぐフローは Playwright（CI の E2E ジョブ）で検証する。配置と書き方は `.ai/rules/frontend/testing.md` を参照。
 
 ## Dead Code
 
