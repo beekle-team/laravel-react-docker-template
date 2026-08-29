@@ -1,11 +1,11 @@
 #!/bin/bash
-# Shared helpers for Claude Code hooks.
+# Shared project helpers for AI-agent hooks.
 #
 # Layout note: the Laravel app lives in src/, not at the repository root.
 # vendor/ and node_modules/ are under src/, and the host has no php binary,
 # so PHP tooling has to go through the app container (working_dir /var/www == ./src).
 
-PROJECT_ROOT="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+PROJECT_ROOT="${AI_PROJECT_ROOT:-${PROJECT_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}}"
 APP_DIR="$PROJECT_ROOT/src"
 COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml"
 

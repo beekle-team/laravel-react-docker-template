@@ -72,4 +72,16 @@ fi
 duplicate_names="$(find "$PROJECT_ROOT/.ai/skills" -name SKILL.md -exec sed -n 's/^name: //p' {} \; | sort | uniq -d)"
 [ -z "$duplicate_names" ] || fail "duplicate skill names: $duplicate_names"
 
+[ ! -d "$PROJECT_ROOT/.claude/hooks" ] || fail ".claude/hooks must not contain shared hook bodies"
+assert_file .codex/config.toml
+
+for hook_path in auto-format.sh post-edit-check.sh pre-bash-check.sh; do
+  rg -q "\\.ai/hooks/$hook_path" "$PROJECT_ROOT/.codex/config.toml" \
+    || fail "Codex config does not reference shared hook: $hook_path"
+done
+
+if rg -q '\.claude/hooks' "$PROJECT_ROOT/.claude/settings.json"; then
+  fail "Claude settings still reference .claude/hooks"
+fi
+
 printf 'PASS: shared rule layout is valid.\n'

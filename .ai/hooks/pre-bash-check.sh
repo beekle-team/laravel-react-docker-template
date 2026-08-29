@@ -8,11 +8,17 @@
 
 INPUT=$(cat)
 COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')
+HOOK_DIR="$(dirname "${BASH_SOURCE[0]}")"
+
+# shellcheck source=lib-event.sh
+source "$HOOK_DIR/lib-event.sh"
+AI_PROJECT_ROOT="$(event_project_root "$INPUT")"
+export AI_PROJECT_ROOT
 
 # git commit 以外の Bash は素通し（lint / test を毎回走らせない）。
 if ! printf '%s' "$COMMAND" | grep -qE '(^|[;&|]|\s)git(\s+-[^;&|]*)?\s+commit(\s|$)'; then
   exit 0
 fi
 
-printf '%s' "$INPUT" | "$(dirname "${BASH_SOURCE[0]}")/pre-commit-check.sh"
+printf '%s' "$INPUT" | "$HOOK_DIR/pre-commit-check.sh"
 exit $?

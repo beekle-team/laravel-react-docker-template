@@ -4,16 +4,27 @@
 # Architecture violations exit 2 so the message is fed back to Claude.
 # Lint output is informational and never blocks (tests run on commit).
 
-INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+INPUT="$(cat)"
+HOOK_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
-[ -z "$FILE_PATH" ] && exit 0
+# shellcheck source=lib-event.sh
+source "$HOOK_DIR/lib-event.sh"
+PROJECT_ROOT="$(event_project_root "$INPUT")"
+export AI_PROJECT_ROOT="$PROJECT_ROOT"
 
 # shellcheck source=lib-project.sh
-source "$(dirname "${BASH_SOURCE[0]}")/lib-project.sh"
+source "$HOOK_DIR/lib-project.sh"
 
-REPO_PATH="$(repo_path "$FILE_PATH")"
-EXT="${FILE_PATH##*.}"
+FILE_PATHS=()
+while IFS= read -r repo_path; do
+  [ -n "$repo_path" ] && FILE_PATHS+=("$repo_path")
+done < <(event_repo_paths "$INPUT" "$PROJECT_ROOT")
+
+if [ "${#FILE_PATHS[@]}" -eq 0 ]; then
+  printf 'No supported edited files in hook input; skipping.\n' >&2
+  exit 0
+fi
+
 VIOLATIONS=""
 
 add_violation() {
@@ -21,8 +32,13 @@ add_violation() {
 "
 }
 
-case "$EXT" in
-  php)
+for REPO_PATH in "${FILE_PATHS[@]}"; do
+  FILE_PATH="$PROJECT_ROOT/$REPO_PATH"
+  [ -f "$FILE_PATH" ] || continue
+  EXT="${REPO_PATH##*.}"
+
+  case "$EXT" in
+    php)
     # Service / Action classes become generic buckets; keep logic in Models.
     if [[ "$REPO_PATH" == src/app/Services/* || "$REPO_PATH" == src/app/Actions/* ]]; then
       add_violation "BLOCK: Service / Action classes are not allowed ($REPO_PATH).
@@ -41,8 +57,8 @@ $MATCHES
 Move rules to app/Http/Requests/** and read validated data with \$request->validated()."
       fi
     fi
-    ;;
-  ts|tsx|js|jsx)
+      ;;
+    ts|tsx|js|jsx)
     MATCHES=$(grep -nE '(:| as |<|,|\(|\[|\{|=)\s*any\b|Array<\s*any\s*>|Record<[^>]*,\s*any\s*>' "$FILE_PATH" || true)
     if [ -n "$MATCHES" ]; then
       add_violation "BLOCK: TypeScript any is not allowed ($REPO_PATH).
@@ -60,8 +76,9 @@ $MATCHES
 Create app/Data/** with #[TypeScript], run php artisan typescript:transform, and use resources/js/types/generated.d.ts."
       fi
     fi
-    ;;
-esac
+      ;;
+  esac
+done
 
 if [ -n "$VIOLATIONS" ]; then
   printf '%s' "$VIOLATIONS" >&2
@@ -69,19 +86,26 @@ if [ -n "$VIOLATIONS" ]; then
 fi
 
 # Informational lint. Never blocks; full type check and tests run on commit.
-case "$EXT" in
-  php)
-    if php_tooling_available; then
-      echo "Analyzing: $(basename "$FILE_PATH")"
-      php_exec ./vendor/bin/phpstan analyse "$(container_path "$FILE_PATH")" --no-progress 2>&1 || true
-    fi
-    ;;
-  ts|tsx|js|jsx)
-    if [ -x "$APP_DIR/node_modules/.bin/biome" ]; then
-      echo "Linting: $(basename "$FILE_PATH")"
-      (cd "$APP_DIR" && ./node_modules/.bin/biome lint "$FILE_PATH" 2>&1) || true
-    fi
-    ;;
-esac
+for REPO_PATH in "${FILE_PATHS[@]}"; do
+  FILE_PATH="$PROJECT_ROOT/$REPO_PATH"
+  [ -f "$FILE_PATH" ] || continue
+  EXT="${REPO_PATH##*.}"
+
+  case "$EXT" in
+    php)
+      if php_tooling_available; then
+        echo "Analyzing: $(basename "$FILE_PATH")"
+        php_exec ./vendor/bin/phpstan analyse "$(container_path "$REPO_PATH")" --no-progress 2>&1 || true
+      fi
+      ;;
+    ts|tsx|js|jsx)
+      APP_PATH="${REPO_PATH#src/}"
+      if [ -x "$APP_DIR/node_modules/.bin/biome" ]; then
+        echo "Linting: $(basename "$FILE_PATH")"
+        (cd "$APP_DIR" && ./node_modules/.bin/biome lint "$APP_PATH" 2>&1) || true
+      fi
+      ;;
+  esac
+done
 
 exit 0

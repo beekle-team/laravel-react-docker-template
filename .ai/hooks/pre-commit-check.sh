@@ -2,7 +2,8 @@
 # PreToolUse hook for `git commit`: architecture guards, lint and tests.
 # Exits 2 on failure so Claude Code actually blocks the commit.
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+PROJECT_DIR="${AI_PROJECT_ROOT:-${CLAUDE_PROJECT_DIR:-$(pwd)}}"
+PROJECT_ROOT="$PROJECT_DIR"
 
 # shellcheck source=lib-project.sh
 source "$(dirname "${BASH_SOURCE[0]}")/lib-project.sh"
