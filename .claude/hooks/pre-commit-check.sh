@@ -20,6 +20,7 @@ echo "=== Pre-commit Check ==="
 
 STAGED_PHP=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep '\.php$' || true)
 STAGED_COMPOSER=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '^src/composer\.(json|lock)$' || true)
+STAGED_TYPES_SOURCE=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMRD | grep -E '^src/(app/(Data|Enums)/.*\.php|config/typescript-transformer\.php|resources/js/types/generated\.d\.ts)$' || true)
 STAGED_TS=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
 
 # composer.json / composer.lock の更新だけでも、インストール済みの
@@ -64,6 +65,22 @@ Start it with: docker compose up -d"
   else
     echo ">>> PHP: Running Pint..."
     php_exec ./vendor/bin/pint --test 2>&1 || fail "BLOCK: Pint found formatting issues. Run: docker compose exec app ./vendor/bin/pint"
+
+    if [ -n "$STAGED_TYPES_SOURCE" ]; then
+      echo ">>> PHP: Regenerating TypeScript Data types..."
+      php_exec php artisan typescript:transform 2>&1 || fail "BLOCK: TypeScript type generation failed."
+
+      if ! git -C "$PROJECT_DIR" diff --quiet -- src/resources/js/types/generated.d.ts; then
+        fail "BLOCK: generated TypeScript types are out of date.
+Run: docker compose exec app composer types
+Then stage: src/resources/js/types/generated.d.ts"
+      fi
+
+      if [ -n "$(git -C "$PROJECT_DIR" ls-files --others --exclude-standard -- src/resources/js/types/generated.d.ts)" ]; then
+        fail "BLOCK: generated TypeScript types are not tracked.
+Stage: src/resources/js/types/generated.d.ts"
+      fi
+    fi
 
     echo ">>> PHP: Running Rector (version-aware dry-run)..."
     php_exec ./vendor/bin/rector process --dry-run 2>&1 || fail "BLOCK: Rector found code that must be migrated for the installed PHP/Laravel versions.
