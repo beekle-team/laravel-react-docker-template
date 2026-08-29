@@ -22,19 +22,49 @@ if ! grep -Fq 'FROM php:8.5-fpm' Dockerfile; then
 fi
 
 DOCKER_PHP_EXTENSIONS="$(awk '
-  /docker-php-ext-install/ {
-    collecting = 1
-    sub(/^.*docker-php-ext-install[[:space:]]*/, "")
+  function print_extensions(instruction, segments, segment_count, segment_index, argument_count, arguments, argument_index, argument) {
+    if (instruction !~ /^[[:space:]]*[Rr][Uu][Nn][[:space:]]+/) {
+      return
+    }
+
+    sub(/^[[:space:]]*[Rr][Uu][Nn][[:space:]]+/, "", instruction)
+    segment_count = split(instruction, segments, /&&|[|]+|;/)
+
+    for (segment_index = 1; segment_index <= segment_count; segment_index++) {
+      if (segments[segment_index] !~ /^[[:space:]]*docker-php-ext-install[[:space:]]+/) {
+        continue
+      }
+
+      sub(/^[[:space:]]*docker-php-ext-install[[:space:]]+/, "", segments[segment_index])
+      argument_count = split(segments[segment_index], arguments, /[[:space:]]+/)
+
+      for (argument_index = 1; argument_index <= argument_count; argument_index++) {
+        argument = arguments[argument_index]
+
+        if (argument == "" || argument ~ /^#/) {
+          break
+        }
+
+        gsub(/^["\047]+/, "", argument)
+        gsub(/["\047]+$/, "", argument)
+        print argument
+      }
+    }
   }
 
-  collecting {
-    continuing = ($0 ~ /\\[[:space:]]*$/)
-    sub(/[[:space:]]*\\[[:space:]]*$/, "")
-    printf "%s ", $0
+  /^[[:space:]]*#/ {
+    next
+  }
+
+  {
+    line = $0
+    continuing = (line ~ /\\[[:space:]]*$/)
+    sub(/[[:space:]]*\\[[:space:]]*$/, " ", line)
+    instruction = instruction line " "
 
     if (!continuing) {
-      print ""
-      collecting = 0
+      print_extensions(instruction)
+      instruction = ""
     }
   }
 ' Dockerfile)"

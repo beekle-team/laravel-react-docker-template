@@ -39,9 +39,27 @@ git -C "$TMP_ROOT" commit -qm initial
   bash scripts/check-php-version-consistency.sh >/dev/null
 )
 
-for bundled_extension in pdo mbstring opcache; do
+cat > "$TMP_ROOT/Dockerfile" <<'DOCKER'
+FROM php:8.5-fpm
+# RUN docker-php-ext-install pdo mbstring opcache
+RUN docker-php-ext-install pdo_pgsql pgsql exif pcntl bcmath gd sockets zip && printf '%s\n' pdo mbstring opcache
+DOCKER
+
+set +e
+OUTPUT="$(cd "$TMP_ROOT" && bash scripts/check-php-version-consistency.sh 2>&1)"
+STATUS=$?
+set -e
+
+if [ "$STATUS" -ne 0 ]; then
+  printf 'FAIL: comments or chained command arguments were treated as extension arguments.\n%s\n' \
+    "$OUTPUT" >&2
+  exit 1
+fi
+
+for docker_argument in pdo "'pdo'" '"pdo"' mbstring "'mbstring'" '"mbstring"' opcache "'opcache'" '"opcache"'; do
+  bundled_extension="$(printf '%s' "$docker_argument" | tr -d "\"'")"
   printf 'FROM php:8.5-fpm\nRUN docker-php-ext-install pdo_pgsql pgsql exif pcntl bcmath gd sockets zip %s\n' \
-    "$bundled_extension" > "$TMP_ROOT/Dockerfile"
+    "$docker_argument" > "$TMP_ROOT/Dockerfile"
 
   set +e
   OUTPUT="$(cd "$TMP_ROOT" && bash scripts/check-php-version-consistency.sh 2>&1)"
