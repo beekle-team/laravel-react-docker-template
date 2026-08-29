@@ -15,4 +15,11 @@ if ! grep -F 'install -d -o "$user" -g "$user" /var/www/vendor /var/www/node_mod
     exit 1
 fi
 
+for dependency_path in src/vendor src/node_modules; do
+    if ! grep -Fx "$dependency_path" "$PROJECT_ROOT/.dockerignore" >/dev/null; then
+        printf 'FAIL: %s is not excluded from the Docker build context.\n' "$dependency_path" >&2
+        exit 1
+    fi
+done
+
 printf 'PASS: Dockerfile is compatible with PHP 8.5 and non-root dependency volumes.\n'
