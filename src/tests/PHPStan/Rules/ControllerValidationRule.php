@@ -15,7 +15,7 @@ use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ObjectType;
 
 /**
- * .claude/rules/laravel/form-request-validation.md:
+ * .ai/rules/laravel/form-request-validation.md:
  * Controller で $request->validate() / request()->validate() を使わず、
  * ルールは Form Request の rules() に置く。
  *

@@ -84,4 +84,14 @@ if rg -q '\.claude/hooks' "$PROJECT_ROOT/.claude/settings.json"; then
   fail "Claude settings still reference .claude/hooks"
 fi
 
+ACTIVE_OLD_REFERENCES="$(
+  cd "$PROJECT_ROOT"
+  rg -n '\.claude/(rules|hooks|commands)/' \
+    AGENTS.md CLAUDE.md .ai .codex docs/specs src/tests .github \
+    --glob '!docs/superpowers/**' \
+    --glob '!.ai/tests/agent-config-layout-test.sh' || true
+)"
+[ -z "$ACTIVE_OLD_REFERENCES" ] || fail "active Claude-only references remain:
+$ACTIVE_OLD_REFERENCES"
+
 printf 'PASS: shared rule layout is valid.\n'

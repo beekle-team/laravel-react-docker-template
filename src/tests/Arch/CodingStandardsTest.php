@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// .claude/rules/php.md の型宣言・strict types ルールを実行可能な形にした検査。
+// .ai/rules/php.md の型宣言・strict types ルールを実行可能な形にした検査。
 
 arch('アプリケーションコードは strict types を宣言する')
     ->expect('App')
