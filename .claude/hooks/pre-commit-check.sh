@@ -20,7 +20,9 @@ echo "=== Pre-commit Check ==="
 
 STAGED_PHP=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep '\.php$' || true)
 STAGED_COMPOSER=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '^src/composer\.(json|lock)$' || true)
-STAGED_TYPES_SOURCE=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMRD | grep -E '^src/(app/(Data|Enums)/.*\.php|config/typescript-transformer\.php|resources/js/types/generated\.d\.ts)$' || true)
+# typescript-transformer.php は app_path() 全体を探索するため、app 配下の
+# PHP変更は配置先にかかわらず生成型の再検証対象にする。
+STAGED_TYPES_SOURCE=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMRD | grep -E '^src/(app/.*\.php|config/typescript-transformer\.php|resources/js/types/generated\.d\.ts)$' || true)
 STAGED_TS=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
 
 # composer更新や生成型だけの変更でも、PHP/Laravelバージョンと
