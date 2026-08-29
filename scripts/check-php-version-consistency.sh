@@ -31,7 +31,11 @@ if [ -n "$INVALID_WORKFLOW_VERSIONS" ]; then
   fail "GitHub Actions contains a PHP version other than 8.5:\n$INVALID_WORKFLOW_VERSIONS"
 fi
 
-OLD_RECTOR_TARGETS=$(git grep -nE 'PHP 8\.3|php83|PHP_83' -- ':!src/composer.lock' || true)
+# The guard necessarily contains the legacy tokens in its search expression,
+# so exclude itself from the repository scan.
+OLD_RECTOR_TARGETS=$(git grep -nE 'PHP 8\.3|php83|PHP_83' -- \
+  ':!src/composer.lock' \
+  ':!scripts/check-php-version-consistency.sh' || true)
 if [ -n "$OLD_RECTOR_TARGETS" ]; then
   fail "Old PHP 8.3 project targets remain:\n$OLD_RECTOR_TARGETS"
 fi
