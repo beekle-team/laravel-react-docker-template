@@ -13,10 +13,13 @@ concurrency:
 jobs:
   hooks:
     runs-on: ubuntu-latest
-    name: Claude Code Hooks
+    name: Repository Guards
 
     steps:
       - uses: actions/checkout@v7
+
+      - name: Verify PHP version consistency
+        run: bash scripts/check-php-version-consistency.sh
 
       - name: Execute hook regression tests
         run: |
