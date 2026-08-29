@@ -18,5 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Execute pre-commit hook regression tests
-        run: bash .claude/hooks/tests/pre-commit-check-test.sh
+      - name: Execute hook regression tests
+        run: |
+          for test_file in .claude/hooks/tests/*-test.sh; do
+            bash "$test_file"
+          done
