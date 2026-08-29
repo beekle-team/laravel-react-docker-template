@@ -23,9 +23,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# OPcache is bundled with the PHP 8.5 FPM image. Reinstalling it produces no
-# module artifact and makes a clean image build fail.
-RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd sockets zip
+# Install extensions that are not bundled with the PHP 8.5 FPM image.
+RUN docker-php-ext-install pdo_pgsql pgsql exif pcntl bcmath gd sockets zip
 
 # Install Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
