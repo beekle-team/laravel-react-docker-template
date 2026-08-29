@@ -19,9 +19,12 @@ fail() {
 echo "=== Pre-commit Check ==="
 
 STAGED_PHP=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep '\.php$' || true)
+STAGED_COMPOSER=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '^src/composer\.(json|lock)$' || true)
 STAGED_TS=$(git -C "$PROJECT_DIR" diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx)$' || true)
 
-if [ -n "$STAGED_PHP" ]; then
+# composer.json / composer.lock の更新だけでも、インストール済みの
+# PHP・Laravel バージョンに応じた Rector セットを検証する。
+if [ -n "$STAGED_PHP" ] || [ -n "$STAGED_COMPOSER" ]; then
   SERVICE_LAYER_FILES=""
   CONTROLLER_VALIDATION=""
 
@@ -61,6 +64,11 @@ Start it with: docker compose up -d"
   else
     echo ">>> PHP: Running Pint..."
     php_exec ./vendor/bin/pint --test 2>&1 || fail "BLOCK: Pint found formatting issues. Run: docker compose exec app ./vendor/bin/pint"
+
+    echo ">>> PHP: Running Rector (version-aware dry-run)..."
+    php_exec ./vendor/bin/rector process --dry-run 2>&1 || fail "BLOCK: Rector found code that must be migrated for the installed PHP/Laravel versions.
+Run: docker compose exec app composer rector:fix
+Then: docker compose exec app composer pint"
 
     echo ">>> PHP: Running PHPStan..."
     php_exec ./vendor/bin/phpstan analyse --no-progress --memory-limit=2G 2>&1 || fail "BLOCK: PHPStan found issues."
