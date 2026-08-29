@@ -60,6 +60,15 @@ assert_lines '' "$(event_repo_paths "$UNSAFE_EVENT" /repo)"
 EXTERNAL_CLAUDE_EVENT='{"cwd":"/repo","tool_name":"Edit","tool_input":{"file_path":"/tmp/outside.ts"}}'
 assert_lines '' "$(event_repo_paths "$EXTERNAL_CLAUDE_EVENT" /repo)"
 
+mkdir -p "$TMP_ROOT/external"
+printf 'external\n' > "$TMP_ROOT/external/outside.ts"
+ln -s "$TMP_ROOT/external" "$TMP_ROOT/repo/external-link"
+SYMLINK_EVENT="$(jq -cn \
+  --arg cwd "$EXPECTED_ROOT" \
+  --arg file_path "$EXPECTED_ROOT/external-link/outside.ts" \
+  '{cwd: $cwd, tool_name: "Edit", tool_input: {file_path: $file_path}}')"
+assert_lines '' "$(event_repo_paths "$SYMLINK_EVENT" "$EXPECTED_ROOT")"
+
 printf 'unchanged\n' > "$TMP_ROOT/repo/sentinel.txt"
 UNKNOWN_EVENT="$(jq -cn --arg cwd "$TMP_ROOT/repo" '{cwd: $cwd, tool_name: "unknown", tool_input: {}}')"
 assert_lines '' "$(event_repo_paths "$UNKNOWN_EVENT" "$TMP_ROOT/repo")"
@@ -72,4 +81,4 @@ done
 
 [ "$(cat "$TMP_ROOT/repo/sentinel.txt")" = 'unchanged' ] || fail 'unknown event modified a file'
 
-printf 'PASS: Claude and Codex hook events normalize to repository paths.\n'
+printf 'PASS: Claude and Codex hook events normalize to safe repository paths.\n'
