@@ -14,33 +14,48 @@ final class PasswordConfirmationTest extends TestCase
 
     public function test_confirm_password_screen_can_be_rendered(): void
     {
-        $user = User::factory()->create();
+        scenario('パスワード確認画面を表示する')
+            ->given('ログイン済みユーザー', function (): User {
+                $user = User::factory()->create();
+                $this->actingAs($user);
 
-        $response = $this->actingAs($user)->get('/confirm-password');
-
-        $response->assertStatus(200);
+                return $user;
+            })
+            ->when('パスワード確認画面へアクセスする', fn () => $this->get('/confirm-password'))
+            ->then('画面が正常に表示される', fn ($response) => $response->assertStatus(200))
+            ->run();
     }
 
     public function test_password_can_be_confirmed(): void
     {
-        $user = User::factory()->create();
+        scenario('正しいパスワードを確認する')
+            ->given('ログイン済みユーザー', function (): User {
+                $user = User::factory()->create();
+                $this->actingAs($user);
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
+                return $user;
+            })
+            ->when('正しいパスワードを送信する', fn () => $this->post('/confirm-password', [
+                'password' => 'password',
+            ]))
+            ->then('リダイレクトされる', fn ($response) => $response->assertRedirect())
+            ->and('セッションエラーがない', fn ($response) => $response->assertSessionHasNoErrors())
+            ->run();
     }
 
     public function test_password_is_not_confirmed_with_invalid_password(): void
     {
-        $user = User::factory()->create();
+        scenario('誤ったパスワードを確認する')
+            ->given('ログイン済みユーザー', function (): User {
+                $user = User::factory()->create();
+                $this->actingAs($user);
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
-        ]);
-
-        $response->assertSessionHasErrors();
+                return $user;
+            })
+            ->when('誤ったパスワードを送信する', fn () => $this->post('/confirm-password', [
+                'password' => 'wrong-password',
+            ]))
+            ->then('セッションエラーになる', fn ($response) => $response->assertSessionHasErrors())
+            ->run();
     }
 }

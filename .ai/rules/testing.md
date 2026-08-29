@@ -5,6 +5,7 @@
 - 要件は docs/specs/{feature}/requirements.md にGherkinで記載する。
 - Feature test変更前に対象scenarioとユーザー承認を確認する。
 - Feature testはscenario() helperを使う。
+- PHPStanはPestの`it()` / `test()`とPHPUnitのテストメソッドを検査し、`scenario()->given()->when()->then()->run()`の完全なチェーンがないFeature testを失敗させる。
 - 1 scenarioずつRed → Green → Refactorし、失敗したまま次へ進まない。
 - describeはUC-XX、itはScenario X.Y形式にする。
 

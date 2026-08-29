@@ -1,0 +1,4 @@
+rules:
+    - Tests\PHPStan\Rules\ControllerValidationRule
+    - Tests\PHPStan\Rules\FeaturePestTestUsesScenarioRule
+    - Tests\PHPStan\Rules\FeatureTestMethodUsesScenarioRule

@@ -1,0 +1,9 @@
+includes:
+    - ../../phpstan-rules.neon
+
+parameters:
+    level: 0
+
+    ignoreErrors:
+        -
+            identifier: function.notFound
