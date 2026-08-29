@@ -1,0 +1,54 @@
+name: Normalize Generated Files
+
+on:
+  push:
+    branches: ["fix/scenario-types-php85"]
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: fix/scenario-types-php85
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Copy environment
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+      - name: Refresh Composer lock metadata
+        run: composer update --lock -q --no-ansi --no-interaction --no-progress --prefer-dist
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Regenerate TypeScript types
+        run: php artisan typescript:transform
+
+      - name: Commit normalized files
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/composer.lock src/resources/js/types/generated.d.ts
+          if git diff --cached --quiet; then
+            echo "Generated files are already current."
+            exit 0
+          fi
+          git commit -m "chore: refresh generated files for PHP 8.5"
+          git push origin HEAD:fix/scenario-types-php85
