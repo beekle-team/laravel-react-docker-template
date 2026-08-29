@@ -17,15 +17,15 @@
 
 ```bash
 bash scripts/check-php-version-consistency.sh
-docker compose exec app composer lint
-docker compose exec app composer test
-docker compose exec app composer types:check # Data DTO・Enum・TypeScript変換対象の変更時
-docker compose exec app npm run lint:js
-docker compose exec app npm run types
-docker compose exec app npm run lint:react-compiler
-docker compose exec app npm run lint:architecture
-docker compose exec app npm run test:unit
-docker compose exec app npm run test:e2e # ユーザーフロー変更時
+scripts/compose.sh exec app composer lint
+scripts/compose.sh exec app composer test
+scripts/compose.sh exec app composer types:check # Data DTO・Enum・TypeScript変換対象の変更時
+scripts/compose.sh exec app npm run lint:js
+scripts/compose.sh exec app npm run types
+scripts/compose.sh exec app npm run lint:react-compiler
+scripts/compose.sh exec app npm run lint:architecture
+scripts/compose.sh exec app npm run test:unit
+scripts/compose.sh exec app npm run test:e2e # ユーザーフロー変更時
 ```
 
 ## Codex固有

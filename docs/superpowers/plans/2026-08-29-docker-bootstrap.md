@@ -320,34 +320,13 @@ git commit -m "feat: Viteを専用Composeサービスで起動する"
 - Create: `README.md`
 - Delete: `src/README.md`
 - Modify: `.github/workflows/ci.yml`
-- Create: `tests/shell/readme-test.sh`
+- Modify: `AGENTS.md`
 
 **Interfaces:**
 - Consumes: `scripts/setup.sh`、`scripts/compose.sh`、Compose services `app`, `nginx`, `vite`, `postgres`, `redis`, `mailpit`。
 - Produces: テンプレートの唯一の利用者向け入口 `README.md` と、GitHub Actions job `docker-smoke`。
 
-- [ ] **Step 1: README 契約の失敗するテストを書く**
-
-`tests/shell/readme-test.sh` で次の必須導線を固定する。
-
-```bash
-test -f README.md
-test ! -e src/README.md
-grep -F 'scripts/setup.sh' README.md
-grep -F 'scripts/compose.sh' README.md
-grep -F 'http://localhost:8080' README.md
-grep -F 'http://localhost:8025' README.md
-grep -F 'down -v' README.md
-grep -F 'データを削除' README.md
-```
-
-- [ ] **Step 2: README がなくテストが失敗することを確認する**
-
-Run: `bash tests/shell/readme-test.sh`
-
-Expected: FAIL。ルート `README.md` が存在しない。
-
-- [ ] **Step 3: README を作成して Laravel 標準 README を削除する**
+- [ ] **Step 1: README を作成して Laravel 標準 README を削除する**
 
 ルート `README.md` に以下を具体的なコマンド付きで記載する。
 
@@ -363,20 +342,18 @@ scripts/compose.sh exec app npm run lint:architecture
 
 URL、`src/.env` の責務、ポート変数、既存ルート `.env` からの移行、依存が named volume に入ること、`down -v` が PostgreSQL データと依存volumeを削除することも記載する。ホストIDEが依存ソースを必要とする場合だけ、ホスト側で Composer/npm を任意実行できることを補足する。`src/README.md` は削除する。
 
-- [ ] **Step 4: README 契約テストを通す**
+- [ ] **Step 2: AI向け品質ゲートをCompose wrapperへ揃える**
 
-Run: `bash tests/shell/readme-test.sh`
+`AGENTS.md` の品質ゲートをrawの`docker compose`から`scripts/compose.sh`へ置き換える。
 
-Expected: PASS。
-
-- [ ] **Step 5: Docker smoke job を追加する**
+- [ ] **Step 3: Docker smoke job を追加する**
 
 `.github/workflows/ci.yml` に `docker-smoke` job を追加する。
 
 ```yaml
   docker-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       COMPOSE_PROJECT_NAME: laravel-template-smoke
     steps:
@@ -414,7 +391,7 @@ Expected: PASS。
       MAIL_MAILER: array
 ```
 
-- [ ] **Step 6: 静的検証と全 shell test を実行する**
+- [ ] **Step 4: 静的検証と全 shell test を実行する**
 
 Run: `docker compose --env-file src/.env.example config --quiet`
 
@@ -428,10 +405,10 @@ Run: `git diff --check`
 
 Expected: exit 0。
 
-- [ ] **Step 7: Task 4 をコミットする**
+- [ ] **Step 5: Task 4 をコミットする**
 
 ```bash
-git add README.md .github/workflows/ci.yml tests/shell/readme-test.sh
+git add README.md AGENTS.md .github/workflows/ci.yml docs/superpowers/plans/2026-08-29-docker-bootstrap.md
 git add -u src/README.md
 git commit -m "docs: Docker初回起動とsmoke testを整備する"
 ```

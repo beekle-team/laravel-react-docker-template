@@ -184,6 +184,13 @@ jobs:
     # ブラウザ導入やサーバ起動で詰まったときに走り続けないよう上限を切る
     timeout-minutes: 20
 
+    env:
+      DB_CONNECTION: sqlite
+      SESSION_DRIVER: file
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+
     defaults:
       run:
         working-directory: ./src
@@ -248,3 +255,51 @@ jobs:
         name: playwright-report
         path: src/playwright-report
         retention-days: 7
+
+  docker-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    name: Docker Bootstrap Smoke
+
+    env:
+      COMPOSE_PROJECT_NAME: laravel-template-smoke
+
+    steps:
+    - uses: actions/checkout@v7
+      with:
+        persist-credentials: false
+
+    - name: Bootstrap Docker Environment
+      run: scripts/setup.sh
+
+    - name: Verify HTTP
+      run: |
+        for attempt in {1..30}; do
+          if curl --fail --silent --show-error http://localhost:8080 > /dev/null; then
+            exit 0
+          fi
+          sleep 2
+        done
+        exit 1
+
+    - name: Verify Vite
+      run: |
+        for attempt in {1..30}; do
+          if curl --fail --silent --show-error http://localhost:5173/@vite/client > /dev/null; then
+            exit 0
+          fi
+          sleep 2
+        done
+        exit 1
+
+    - name: Verify Database
+      run: scripts/compose.sh exec -T app php artisan migrate:status
+
+    - name: Show Docker Logs
+      if: failure()
+      run: scripts/compose.sh logs --no-color
+
+    - name: Stop Docker Environment
+      if: always()
+      run: scripts/compose.sh down -v --remove-orphans
