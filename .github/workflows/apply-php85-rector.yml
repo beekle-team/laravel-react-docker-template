@@ -1,0 +1,51 @@
+name: Apply PHP 8.5 Rector
+
+on:
+  push:
+    branches: ["fix/scenario-types-php85"]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: fix/scenario-types-php85
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.5
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Apply Rector
+        run: ./vendor/bin/rector process
+
+      - name: Apply Pint
+        run: ./vendor/bin/pint
+
+      - name: Commit PHP 8.5 transformations
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          if git diff --cached --quiet; then
+            echo "No Rector changes were needed."
+            exit 0
+          fi
+          git commit -m "refactor: apply PHP 8.5 Rector transformations"
+          git push origin HEAD:fix/scenario-types-php85
