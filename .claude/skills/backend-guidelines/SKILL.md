@@ -471,7 +471,7 @@ composer test          # Pest テスト
 # TypeScript
 npm run lint:js        # Biome lint
 npm run types          # 型チェック
-npm run test           # Vitest
+npm run test:unit      # Vitest
 ```
 
 ### 開発サーバー
