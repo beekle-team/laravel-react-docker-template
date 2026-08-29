@@ -10,6 +10,8 @@ license: MIT
 
 Read `.ai/rules/php.md` and the relevant files under `.ai/rules/laravel/**` before making changes.
 
+Treat `app/**` and `resources/**` paths in the reference as relative to the Laravel application root `src/`. Prefix them with `src/` when working from the repository root.
+
 ## Workflow
 
 1. Identify the sections needed for the request.

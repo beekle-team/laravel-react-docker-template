@@ -74,11 +74,35 @@ if grep -RInE 'Task\(|\$ARGUMENTS|allowed-tools:' "$PROJECT_ROOT/.ai/skills"; th
   fail "tool-specific syntax found in shared skills"
 fi
 
+BACKEND_GUIDE="$PROJECT_ROOT/.ai/skills/backend-guidelines/references/guide.md"
+while IFS= read -r package; do
+  if ! grep -Fq "\"$package\"" "$PROJECT_ROOT/src/composer.json" \
+    && ! grep -Fq "\"$package\"" "$PROJECT_ROOT/src/package.json"; then
+    fail "backend guide references an undeclared package: $package"
+  fi
+done < <(
+  sed -n '/^## 主要ライブラリ$/,/^## Laravel Data/p' "$BACKEND_GUIDE" \
+    | sed -n 's/^| `\([^`]*\)` |.*/\1/p'
+)
+
+GENERATED_TYPES_PATH="$(grep -oE '[[:alnum:]_./-]+/generated\.d\.ts' "$BACKEND_GUIDE" | head -1)"
+[ -n "$GENERATED_TYPES_PATH" ] || fail "backend guide does not identify the generated TypeScript declaration"
+[ -f "$PROJECT_ROOT/$GENERATED_TYPES_PATH" ] \
+  || fail "backend guide points to a missing generated TypeScript declaration: $GENERATED_TYPES_PATH"
+
 duplicate_names="$(find "$PROJECT_ROOT/.ai/skills" -name SKILL.md -exec sed -n 's/^name: //p' {} \; | sort | uniq -d)"
 [ -z "$duplicate_names" ] || fail "duplicate skill names: $duplicate_names"
 
 [ ! -d "$PROJECT_ROOT/.claude/hooks" ] || fail ".claude/hooks must not contain shared hook bodies"
 assert_file .codex/config.toml
+
+grep -Fq '[mcp_servers.laravel-boost]' "$PROJECT_ROOT/.codex/config.toml" \
+  || fail "Codex config does not declare MCP server: laravel-boost"
+grep -Fq 'command = "docker"' "$PROJECT_ROOT/.codex/config.toml" \
+  || fail "Codex laravel-boost MCP does not use Docker"
+grep -Fq 'args = ["compose", "exec", "-T", "app", "php", "artisan", "boost:mcp"]' \
+  "$PROJECT_ROOT/.codex/config.toml" \
+  || fail "Codex laravel-boost MCP command does not match the repository container"
 
 for hook_path in auto-format.sh post-edit-check.sh pre-bash-check.sh; do
   grep -Fq ".ai/hooks/$hook_path" "$PROJECT_ROOT/.codex/config.toml" \
