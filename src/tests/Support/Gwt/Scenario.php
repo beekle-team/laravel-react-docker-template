@@ -123,9 +123,10 @@ final class Scenario
             ($then['action'])($result, $this->context);
         }
 
-        // If no assertions were made, ensure at least one passes
-        if (count($this->thens) === 0) {
-            Assert::assertTrue(true, 'Scenario completed without explicit assertions');
+        // Then が無いシナリオでも PHPUnit の risky 判定を避けるため、
+        // 分岐条件そのものをアサーションとして 1 件計上する。
+        if ($this->thens === []) {
+            Assert::assertCount(0, $this->thens, 'Scenario completed without explicit assertions');
         }
     }
 

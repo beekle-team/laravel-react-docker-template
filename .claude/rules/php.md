@@ -27,13 +27,18 @@ Laravel Pint (PSR-12ベース) に準拠。
 
 ## 静的解析
 
-PHPStan Level 5 + Larastan。
+PHPStan Level 9 + Larastan。解析対象は `app/` だけでなく `database/` `routes/` `tests/` も含む。
 
 ```bash
 ./vendor/bin/phpstan analyse
 ```
 
-**設定**: `phpstan.neon` → `level: 5`
+**設定**: `phpstan.neon` → `level: 9`
+
+プロジェクト固有の設計ルールのうち、AST を見ないと判定できないものはカスタムルールとして
+`tests/PHPStan/Rules/**` に置き、`phpstan.neon` の `rules:` に登録する。
+Pest arch テストで表現できるもの（クラスの有無・継承・依存）は arch テスト側に置く。
+使い分けは `.claude/rules/testing/architecture-tests.md` を参照。
 
 ## 自動リファクタ
 
@@ -44,7 +49,8 @@ Rector（PHP 8.3 + Laravel composer-based）。フォーマットは Pint に任
 ./vendor/bin/rector process            # 適用
 ```
 
-**設定**: `rector.php` → `withPhpSets(php83: true)` / `PhpVersion::PHP_83`
+**設定**: `rector.php` → `withPhpSets(php83: true)` / `PhpVersion::PHP_83` /
+`withPreparedSets(deadCode, codeQuality, typeDeclarations, earlyReturn, instanceOf, phpunitCodeQuality)`
 
 ## 型宣言
 
@@ -87,5 +93,5 @@ php artisan ide-helper:models -W  # モデルの DocBlock を更新
 
 ```bash
 # コード品質チェック（CI/プッシュ前に実行）
-./vendor/bin/pint --test && ./vendor/bin/phpstan analyse && ./vendor/bin/rector process --dry-run
+composer lint
 ```
