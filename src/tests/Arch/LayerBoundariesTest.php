@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
-// .claude/rules/laravel/model-layer-boundaries.md を実行可能な形にした検査。
+// .ai/rules/laravel/model-layer-boundaries.md を実行可能な形にした検査。
 
 it('Service / Action レイヤーを作らない', function (): void {
     expect(is_dir(app_path('Services')))->toBeFalse()
@@ -40,7 +40,7 @@ arch('Concerns は Trait として書く')
     ->expect('App\Models\Concerns')
     ->toBeTraits();
 
-// .claude/rules/laravel/form-request-validation.md の Controller 側ルール。
+// .ai/rules/laravel/form-request-validation.md の Controller 側ルール。
 
 arch('Controller は入力検証を Form Request に委ねる')
     ->expect('App\Http\Controllers')

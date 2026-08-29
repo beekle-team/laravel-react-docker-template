@@ -1,18 +1,28 @@
 # AGENTS.md
-このファイルは Codex の入口です。AIエージェント共通ルールの正本は .ai/ に置きます。
+
+このファイルは AI エージェントの共通入口です。共通ルール、skill、hook 本文の正本は `.ai/` に置きます。
+
 ## 必読
+
 - .ai/README.md
 - .ai/rules/workspace.md
 - .ai/rules/testing.md
 - .ai/rules/error-handling.md
+
 ## 変更対象ごとの詳細ルール
-- Laravel / PHP: .claude/rules/laravel/ と .claude/rules/php.md
-- React / TypeScript: .claude/rules/frontend/ と .claude/rules/type-safety.md
-- Test / static analysis: .claude/rules/testing/
+
+- Laravel / PHP: `.ai/rules/laravel/` と `.ai/rules/php.md`
+- React / TypeScript: `.ai/rules/frontend/` と `.ai/rules/type-safety.md`
+- Test / static analysis: `.ai/rules/testing/`
+
+## 共通 skill
+
+- 共通 skill の正本は `.ai/skills/**` に置く。
+- Claude Code は `.claude/skills`、Codex は `.agents/skills` の symlink から同じ skill を discovery する。
 
 ## 品質ゲートとテスト
 
-- 正本は .ai/rules/workspace.md の Quality Gates、テスト境界は .ai/rules/testing.md、フロント詳細は .claude/rules/frontend/quality-scans.md を参照する。
+- 正本は `.ai/rules/workspace.md` の Quality Gates、テスト境界は `.ai/rules/testing.md`、フロント詳細は `.ai/rules/frontend/quality-scans.md` を参照する。
 - リポジトリルートで、変更対象に応じて次を実行する。
 
 ```bash
@@ -30,6 +40,7 @@ scripts/compose.sh exec app npm run test:e2e # ユーザーフロー変更時
 ```
 
 ## Codex固有
+
 - Codex固有情報は .codex/ に置く。
-- 共通ルールは .ai/ を更新する。
-- generated TypeScript と Wayfinder生成物を手編集しない。
+- 共通内容は `.ai/` を更新する。
+- generated TypeScript と Wayfinder 生成物を手編集しない。

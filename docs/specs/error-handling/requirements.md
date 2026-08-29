@@ -493,7 +493,7 @@ And .claude と .codex には tool 固有情報だけを置く
 - [ ] `.ai/rules/error-handling.md` に本要件の分類表と実装ルールを置く。
 - [ ] `CLAUDE.md` は必須共通ルールを `@import` する。
 - [ ] `AGENTS.md` は Codex の入口として同じ共通ルールを必読にする。
-- [ ] 既存 `.claude/rules/**` の native auto-load を維持し、Codex から必要時に参照する導線を設ける。
+- [ ] `.claude/rules` は native auto-load 用の symlink adapter のみにし、すべての rule 本文を `.ai/rules/**` に置く。
 - [ ] 共通ルール変更時は原則 `.ai/` の正本だけを更新する。
 
 ---

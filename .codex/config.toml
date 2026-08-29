@@ -1,0 +1,20 @@
+[[hooks.PostToolUse]]
+matcher = "Edit|Write"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "bash -lc 'root=$(git rev-parse --show-toplevel) && exec \"$root/.ai/hooks/auto-format.sh\"'"
+timeout = 10
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "bash -lc 'root=$(git rev-parse --show-toplevel) && exec \"$root/.ai/hooks/post-edit-check.sh\"'"
+timeout = 30
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = "bash -lc 'root=$(git rev-parse --show-toplevel) && exec \"$root/.ai/hooks/pre-bash-check.sh\"'"
+timeout = 120

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Route as RouteFacade;
 
-// .claude/rules/laravel/form-request-validation.md:
+// .ai/rules/laravel/form-request-validation.md:
 // Form Request を使う変更系 route には HandlePrecognitiveRequests を付ける。
 // これが漏れるとフロントの validate() がライブ検証ではなく本処理を実行してしまう。
 

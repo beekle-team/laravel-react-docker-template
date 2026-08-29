@@ -28,7 +28,8 @@ jobs:
 
       - name: Execute hook regression tests
         run: |
-          for test_file in .claude/hooks/tests/*-test.sh; do
+          bash .ai/tests/agent-config-layout-test.sh
+          for test_file in .ai/hooks/tests/*-test.sh; do
             bash "$test_file"
           done
 
