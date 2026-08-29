@@ -1,10 +1,6 @@
 #!/bin/bash
-# PreToolUse(Bash) のディスパッチャ。
-#
-# Claude Code の hook matcher は「ツール名」に対する正規表現で、
-# permissions の "Bash(git commit:*)" 記法は使えない。matcher に
-# コマンド条件を書くと一致せず hook が一度も起動しないため、
-# matcher は "Bash" にして、実際のコマンド判定をここで行う。
+# 対応する AI エージェント向け PreToolUse(Bash) dispatcher。
+# hook matcher はツール名を対象とするため、実際のコマンド判定をここで行う。
 
 INPUT=$(cat)
 COMMAND=$(printf '%s' "$INPUT" | jq -r '.tool_input.command // empty')
