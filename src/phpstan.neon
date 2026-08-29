@@ -1,5 +1,6 @@
 includes:
     - ./vendor/larastan/larastan/extension.neon
+    - ./phpstan-rules.neon
 
 parameters:
     paths:
@@ -26,6 +27,3 @@ parameters:
             message: '#^Call to an undefined method Pest\\PendingCalls\\TestCall::(expect|preset)\(\)#'
             paths:
                 - tests/Arch
-
-rules:
-    - Tests\PHPStan\Rules\ControllerValidationRule
