@@ -63,7 +63,7 @@ final class ControllerValidationRule implements Rule
         }
 
         // Auth::guard()->validate() のような別オブジェクトの validate は対象外。
-        if (! (new ObjectType(Request::class))->isSuperTypeOf($scope->getType($node->var))->yes()) {
+        if (! new ObjectType(Request::class)->isSuperTypeOf($scope->getType($node->var))->yes()) {
             return [];
         }
 

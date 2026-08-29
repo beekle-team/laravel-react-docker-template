@@ -19,6 +19,7 @@ class UserFactory extends Factory
      *
      * @var class-string<User>
      */
+    #[\Override]
     protected $model = User::class;
 
     /**
