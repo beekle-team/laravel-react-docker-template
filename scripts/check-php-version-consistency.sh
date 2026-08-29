@@ -26,9 +26,21 @@ if ! grep -Fq 'withPhpSets(php85: true)' src/rector.php \
   fail "src/rector.php must target PHP 8.5"
 fi
 
-INVALID_WORKFLOW_VERSIONS=$(grep -RInE 'php-version:[[:space:]]*['"'"']?(8\.[0-4]|\$\{\{[[:space:]]*matrix\.php)' .github/workflows || true)
+INVALID_WORKFLOW_VERSIONS=""
+while IFS= read -r line; do
+  [ -z "$line" ] && continue
+
+  value="${line#*php-version:}"
+  value="${value%%#*}"
+  value="$(printf '%s' "$value" | tr -d "[:space:]'\"")"
+
+  if [ "$value" != "$EXPECTED_VERSION" ]; then
+    INVALID_WORKFLOW_VERSIONS="${INVALID_WORKFLOW_VERSIONS}${line}\n"
+  fi
+done < <(grep -RInE '^[[:space:]]*php-version:[[:space:]]*' .github/workflows || true)
+
 if [ -n "$INVALID_WORKFLOW_VERSIONS" ]; then
-  fail "GitHub Actions contains a PHP version other than 8.5:\n$INVALID_WORKFLOW_VERSIONS"
+  fail "GitHub Actions contains a PHP version other than 8.5:\n${INVALID_WORKFLOW_VERSIONS%\\n}"
 fi
 
 # The guard necessarily contains the legacy tokens in its search expression,
