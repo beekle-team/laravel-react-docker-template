@@ -11,9 +11,10 @@ use RectorLaravel\Set\LaravelSetProvider;
 return RectorConfig::configure()
     ->withPaths([
         __DIR__.'/app',
-        __DIR__.'/bootstrap/app.php',
+        __DIR__.'/bootstrap',
         __DIR__.'/config',
         __DIR__.'/database',
+        __DIR__.'/public/index.php',
         __DIR__.'/routes',
         __DIR__.'/tests',
     ])
@@ -29,9 +30,9 @@ return RectorConfig::configure()
             __DIR__.'/tests',
         ],
     ])
-    // composer / Laravel 13 の下限は PHP 8.3。Docker / CI 本命の 8.5 専用構文は入れない。
-    ->withPhpSets(php83: true)
-    ->withPhpVersion(PhpVersion::PHP_83)
+    // 実行環境・Composer・CIをPHP 8.5へ統一する。
+    ->withPhpSets(php85: true)
+    ->withPhpVersion(PhpVersion::PHP_85)
     // バージョン移行セットだけでは死蔵コード・型宣言漏れを拾えないので、
     // 品質セットも有効にする（CI の rector --dry-run がこれで効く）。
     ->withPreparedSets(
