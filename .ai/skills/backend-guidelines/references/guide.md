@@ -1,9 +1,3 @@
----
-name: backend-guidelines
-description: Enforce Laravel MVC patterns with Concerns and Query Scopes. Controllers stay thin, Models hold logic, and queries read like English sentences.
-license: MIT
----
-
 # Laravel MVC + Concerns + Query Scopes
 
 Laravel標準のMVCパターン。Serviceクラスは作らない。クエリはスコープで英語のように読めるように。

@@ -198,7 +198,7 @@ effects: {
 - **汎用 UI Components**: `resources/js/shared/components/`
 - **feature 固有 UI**: `resources/js/features/{feature}/components/`
 
-配置の正本は `.claude/rules/frontend/architecture.md`。
+配置の正本は `.ai/rules/frontend/architecture.md`。
 
 ## Dark Mode
 

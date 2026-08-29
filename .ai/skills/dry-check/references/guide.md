@@ -1,9 +1,3 @@
----
-name: dry-check
-description: 重複コード検出とDRY原則の適用。Fat Model + Concernsアプローチで、ビジネスロジックはModelに集約、共通機能はTraitで共有。コード作成・レビュー時に重複パターンを検出し、適切なリファクタリングを提案。
-license: MIT
----
-
 # DRY Check - 重複コード検出とリファクタリング
 
 コード作成・編集時に重複パターンを検出し、DRY（Don't Repeat Yourself）原則に基づいたリファクタリングを提案するスキル。

@@ -46,4 +46,25 @@ for rule_file in "${RULE_FILES[@]}"; do
 done
 
 assert_link .claude/rules ../.ai/rules
+
+assert_link .claude/skills ../.ai/skills
+assert_link .agents/skills ../.ai/skills
+
+EXISTING_SKILLS=(
+  backend-guidelines
+  brand-guidelines
+  dry-check
+  frontend-design
+  inertia-react
+  tdd-methodology
+)
+
+for skill in "${EXISTING_SKILLS[@]}"; do
+  skill_file="$PROJECT_ROOT/.ai/skills/$skill/SKILL.md"
+  [ -f "$skill_file" ] || fail "missing skill: $skill"
+  rg -q '^name: ' "$skill_file" || fail "missing name: $skill"
+  rg -q '^description: ' "$skill_file" || fail "missing description: $skill"
+  [ "$(wc -l < "$skill_file")" -le 500 ] || fail "SKILL.md exceeds 500 lines: $skill"
+done
+
 printf 'PASS: shared rule layout is valid.\n'

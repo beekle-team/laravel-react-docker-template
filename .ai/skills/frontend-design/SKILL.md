@@ -11,7 +11,7 @@ license: MIT
 **Stack**: React 19 + TypeScript + Inertia.js v2 + Tailwind CSS v4 + Headless UI
 **Keywords**: frontend, react, design, UI, components, inertia, tailwind
 
-配置ルールは `.claude/rules/frontend/architecture.md` が正本。このファイルは見た目の作り方だけを扱う。
+配置ルールは `.ai/rules/frontend/architecture.md` が正本。このファイルは見た目の作り方だけを扱う。
 
 ## Design Context
 
@@ -89,7 +89,7 @@ Tailwind v4 は CSS-first 設定。token は `resources/css/app.css` の `@theme
 
 ## Component Hierarchy
 
-`.claude/rules/frontend/architecture.md` の区分に従う。
+`.ai/rules/frontend/architecture.md` の区分に従う。
 
 | 種類 | 置き場所 |
 |---|---|
@@ -120,7 +120,7 @@ DON'T:
 
 - 存在しないモジュール (`@/design-system/theme` など) を import する
 - hex / px をコンポーネントに直書きする
-- `any` を使う (`.claude/rules/type-safety.md`)
+- `any` を使う (`.ai/rules/type-safety.md`)
 - 手書きの型を `resources/js/types/**` に足す
 - Headless UI で足りる UI を自作する
 

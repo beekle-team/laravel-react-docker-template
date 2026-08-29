@@ -1,8 +1,3 @@
----
-name: tdd-methodology
-description: TDD/BDD実践ガイド。Pest v4の関数型構文（it/describe）でBDDスタイルのテストを記述。Gherkin形式での要件定義、Feature Tests、Browser Tests（Playwright）によるE2Eテストを網羅。
----
-
 # TDD/BDD Methodology
 
 Test-Driven Development と Behavior-Driven Development の実践ガイド。
@@ -262,7 +257,7 @@ describe('useForm', () => {
 
 ### E2E Browser Tests (Pest v4 + Playwright)
 
-> このプロジェクトの E2E は Playwright の runner (`playwright/**/*.spec.ts`, `npm run test:e2e`) で実行する。Pest v4 の Browser Testing は未セットアップなので、以下は参考情報として扱い、実際のテストは `.claude/rules/frontend/testing.md` に従って `playwright/` 配下に書く。
+> このプロジェクトの E2E は Playwright の runner (`playwright/**/*.spec.ts`, `npm run test:e2e`) で実行する。Pest v4 の Browser Testing は未セットアップなので、以下は参考情報として扱い、実際のテストは `.ai/rules/frontend/testing.md` に従って `playwright/` 配下に書く。
 
 Pest v4のBrowser Testing機能を使用して、実際のブラウザでE2Eテストを実行。
 

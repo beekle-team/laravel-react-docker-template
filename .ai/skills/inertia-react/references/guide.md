@@ -1,9 +1,3 @@
----
-name: inertia-react
-description: Inertia.js v2 + React開発のベストプラクティス。ページ作成、フォーム処理、ナビゲーション、データ取得、ポーリング、プリフェッチ、遅延読み込み、Laravel Precognition（リアルタイムバリデーション）などInertia v2の全機能を網羅。Laravel + React SPAを構築する際に使用。
-license: MIT
----
-
 # Inertia.js v2 + React Development Guide
 
 このスキルはInertia.js v2とReactを使用したモダンなSPA開発のガイドラインを提供します。
@@ -1240,7 +1234,7 @@ export default function UserList({ users }: Props) {
 }
 ```
 
-`memo` / `useMemo` / `useCallback` を手で書くのは、計測して効果が確認できた場合か、参照同一性が外部 API の契約になっている場合に限る。詳細は `.claude/rules/frontend/react-compiler.md` を参照。
+`memo` / `useMemo` / `useCallback` を手で書くのは、計測して効果が確認できた場合か、参照同一性が外部 API の契約になっている場合に限る。詳細は `.ai/rules/frontend/react-compiler.md` を参照。
 
 ## ディレクトリ構造
 
