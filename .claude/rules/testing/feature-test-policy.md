@@ -10,16 +10,16 @@
 禁止: ユーザー承認なしでテスト生成
 禁止: 複数テストを一括で書く（1テストずつ進める）
 禁止: テスト失敗のまま次のテストに進む
-禁止: scenario() ヘルパーなしで Feature テスト実装 ← 🔴 NEW
+禁止: scenario() ヘルパーなしで Feature テスト実装
 許可: /bdd コマンド経由でのテスト生成
 許可: 既存 requirements.md に基づく追加（承認後）
 必須: 1テストがパスしてから次へ
-必須: scenario() ヘルパーを使用した GWT 形式 ← 🔴 NEW
+必須: scenario() ヘルパーを使用した GWT 形式
 ```
 
 ## scenario() ヘルパー強制
 
-**🔴 CRITICAL: Feature テストでは必ず `scenario()` ヘルパーを使用**
+Feature テストでは必ず `scenario()` ヘルパーを使用する。
 
 ```php
 // ✅ 正しい形式
@@ -45,6 +45,20 @@ it('registers a user', function () {
     expect(...)->toBe(...);
 });
 ```
+
+## 実行可能な Scenario 契約
+
+`Scenario` Builder 自体が次の契約を検証する。契約を満たさないテストはPASSにしない。
+
+- `Given` は最低1つ必要
+- `When` は業務上の主操作としてちょうど1つ必要
+- `Then` は最低1つ必要で、外部から観測可能な結果を検証する
+- 順序は `Given → When → Then`
+- `And` は Given または Then の追加にだけ使う。When の追加操作には使わない
+- `run()` は最後に1回だけ呼ぶ
+- Thenなし、順序違反、複数When、二重実行はテスト失敗とする
+
+複数の主操作が必要に見える場合は、Scenarioを分割するか、単一の業務操作として表現できる境界を見直す。
 
 ### 命名規則
 
