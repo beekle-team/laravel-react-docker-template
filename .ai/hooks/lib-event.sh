@@ -11,6 +11,31 @@ event_project_root() {
   git -C "$seed" rev-parse --show-toplevel 2>/dev/null || printf '%s' "$seed"
 }
 
+event_resolve_path() {
+  local target="$1"
+  local link_target
+  local parent_real
+  local link_count=0
+
+  while [ -L "$target" ]; do
+    [ "$link_count" -lt 40 ] || return 1
+    link_target="$(readlink "$target")" || return 1
+    case "$link_target" in
+      /*) target="$link_target" ;;
+      *) target="$(dirname "$target")/$link_target" ;;
+    esac
+    link_count=$((link_count + 1))
+  done
+
+  if [ -d "$target" ]; then
+    (cd "$target" 2>/dev/null && pwd -P)
+    return
+  fi
+
+  parent_real="$(cd "$(dirname "$target")" 2>/dev/null && pwd -P)" || return 1
+  printf '%s/%s\n' "$parent_real" "$(basename "$target")"
+}
+
 event_path_is_within_root() {
   local project_root="$1"
   local path="$2"
@@ -34,7 +59,7 @@ event_path_is_within_root() {
     probe="$parent"
   done
 
-  probe_real="$(realpath "$probe" 2>/dev/null)" || return 1
+  probe_real="$(event_resolve_path "$probe")" || return 1
   case "$probe_real" in
     "$root_real" | "$root_real"/*)
       return 0

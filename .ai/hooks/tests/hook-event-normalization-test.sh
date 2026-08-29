@@ -60,14 +60,48 @@ assert_lines '' "$(event_repo_paths "$UNSAFE_EVENT" /repo)"
 EXTERNAL_CLAUDE_EVENT='{"cwd":"/repo","tool_name":"Edit","tool_input":{"file_path":"/tmp/outside.ts"}}'
 assert_lines '' "$(event_repo_paths "$EXTERNAL_CLAUDE_EVENT" /repo)"
 
-mkdir -p "$TMP_ROOT/external"
+mkdir -p "$TMP_ROOT/external" "$TMP_ROOT/repo/internal-target"
 printf 'external\n' > "$TMP_ROOT/external/outside.ts"
+printf 'internal\n' > "$TMP_ROOT/repo/internal-target/existing.ts"
 ln -s "$TMP_ROOT/external" "$TMP_ROOT/repo/external-link"
+ln -s internal-target "$TMP_ROOT/repo/internal-link"
 SYMLINK_EVENT="$(jq -cn \
   --arg cwd "$EXPECTED_ROOT" \
   --arg file_path "$EXPECTED_ROOT/external-link/outside.ts" \
   '{cwd: $cwd, tool_name: "Edit", tool_input: {file_path: $file_path}}')"
 assert_lines '' "$(event_repo_paths "$SYMLINK_EVENT" "$EXPECTED_ROOT")"
+
+EXTERNAL_NEW_EVENT="$(jq -cn \
+  --arg cwd "$EXPECTED_ROOT" \
+  --arg file_path "$EXPECTED_ROOT/external-link/new.ts" \
+  '{cwd: $cwd, tool_name: "Write", tool_input: {file_path: $file_path}}')"
+assert_lines '' "$(event_repo_paths "$EXTERNAL_NEW_EVENT" "$EXPECTED_ROOT")"
+
+INTERNAL_EXISTING_EVENT="$(jq -cn \
+  --arg cwd "$EXPECTED_ROOT" \
+  --arg file_path "$EXPECTED_ROOT/internal-link/existing.ts" \
+  '{cwd: $cwd, tool_name: "Edit", tool_input: {file_path: $file_path}}')"
+assert_lines 'internal-link/existing.ts' \
+  "$(event_repo_paths "$INTERNAL_EXISTING_EVENT" "$EXPECTED_ROOT")"
+
+INTERNAL_NEW_EVENT="$(jq -cn \
+  --arg cwd "$EXPECTED_ROOT" \
+  --arg file_path "$EXPECTED_ROOT/internal-link/new.ts" \
+  '{cwd: $cwd, tool_name: "Write", tool_input: {file_path: $file_path}}')"
+assert_lines 'internal-link/new.ts' \
+  "$(event_repo_paths "$INTERNAL_NEW_EVENT" "$EXPECTED_ROOT")"
+
+PORTABLE_BIN="$TMP_ROOT/portable-bin"
+mkdir -p "$PORTABLE_BIN"
+for command_name in basename dirname readlink; do
+  ln -s "$(command -v "$command_name")" "$PORTABLE_BIN/$command_name"
+done
+PORTABLE_RESULT="$(
+  PATH="$PORTABLE_BIN" /bin/bash -c \
+    'source "$1"; event_normalize_repo_path "$2" "$3"' \
+    _ "$HOOK_DIR/lib-event.sh" "$EXPECTED_ROOT" internal-link/existing.ts
+)"
+assert_lines 'internal-link/existing.ts' "$PORTABLE_RESULT"
 
 printf 'unchanged\n' > "$TMP_ROOT/repo/sentinel.txt"
 UNKNOWN_EVENT="$(jq -cn --arg cwd "$TMP_ROOT/repo" '{cwd: $cwd, tool_name: "unknown", tool_input: {}}')"
