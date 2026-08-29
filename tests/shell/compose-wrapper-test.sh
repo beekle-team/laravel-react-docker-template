@@ -20,8 +20,8 @@ PATH="$TEST_ROOT/bin:$PATH" \
     "$TEST_ROOT/project/scripts/compose.sh" ps
 
 EXPECTED_PROJECT_ROOT="$(cd "$TEST_ROOT/project" && pwd -P)"
-grep -Fx "cwd=$EXPECTED_PROJECT_ROOT" "$TEST_ROOT/docker.calls"
-grep -Fx 'args=compose --env-file src/.env ps' "$TEST_ROOT/docker.calls"
+grep -Fx "cwd=$EXPECTED_PROJECT_ROOT" "$TEST_ROOT/docker.calls" >/dev/null
+grep -Fx 'args=compose --env-file src/.env ps' "$TEST_ROOT/docker.calls" >/dev/null
 
 rm "$TEST_ROOT/project/src/.env"
 
@@ -32,6 +32,6 @@ if DOCKER_CALLS="$TEST_ROOT/docker.calls" \
     exit 1
 fi
 
-grep -F 'scripts/setup.sh' "$TEST_ROOT/output"
+grep -F 'scripts/setup.sh' "$TEST_ROOT/output" >/dev/null
 
 printf 'PASS: compose wrapper uses src/.env from the repository root.\n'
