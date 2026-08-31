@@ -25,7 +25,7 @@
         "laravel/pint": "^1.24",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "pestphp/pest": "^4.0",
+        "pestphp/pest": "^5.1",
         "rector/rector": "^2.6",
         "spatie/laravel-typescript-transformer": "^3.3"
     },
