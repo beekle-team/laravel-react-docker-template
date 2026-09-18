@@ -206,7 +206,7 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $post = auth()->user()->posts()->create($request->validated());
+        $post = Post::createForAuthor($request->user(), $request->validated());
 
         return redirect()->route('posts.show', $post);
     }
@@ -235,7 +235,11 @@ class Post extends Model
 }
 ```
 
-### 生のwhere句を並べる
+### 業務条件をスコープで表す
+
+繰り返す条件・業務上の意味がある条件を優先する。単発の単純なwhereは禁止しない。
+Scope内でget/first等の実行、更新、外部通信、auth()/request()を使わない。
+永続化・ロックの具体的な制約は .ai/rules/laravel/architecture-enforcement.md を正とする。
 
 ```php
 // 読みにくい
