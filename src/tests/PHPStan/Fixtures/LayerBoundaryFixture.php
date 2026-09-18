@@ -53,3 +53,21 @@ final class ExampleModel
         Http::get('https://example.test');
     }
 }
+
+namespace Laravel\Cashier\ArchitectureFixture;
+
+use Illuminate\Database\Eloquent\Model;
+
+final class SubscriptionRecord extends Model {}
+
+namespace App\Models\Eloquent\ArchitectureFixture;
+
+use Laravel\Cashier\ArchitectureFixture\SubscriptionRecord;
+
+final class BillingAggregate
+{
+    public function persist(SubscriptionRecord $record): void
+    {
+        $record->fill([])->save();
+    }
+}

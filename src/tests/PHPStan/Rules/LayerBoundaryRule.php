@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
+use Laravel\Cashier\Cashier;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\Scope;
@@ -84,7 +85,7 @@ final class LayerBoundaryRule implements Rule
                 || str_starts_with($target, 'GuzzleHttp\\')
                 || str_starts_with($target, 'Illuminate\\Http\\Client\\')
                 || $target === Http::class
-                || str_starts_with($target, 'Laravel\\Cashier\\');
+                || (class_exists(Cashier::class) && $target === Cashier::class);
             if (($controller || $request || $model) && $external) {
                 $reason = '外部通信・SDK操作は Gateway へ移す';
             }
