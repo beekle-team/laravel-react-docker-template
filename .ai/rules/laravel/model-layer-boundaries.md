@@ -6,6 +6,8 @@ paths: ["src/app/**/*.php"]
 
 アプリケーションの基本処理は Model 層に寄せる。Controller は HTTP 入出力、Form Request、認可、レスポンス制御に集中させる。
 
+具体的な禁止事項、Scopeの純粋性、PHPStanと既存違反の扱いは [architecture-enforcement.md](architecture-enforcement.md) を必ず適用する。
+
 ## Service / Action クラスは禁止
 
 `app/Services/**` や `app/Actions/**` にユースケース処理を集めない。
@@ -85,5 +87,6 @@ Trait / Concern を使う条件:
 1. DB レコードそのものの話なら Eloquent Model に書く
 2. 外部サービスのリソースや API 操作なら Gateway Model に書く
 3. 複数 Model に共通する小さい性質なら Concern に切り出す
-4. Controller は Form Request と Model 呼び出しだけに寄せる
-5. 迷う場合も Service クラスは作らず、Eloquent / Gateway / Concern のどれの責務かを先に決める
+4. 複数ModelとGatewayの連携は目的を限定したSupportへ置く。状態遷移や通信仕様そのものは各Modelへ委譲する
+5. Controller は Form Request と Model 呼び出しだけに寄せる
+6. 迷う場合も Service クラスは作らず、Eloquent / Gateway / Concern / Support のどれの責務かを先に決める

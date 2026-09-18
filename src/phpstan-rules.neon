@@ -1,4 +1,6 @@
 rules:
+    - Tests\PHPStan\Rules\LayerBoundaryRule
+    - Tests\PHPStan\Rules\QueryScopeRule
     - Tests\PHPStan\Rules\ControllerValidationRule
     - Tests\PHPStan\Rules\FeaturePestTestUsesScenarioRule
     - Tests\PHPStan\Rules\FeatureTestMethodUsesScenarioRule
