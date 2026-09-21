@@ -24,12 +24,30 @@ DB 永続化を持つものは `App\Models\Eloquent` の Eloquent Model に書�
 書くもの:
 
 - relationships
-- scopes
+- scopes（`#[Scope]`。下記）
 - casts
 - accessor / mutator
 - そのレコード自身の状態判定
 - そのレコード自身の状態変更
 - その Model の不変条件を守る処理
+
+スコープは `#[Scope]` 属性で書く（`Illuminate\Database\Eloquent\Attributes\Scope`）。メソッド名は素の名前にし（`scopeXxx` の旧来の命名は使わない）、`protected` で宣言して戻り値は `void` にする。記述位置は他の protected メソッドと一緒。
+
+```php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * @param  Builder<self>  $query
+ */
+#[Scope]
+protected function published(Builder $query): void
+{
+    $query->whereNotNull('published_at');
+}
+```
+
+呼び出し側は `Post::query()->published()` になる。旧来の `scopePublished()` でも呼び出し名は同じなので、書き方が混在しても動いて気づけない。`tests/Arch/LayerBoundariesTest.php` は、自分たちのファイルで宣言された `scope` で始まるメソッドがあると失敗する。Cashier の `Billable` などが持ち込む `scopeOnGenericTrial` のように、依存パッケージ側で宣言されたメソッドは見ない。
 
 書かないもの:
 

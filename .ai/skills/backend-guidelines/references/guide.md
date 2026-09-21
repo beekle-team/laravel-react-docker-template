@@ -29,56 +29,69 @@ $posts = Post::query()
 
 ### スコープ定義
 
+`#[Scope]` で書き、メソッド名は `published` のように素の名前にする。`scopePublished` は使わない。`protected` で、戻り値は `void`。呼び出し側は `published()` のままなので、旧記法と混ざっても動く。正本は `.ai/rules/laravel/model-layer-boundaries.md`。
+
 ```php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 class Post extends Model
 {
     // 状態スコープ
-    public function scopePublished(Builder $query): Builder
+    #[Scope]
+    protected function published(Builder $query): void
     {
-        return $query->whereNotNull('published_at');
+        $query->whereNotNull('published_at');
     }
 
-    public function scopeDraft(Builder $query): Builder
+    #[Scope]
+    protected function draft(Builder $query): void
     {
-        return $query->whereNull('published_at');
+        $query->whereNull('published_at');
     }
 
     // フィルタスコープ
-    public function scopeForAuthor(Builder $query, User $author): Builder
+    #[Scope]
+    protected function forAuthor(Builder $query, User $author): void
     {
-        return $query->where('user_id', $author->id);
+        $query->where('user_id', $author->id);
     }
 
-    public function scopeForCategory(Builder $query, Category $category): Builder
+    #[Scope]
+    protected function forCategory(Builder $query, Category $category): void
     {
-        return $query->where('category_id', $category->id);
+        $query->where('category_id', $category->id);
     }
 
-    public function scopeOfType(Builder $query, string $type): Builder
+    #[Scope]
+    protected function ofType(Builder $query, string $type): void
     {
-        return $query->where('type', $type);
+        $query->where('type', $type);
     }
 
     // Eager Loading スコープ
-    public function scopeWithComments(Builder $query): Builder
+    #[Scope]
+    protected function withComments(Builder $query): void
     {
-        return $query->with(['comments', 'comments.user']);
+        $query->with(['comments', 'comments.user']);
     }
 
-    public function scopeWithAuthor(Builder $query): Builder
+    #[Scope]
+    protected function withAuthor(Builder $query): void
     {
-        return $query->with('user');
+        $query->with('user');
     }
 
     // 並び替えスコープ
-    public function scopeRecentFirst(Builder $query): Builder
+    #[Scope]
+    protected function recentFirst(Builder $query): void
     {
-        return $query->orderByDesc('created_at');
+        $query->orderByDesc('created_at');
     }
 
-    public function scopePopular(Builder $query): Builder
+    #[Scope]
+    protected function popular(Builder $query): void
     {
-        return $query->orderByDesc('view_count');
+        $query->orderByDesc('view_count');
     }
 }
 ```
@@ -158,6 +171,8 @@ class Post extends Model
 
 ```php
 // app/Models/Concerns/HasSlug.php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 trait HasSlug
 {
     public static function bootHasSlug(): void
@@ -167,9 +182,10 @@ trait HasSlug
         });
     }
 
-    public function scopeBySlug(Builder $query, string $slug): Builder
+    #[Scope]
+    protected function bySlug(Builder $query, string $slug): void
     {
-        return $query->where('slug', $slug);
+        $query->where('slug', $slug);
     }
 
     public function getRouteKeyName(): string

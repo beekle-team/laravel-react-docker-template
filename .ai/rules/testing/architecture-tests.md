@@ -20,7 +20,7 @@ arch テストで書けるものは arch テストに置く。宣言的で読め
 | ファイル | 内容 |
 | --- | --- |
 | `tests/Arch/PresetsTest.php` | Pest の `php` / `security` / `laravel` preset |
-| `tests/Arch/LayerBoundariesTest.php` | Model 層境界と Controller の責務（`model-layer-boundaries.md` / `form-request-validation.md` 由来） |
+| `tests/Arch/LayerBoundariesTest.php` | Model 層境界、Controller の責務、スコープの `#[Scope]` 記法（`model-layer-boundaries.md` / `form-request-validation.md` 由来） |
 | `tests/Arch/CodingStandardsTest.php` | strict types（`php.md` 由来） |
 | `tests/Arch/PrecognitionTest.php` | Form Request を使う変更系 route の Precognition middleware（`form-request-validation.md` 由来） |
 | `tests/PHPStan/Rules/ControllerValidationRule.php` | Controller での `$request->validate()` / `request()->validate()` 禁止（`form-request-validation.md` 由来） |
