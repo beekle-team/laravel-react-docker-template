@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Tests\Support\LocalScopeNaming;
 
 // .ai/rules/laravel/model-layer-boundaries.md を実行可能な形にした検査。
 
@@ -49,3 +50,15 @@ arch('Controller は入力検証を Form Request に委ねる')
 arch('Controller から DB ファサードを直接使わない')
     ->expect('App\Http\Controllers')
     ->not->toUse(DB::class);
+
+it('モデルのスコープは #[Scope] 属性で書く（scopeXxx の命名を使わない）', function (): void {
+    expect(LocalScopeNaming::violations(app_path('Models')))->toBe([]);
+});
+
+it('scopeXxx の検査は自分たちの宣言だけを見て、#[Scope] と依存パッケージのスコープは見ない', function (): void {
+    $root = dirname(__DIR__).'/Fixtures/Arch/LocalScopes/App';
+
+    expect(LocalScopeNaming::violations($root))->toBe([
+        'Tests\\Fixtures\\Arch\\LocalScopes\\App\\LegacyPost::scopePublished',
+    ]);
+});
