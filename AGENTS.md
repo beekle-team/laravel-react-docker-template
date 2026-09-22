@@ -8,6 +8,7 @@
 - .ai/rules/workspace.md
 - .ai/rules/testing.md
 - .ai/rules/error-handling.md
+- PHP変更時: .ai/rules/laravel/model-layer-boundaries.md と .ai/rules/laravel/architecture-enforcement.md
 
 ## 変更対象ごとの詳細ルール
 
