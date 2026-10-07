@@ -61,6 +61,8 @@ scripts/compose.sh exec app npm run test:unit
 | `MAILPIT_SMTP_PORT` | `1025` | Mailpit SMTP |
 | `MAILPIT_UI_PORT` | `8025` | Mailpit UI |
 
+ホスト側のポートは`127.0.0.1`にだけ公開します。Docker Engine 28.0.0以降では、同じネットワークの他の端末から届きません。それより古い版では同じL2ネットワークの端末から届くことがあるため、Docker Engineを28.0.0以降に上げてください。
+
 ポートが競合する場合は、`src/.env`で該当変数のコメントを外して変更し、サービスを再起動してください。
 Laravelがコンテナ間通信に使う`DB_PORT=5432`と`REDIS_PORT=6379`は変更せず、ホスト側だけを`DB_HOST_PORT`と`REDIS_HOST_PORT`で変更します。
 

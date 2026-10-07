@@ -23,7 +23,7 @@ updates:
   # フロント依存。React 19 への major 更新は React Compiler の target 変更を伴うため、
   # まとめずに個別 PR で来るようにしておく。
   # Vite 8 / plugin-react 6 / TypeScript 7 / laravel-vite-plugin 3 は toolchain の専用作業。
-  # Babel 8 / jsdom 30 / concurrently 10 は Node 22+ 前提で、CI はまだ Node 20。
+  # Babel 8 / jsdom 30 / concurrently 10 は Node 22+ 前提。CI と Docker は Node 22 に上げ済みなので、個別に上げる。
   - package-ecosystem: npm
     directory: /src
     schedule:
