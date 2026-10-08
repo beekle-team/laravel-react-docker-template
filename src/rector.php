@@ -19,6 +19,8 @@ return RectorConfig::configure()
         __DIR__.'/tests',
     ])
     ->withSkip([
+        // Static-analysis fixtures deliberately contain rejected code; preserve diagnostic lines.
+        __DIR__.'/tests/PHPStan/Fixtures',
         __DIR__.'/bootstrap/cache',
         __DIR__.'/storage',
         __DIR__.'/vendor',

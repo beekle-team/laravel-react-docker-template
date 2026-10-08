@@ -1,0 +1,43 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^App\\Http\\Controllers\\Auth\\NewPasswordController\:\:forcefill\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: '#^App\\Http\\Controllers\\Auth\\NewPasswordController\:\:save\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/Auth/NewPasswordController.php
+
+		-
+			message: '#^App\\Http\\Controllers\\Auth\\PasswordController\:\:update\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/Auth/PasswordController.php
+
+		-
+			message: '#^App\\Http\\Controllers\\Auth\\RegisteredUserController\:\:create\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/Auth/RegisteredUserController.php
+
+		-
+			message: '#^App\\Http\\Controllers\\ProfileController\:\:delete\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^App\\Http\\Controllers\\ProfileController\:\:fill\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/ProfileController.php
+
+		-
+			message: '#^App\\Http\\Controllers\\ProfileController\:\:save\(\)\: 永続化・状態変更は Eloquent Model の業務メソッドへ移す。$#'
+			identifier: architecture.layerBoundary
+			count: 1
+			path: app/Http/Controllers/ProfileController.php

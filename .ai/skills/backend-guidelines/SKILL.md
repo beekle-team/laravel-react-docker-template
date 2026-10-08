@@ -15,6 +15,7 @@ Treat `app/**` and `resources/**` paths in the reference as relative to the Lara
 ## Workflow
 
 1. Identify the sections needed for the request.
+   Read .ai/rules/laravel/architecture-enforcement.md before backend edits. Reuse existing scopes and domain methods. Never silence new architecture violations with baseline exceptions.
 2. Read those sections in `references/guide.md` completely.
 3. Apply the repository rules and the guide together.
 4. Run the quality gates required by `AGENTS.md`.
