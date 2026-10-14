@@ -110,16 +110,20 @@ public function getActiveProducts(): Collection
 ```php
 // GOOD: Query Scopeに抽出
 // app/Models/Concerns/HasActiveScope.php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 trait HasActiveScope
 {
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): void
     {
-        return $query->where('status', 'active');
+        $query->where('status', 'active');
     }
 
-    public function scopeLatestFirst(Builder $query): Builder
+    #[Scope]
+    protected function latestFirst(Builder $query): void
     {
-        return $query->orderBy('created_at', 'desc');
+        $query->orderBy('created_at', 'desc');
     }
 }
 
@@ -185,6 +189,8 @@ public function complete(Assessment $assessment): RedirectResponse
 
 ```php
 // app/Models/Concerns/HasSlug.php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 trait HasSlug
 {
     public static function bootHasSlug(): void
@@ -194,25 +200,30 @@ trait HasSlug
         });
     }
 
-    public function scopeBySlug(Builder $query, string $slug): Builder
+    #[Scope]
+    protected function bySlug(Builder $query, string $slug): void
     {
-        return $query->where('slug', $slug);
+        $query->where('slug', $slug);
     }
 }
 ```
 
 ```php
 // app/Models/Concerns/HasStatus.php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 trait HasStatus
 {
-    public function scopeActive(Builder $query): Builder
+    #[Scope]
+    protected function active(Builder $query): void
     {
-        return $query->where('status', 'active');
+        $query->where('status', 'active');
     }
 
-    public function scopePending(Builder $query): Builder
+    #[Scope]
+    protected function pending(Builder $query): void
     {
-        return $query->where('status', 'pending');
+        $query->where('status', 'pending');
     }
 
     public function isActive(): bool
@@ -270,21 +281,24 @@ class RegisterRequest extends FormRequest
 
 ```php
 // app/Models/Concerns/Filterable.php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+
 trait Filterable
 {
-    public function scopeFilter(Builder $query, array $filters): Builder
+    #[Scope]
+    protected function filter(Builder $query, array $filters): void
     {
         foreach ($filters as $field => $value) {
             if ($value !== null) {
                 $query->where($field, $value);
             }
         }
-        return $query;
     }
 
-    public function scopeDateRange(Builder $query, ?string $from, ?string $to): Builder
+    #[Scope]
+    protected function dateRange(Builder $query, ?string $from, ?string $to): void
     {
-        return $query
+        $query
             ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn ($q) => $q->where('created_at', '<=', $to));
     }

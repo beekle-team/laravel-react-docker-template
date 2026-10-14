@@ -6,6 +6,8 @@ paths: ["src/app/**/*.php"]
 
 アプリケーションの基本処理は Model 層に寄せる。Controller は HTTP 入出力、Form Request、認可、レスポンス制御に集中させる。
 
+具体的な禁止事項、Scopeの純粋性、PHPStanと既存違反の扱いは [architecture-enforcement.md](architecture-enforcement.md) を必ず適用する。
+
 ## Service / Action クラスは禁止
 
 `app/Services/**` や `app/Actions/**` にユースケース処理を集めない。
@@ -24,12 +26,30 @@ DB 永続化を持つものは `App\Models\Eloquent` の Eloquent Model に書�
 書くもの:
 
 - relationships
-- scopes
+- scopes（`#[Scope]`。下記）
 - casts
 - accessor / mutator
 - そのレコード自身の状態判定
 - そのレコード自身の状態変更
 - その Model の不変条件を守る処理
+
+スコープは `#[Scope]` 属性で書く（`Illuminate\Database\Eloquent\Attributes\Scope`）。メソッド名は素の名前にし（`scopeXxx` の旧来の命名は使わない）、`protected` で宣言して戻り値は `void` にする。記述位置は他の protected メソッドと一緒。
+
+```php
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
+
+/**
+ * @param  Builder<self>  $query
+ */
+#[Scope]
+protected function published(Builder $query): void
+{
+    $query->whereNotNull('published_at');
+}
+```
+
+呼び出し側は `Post::query()->published()` になる。旧来の `scopePublished()` でも呼び出し名は同じなので、書き方が混在しても動いて気づけない。`tests/Arch/LayerBoundariesTest.php` は、自分たちのファイルで宣言された `scope` で始まるメソッドがあると失敗する。Cashier の `Billable` などが持ち込む `scopeOnGenericTrial` のように、依存パッケージ側で宣言されたメソッドは見ない。
 
 書かないもの:
 
@@ -85,5 +105,6 @@ Trait / Concern を使う条件:
 1. DB レコードそのものの話なら Eloquent Model に書く
 2. 外部サービスのリソースや API 操作なら Gateway Model に書く
 3. 複数 Model に共通する小さい性質なら Concern に切り出す
-4. Controller は Form Request と Model 呼び出しだけに寄せる
-5. 迷う場合も Service クラスは作らず、Eloquent / Gateway / Concern のどれの責務かを先に決める
+4. 複数ModelとGatewayの連携は目的を限定したSupportへ置く。状態遷移や通信仕様そのものは各Modelへ委譲する
+5. Controller は Form Request と Model 呼び出しだけに寄せる
+6. 迷う場合も Service クラスは作らず、Eloquent / Gateway / Concern / Support のどれの責務かを先に決める
