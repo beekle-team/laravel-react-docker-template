@@ -28,6 +28,16 @@ jobs:
     - uses: actions/checkout@v7
       with:
         persist-credentials: false
+        fetch-depth: 0
+
+    - name: Architecture baseline cannot grow
+      if: github.event_name == 'pull_request'
+      working-directory: .
+      env:
+        BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      run: |
+        node --test scripts/check-architecture-baseline.test.mjs
+        node scripts/check-architecture-baseline.mjs "$BASE_SHA"
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
