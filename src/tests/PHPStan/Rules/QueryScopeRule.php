@@ -55,6 +55,7 @@ final class QueryScopeRule implements Rule
 
         if (($node instanceof Expr\MethodCall || $node instanceof Expr\StaticCall)
             && $node->name instanceof Node\Identifier) {
+            $methodName = $node->name->toString();
             $type = $node instanceof Expr\StaticCall
                 ? ($node->class instanceof Node\Name ? new ObjectType($scope->resolveName($node->class)) : $scope->getType($node->class))
                 : $scope->getType($node->var);
@@ -63,7 +64,7 @@ final class QueryScopeRule implements Rule
                 $orm = $orm || new ObjectType($base)->isSuperTypeOf($type)->yes();
             }
 
-            if ($orm && in_array(strtolower($node->name->toString()), [
+            if ($orm && in_array(strtolower($methodName), [
                 'get', 'first', 'firstorfail', 'find', 'findorfail', 'sole', 'all', 'pluck', 'value',
                 'count', 'exists', 'doesntexist', 'sum', 'avg', 'min', 'max', 'paginate', 'simplepaginate',
                 'cursorpaginate', 'cursor', 'lazy', 'lazybyid', 'chunk', 'chunkbyid', 'each',
@@ -72,7 +73,7 @@ final class QueryScopeRule implements Rule
                 'firstorcreate', 'createorfirst', 'updateorcreate', 'destroy', 'forcedelete', 'restore',
                 'attach', 'detach', 'sync', 'toggle', 'push', 'fill', 'forcefill', 'truncate',
             ], true)) {
-                $forbidden = $node->name->toString();
+                $forbidden = $methodName;
             }
 
             foreach ($type->getObjectClassNames() as $target) {
@@ -85,7 +86,7 @@ final class QueryScopeRule implements Rule
                         Http::class, DB::class,
                         Request::class,
                     ], true)) {
-                    $forbidden = $target.'::'.$node->name->toString();
+                    $forbidden = $target.'::'.$methodName;
                 }
             }
         }
