@@ -19,6 +19,8 @@ return RectorConfig::configure()
         __DIR__.'/tests',
     ])
     ->withSkip([
+        // 意図的な旧式スコープを、命名規則の回帰テスト用に保持する。
+        __DIR__.'/tests/Fixtures/Arch/LocalScopes/App/LegacyPost.php',
         __DIR__.'/bootstrap/cache',
         __DIR__.'/storage',
         __DIR__.'/vendor',

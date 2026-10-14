@@ -56,7 +56,7 @@ it('モデルのスコープは #[Scope] 属性で書く（scopeXxx の命名を
 });
 
 it('scopeXxx の検査は自分たちの宣言だけを見て、#[Scope] と依存パッケージのスコープは見ない', function (): void {
-    $root = dirname(__DIR__).'/Fixtures/Arch/LocalScopes/App';
+    $root = __DIR__.'/../Fixtures/Arch/LocalScopes/App';
 
     expect(LocalScopeNaming::violations($root))->toBe([
         'Tests\\Fixtures\\Arch\\LocalScopes\\App\\LegacyPost::scopePublished',
