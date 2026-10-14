@@ -17,12 +17,12 @@ parameters:
     level: 9
 
     ignoreErrors:
-        # Pest のテストクロージャは実行時に TestCase へ束縛されるため、静的解析からは
-        # 継承元の PHPUnit\Framework\TestCase しか見えない。Laravel の TestCase が
+        # Pest 5 のテストクロージャは実行時に TestCase へ束縛されるが、静的解析からは
+        # Pest\PendingCalls\TestCall として見える。Laravel の TestCase が
         # 実際に持つメソッドだけを列挙する（$this->psot() のような打ち間違いは検出したい）。
         -
             identifier: method.notFound
-            message: '#^Call to an undefined method PHPUnit\\Framework\\TestCase::(actingAs|assertAuthenticated|assertGuest|post)\(\)#'
+            message: '#^Call to an undefined method Pest\\PendingCalls\\TestCall::(actingAs|assertAuthenticated|assertGuest|post)\(\)#'
             paths:
                 - tests/Feature
         # arch() / preset() の流暢 API も PendingCalls 経由で解決されるため同様。
