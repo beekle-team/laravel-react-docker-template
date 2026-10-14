@@ -1,8 +1,12 @@
 includes:
+    - ./phpstan-architecture-baseline.neon
     - ./vendor/larastan/larastan/extension.neon
     - ./phpstan-rules.neon
 
 parameters:
+    excludePaths:
+        analyse:
+            - tests/PHPStan/Fixtures
     paths:
         - app/
         - database/
