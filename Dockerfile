@@ -5,7 +5,9 @@ ARG user=laravel-user
 ARG uid=1000
 
 # Install system dependencies
+# ca-certificates: ベースイメージが古くても、取り消された CA を外した最新の CA 束を入れる
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
     git \
     curl \
     libpng-dev \
